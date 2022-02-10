@@ -2,7 +2,8 @@ package database
 
 import (
 	"context"
-	"log"
+	debug "main/Debug"
+	"net/http"
 
 	"cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go/v4"
@@ -22,14 +23,26 @@ func SetUp() {
 	opt := option.WithCredentialsFile("./API/serviceAccountKey.json")
 	app, err := firebase.NewApp(context.Background(), nil, opt)
 	if err != nil {
-		// TODO: proper error handling
-		log.Fatalln(err)
+		var errorMsg debug.Debug
+		errorMsg.Update(
+			http.StatusInternalServerError,
+			"database.SetUp() -> Connect to Firebase",
+			err.Error(),
+			"Unknown",
+		)
+		return
 	}
 
 	client, err = app.Firestore(ctx)
 	if err != nil {
-		// TODO: error
-		log.Fatalln(err)
+		var errorMsg debug.Debug
+		errorMsg.Update(
+			http.StatusInternalServerError,
+			"database.SetUp() -> Create client",
+			err.Error(),
+			"Unknown",
+		)
+		return
 	}
 
 	defer client.Close()
