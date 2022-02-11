@@ -14,8 +14,8 @@ from dictionary import EXTENSIONS as ext # for testExt - move func to dict?
 
 # NOTE - paths will need to be rewritten depending on what layout we end up with WRT Data folder
 
-# Downloads a file from given URL
-def downloadAsWav(url):
+# Downloads an audio file from given URL
+def downloadAudio(url):
     import pafy 
     video = pafy.new(url)
         
