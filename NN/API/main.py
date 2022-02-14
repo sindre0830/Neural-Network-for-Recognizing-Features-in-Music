@@ -13,7 +13,7 @@ def getUptime():
     return ("%i seconds" % math.floor(time.time() - start_time))
 
 
-@app.route("/v1/diag")
+@app.route(dict.DIAGNOSIS_PATH)
 def diagnosis():
     output = {
         "Version": dict.VERSION,
