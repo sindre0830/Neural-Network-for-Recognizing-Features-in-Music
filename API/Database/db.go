@@ -21,7 +21,7 @@ func (db *Database) Setup() error {
 	db.ctx = context.Background()
 
 	// Connect to Firebase with the service account key
-	opt := option.WithCredentialsFile("./API/serviceAccountKey.json")
+	opt := option.WithCredentialsFile("./serviceAccountKey.json")
 	app, err := firebase.NewApp(context.Background(), nil, opt)
 	if err != nil {
 		return err
