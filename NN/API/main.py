@@ -1,9 +1,11 @@
+# import local modules
+import dictionary as dict
+# import foreign modules
 import flask
 import time
 import math
 
 start_time = time.time()
-
 app = flask.Flask("NN-Internal-API")
 
 
@@ -13,4 +15,8 @@ def getUptime():
 
 @app.route("/v1/diag")
 def diagnosis():
-    return {"Uptime": getUptime()}
+    output = {
+        "Version": dict.VERSION,
+        "Uptime": getUptime()
+    }
+    return output
