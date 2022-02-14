@@ -8,6 +8,7 @@ import (
 	"cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go/v4"
 
+	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 )
 
@@ -50,8 +51,9 @@ func (db *Database) Setup() {
 	defer db.client.Close()
 }
 
-// Get a document based on ID from a specific collection.
+// Get a document from a collection.
 func (db *Database) Get(collection string, id string) (interface{}, error) {
+	// Find the document with the specific ID
 	dsnap, err := db.client.Collection(collection).Doc(id).Get(db.ctx)
 	if err != nil {
 		return nil, err
@@ -59,4 +61,23 @@ func (db *Database) Get(collection string, id string) (interface{}, error) {
 
 	data := dsnap.Data()
 	return data, err
+}
+
+// Get all documents from a collection.
+func (db *Database) GetAll(collection string) ([]interface{}, error) {
+	var data []interface{}
+	// Iterate through collection
+	iter := db.client.Collection(collection).Documents(db.ctx)
+	for {
+		el, err := iter.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			return nil, err
+		}
+		// Add current document to the data slice
+		data = append(data, el)
+	}
+	return data, nil
 }
