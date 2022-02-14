@@ -18,10 +18,10 @@ type Database struct {
 
 // Setup sets up the database.
 func (db *Database) Setup() error {
-	// Initialization
+	// initialization
 	db.ctx = context.Background()
 
-	// Connect to Firebase with the service account key
+	// connect to Firebase with the service account key
 	opt := option.WithCredentialsFile("./serviceAccountKey.json")
 	app, err := firebase.NewApp(context.Background(), nil, opt)
 	if err != nil {
@@ -38,7 +38,7 @@ func (db *Database) Setup() error {
 
 // Get a document from a collection.
 func (db *Database) Get(collection string, id string) (map[string]interface{}, error) {
-	// Find the document with the specific ID
+	// find the document with the specific ID
 	dsnap, err := db.client.Collection(collection).Doc(id).Get(db.ctx)
 	if err != nil {
 		return nil, err
@@ -51,7 +51,7 @@ func (db *Database) Get(collection string, id string) (map[string]interface{}, e
 // Get all documents from a collection.
 func (db *Database) GetAll(collection string) ([]map[string]interface{}, error) {
 	var data []map[string]interface{}
-	// Iterate through collection
+	// iterate through collection
 	iter := db.client.Collection(collection).Documents(db.ctx)
 	for {
 		el, err := iter.Next()
@@ -61,7 +61,7 @@ func (db *Database) GetAll(collection string) ([]map[string]interface{}, error) 
 		if err != nil {
 			return nil, err
 		}
-		// Add current document to the data slice
+		// add current document to the data slice
 		data = append(data, el.Data())
 	}
 	return data, nil
