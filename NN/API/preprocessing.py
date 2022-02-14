@@ -69,3 +69,4 @@ def convertFolder(path):
         convertToWav(path + "/" + file, os.path.basename(path))
         print(file + " converted to wav!")
     print("Conversion of " + os.path.basename(path) + " done!")
+    
