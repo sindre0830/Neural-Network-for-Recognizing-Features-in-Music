@@ -11,13 +11,15 @@ import (
 	"google.golang.org/api/option"
 )
 
-var ctx context.Context
-var client *firestore.Client
+type Database struct {
+	ctx    context.Context
+	client *firestore.Client
+}
 
 // SetUp sets up the database
-func SetUp() {
+func (db *Database) SetUp() {
 	// Initialization
-	ctx = context.Background()
+	db.ctx = context.Background()
 
 	// Connect to Firebase with the service account key
 	opt := option.WithCredentialsFile("./API/serviceAccountKey.json")
@@ -33,7 +35,7 @@ func SetUp() {
 		return
 	}
 
-	client, err = app.Firestore(ctx)
+	db.client, err = app.Firestore(db.ctx)
 	if err != nil {
 		var errorMsg debug.Debug
 		errorMsg.Update(
@@ -45,5 +47,5 @@ func SetUp() {
 		return
 	}
 
-	defer client.Close()
+	defer db.client.Close()
 }
