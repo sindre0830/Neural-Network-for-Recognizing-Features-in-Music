@@ -52,7 +52,7 @@ func (db *Database) Setup() {
 }
 
 // Get a document from a collection.
-func (db *Database) Get(collection string, id string) (interface{}, error) {
+func (db *Database) Get(collection string, id string) (map[string]interface{}, error) {
 	// Find the document with the specific ID
 	dsnap, err := db.client.Collection(collection).Doc(id).Get(db.ctx)
 	if err != nil {
@@ -64,8 +64,8 @@ func (db *Database) Get(collection string, id string) (interface{}, error) {
 }
 
 // Get all documents from a collection.
-func (db *Database) GetAll(collection string) ([]interface{}, error) {
-	var data []interface{}
+func (db *Database) GetAll(collection string) ([]map[string]interface{}, error) {
+	var data []map[string]interface{}
 	// Iterate through collection
 	iter := db.client.Collection(collection).Documents(db.ctx)
 	for {
@@ -77,7 +77,7 @@ func (db *Database) GetAll(collection string) ([]interface{}, error) {
 			return nil, err
 		}
 		// Add current document to the data slice
-		data = append(data, el)
+		data = append(data, el.Data())
 	}
 	return data, nil
 }
