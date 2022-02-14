@@ -2,8 +2,6 @@ package database
 
 import (
 	"context"
-	debug "main/Debug"
-	"net/http"
 
 	"cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go/v4"
@@ -18,7 +16,7 @@ type Database struct {
 }
 
 // Setup sets up the database.
-func (db *Database) Setup() {
+func (db *Database) Setup() error {
 	// Initialization
 	db.ctx = context.Background()
 
@@ -26,29 +24,16 @@ func (db *Database) Setup() {
 	opt := option.WithCredentialsFile("./API/serviceAccountKey.json")
 	app, err := firebase.NewApp(context.Background(), nil, opt)
 	if err != nil {
-		var errorMsg debug.Debug
-		errorMsg.Update(
-			http.StatusInternalServerError,
-			"database.SetUp() -> Connect to Firebase",
-			err.Error(),
-			"Unknown",
-		)
-		return
+		return err
 	}
 
 	db.client, err = app.Firestore(db.ctx)
 	if err != nil {
-		var errorMsg debug.Debug
-		errorMsg.Update(
-			http.StatusInternalServerError,
-			"database.SetUp() -> Create client",
-			err.Error(),
-			"Unknown",
-		)
-		return
+		return err
 	}
 
 	defer db.client.Close()
+	return nil
 }
 
 // Get a document from a collection.
@@ -60,7 +45,7 @@ func (db *Database) Get(collection string, id string) (map[string]interface{}, e
 	}
 
 	data := dsnap.Data()
-	return data, err
+	return data, nil
 }
 
 // Get all documents from a collection.
@@ -85,8 +70,10 @@ func (db *Database) GetAll(collection string) ([]map[string]interface{}, error) 
 // Add a document to a collection.
 func (db *Database) Add(collection string, id string, data interface{}) error {
 	_, err := db.client.Collection(collection).Doc(id).Set(db.ctx, data)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
+}
+
+func (db *Database) Delete(collection string, id string) error {
+	_, err := db.client.Collection(collection).Doc(id).Delete(db.ctx)
+	return err
 }
