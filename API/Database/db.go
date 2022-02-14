@@ -73,6 +73,7 @@ func (db *Database) Add(collection string, id string, data interface{}) error {
 	return err
 }
 
+// Delete a document from a collection.
 func (db *Database) Delete(collection string, id string) error {
 	_, err := db.client.Collection(collection).Doc(id).Delete(db.ctx)
 	return err
