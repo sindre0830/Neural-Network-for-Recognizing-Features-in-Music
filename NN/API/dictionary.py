@@ -19,5 +19,4 @@ def printOperation(message):
 
 # Print divider in console.
 def printDivider():
-    print("\n") 
-    
+    print("\n")
