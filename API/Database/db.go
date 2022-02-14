@@ -10,6 +10,7 @@ import (
 	"google.golang.org/api/option"
 )
 
+// Database structure contains db variables
 type Database struct {
 	ctx    context.Context
 	client *firestore.Client
@@ -32,7 +33,6 @@ func (db *Database) Setup() error {
 		return err
 	}
 
-	defer db.client.Close()
 	return nil
 }
 
