@@ -81,3 +81,12 @@ func (db *Database) GetAll(collection string) ([]map[string]interface{}, error) 
 	}
 	return data, nil
 }
+
+// Add a document to a collection.
+func (db *Database) Add(collection string, id string, data interface{}) error {
+	_, err := db.client.Collection(collection).Doc(id).Set(db.ctx, data)
+	if err != nil {
+		return err
+	}
+	return nil
+}
