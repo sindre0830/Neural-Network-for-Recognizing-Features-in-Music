@@ -17,7 +17,7 @@ def downloadAudio(url):
         if best == 0 or temp > best:
             best = idx
         print(val.bitrate, val.extension, val.get_filesize())
-    filename = (video.title + "." +audiostreams[best].extension).replace(" ", "_")
+    filename = (video.title + "." + audiostreams[best].extension).replace(" ", "_")
     if os.path.exists("../Data/Download/" + filename) is False:
         # DL is randomly throttled @ 60kb/s...
         audiostreams[best].download(filepath="../Data/Download/" + filename)
@@ -46,7 +46,7 @@ def testExt(file):
 
 # Function iterating through folders containing files to be converted to wav.
 def convertDataset(path):
-    dirs = [folder for folder in os.listdir(path) if os.path.isdir(os.path.join(path, folder))] # only directories
+    dirs = [folder for folder in os.listdir(path) if os.path.isdir(os.path.join(path, folder))]
     print("Folders acquired, entering...")
     if os.path.exists("Data/" + dirs[0]) is False:
         convertFolder(path + "/" + dirs[0])
@@ -59,4 +59,3 @@ def convertFolder(path):
         convertToWav(path + "/" + file, os.path.basename(path))
         print(file + " converted to wav!")
     print("Conversion of " + os.path.basename(path) + " done!")
-    
