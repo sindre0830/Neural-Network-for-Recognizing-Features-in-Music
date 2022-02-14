@@ -4,15 +4,12 @@ import flask_restful
 app = flask.Flask("NN-Internal-API")
 api = flask_restful.Api(app)
 
-class SongAnalysis(flask_restful.Resource):
+
+class Diagnosis(flask_restful.Resource):
     def get(self):
-        youtubeID = flask.request.args.get(key="id")
+        return {}, 200
 
-        if youtubeID == None:
-            return {"Message": "Error occured, requires a YouTube ID."}, 400
 
-        return {"Message": youtubeID}, 200
-
-api.add_resource(SongAnalysis, "/analyze")
+api.add_resource(Diagnosis, "/v1/diag")
 
 app.run()
