@@ -16,8 +16,8 @@ type Database struct {
 	client *firestore.Client
 }
 
-// SetUp sets up the database
-func (db *Database) SetUp() {
+// Setup sets up the database.
+func (db *Database) Setup() {
 	// Initialization
 	db.ctx = context.Background()
 
@@ -48,4 +48,15 @@ func (db *Database) SetUp() {
 	}
 
 	defer db.client.Close()
+}
+
+// Get a document based on ID from a specific collection.
+func (db *Database) Get(collection string, id string) (interface{}, error) {
+	dsnap, err := db.client.Collection(collection).Doc(id).Get(db.ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	data := dsnap.Data()
+	return data, err
 }
