@@ -4,6 +4,7 @@ on:
   push:
     paths:
     - 'API/**'
+  pull_request:
 
 jobs:
 

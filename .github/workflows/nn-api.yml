@@ -4,6 +4,7 @@ on:
   push:
     paths:
     - 'NN/API**'
+  pull_request:
 
 jobs:
   build:

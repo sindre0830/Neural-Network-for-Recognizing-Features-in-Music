@@ -4,6 +4,7 @@ on:
   push:
     paths:
     - 'NN/Model-Training/**'
+  pull_request:
 
 jobs:
   build:
