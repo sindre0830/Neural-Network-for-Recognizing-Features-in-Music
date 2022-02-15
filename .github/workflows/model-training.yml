@@ -1,6 +1,8 @@
 name: Model Training
 
 on: [push, pull_request]
+  paths:
+  - 'NN/Model-Training/**'
 
 jobs:
   build:
