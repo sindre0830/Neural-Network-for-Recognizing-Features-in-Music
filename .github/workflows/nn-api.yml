@@ -1,8 +1,9 @@
 name: NN Internal API
 
-on: [push, pull_request]
-  paths:
-  - 'NN/API**'
+on:
+  push:
+    paths:
+    - 'NN/API**'
 
 jobs:
   build:

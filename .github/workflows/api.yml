@@ -1,8 +1,9 @@
 name: API
 
-on: [push, pull_request]
-  paths:
-  - 'API/**'
+on:
+  push:
+    paths:
+    - 'API/**'
 
 jobs:
 
