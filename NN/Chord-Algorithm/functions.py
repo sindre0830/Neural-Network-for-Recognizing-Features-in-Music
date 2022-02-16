@@ -3,14 +3,14 @@ import matplotlib.pyplot as plt
 import librosa
 import librosa.display
 import numpy as np
+from pydub.utils import mediainfo
 
-# Splits song into 512-frame overlapping windows, and loads all with librosa
-def splitSong(path, samplerate, win_s=512, hop_s=256):
-    data = []
-    samples = []
-    # separate song here, incomplete!!!
-    for index, a in enumerate(b):
-        data[index], samples[index] = librosa.load(path, duration=win_s)
+# Loads with librosa
+# If we want to split and use those for NN training, we might have to manually keep
+# track of the splits by passing in individually and storing in arrays...
+def songHandler(path):
+    data, sample = librosa.load(path, sr = int(mediainfo(path)['sample_rate']))
+    plotChroma(data, sample)
 
     
 def plotChroma(data, sample):
