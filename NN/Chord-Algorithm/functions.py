@@ -11,8 +11,10 @@ from pydub.utils import mediainfo
 def songHandler(path):
     data, sample = librosa.load(path, sr = int(mediainfo(path)['sample_rate']))
     plotChroma(data, sample)
-
     
+    
+# Performs plotting
+# Rather than plot, we want to just get the data out
 def plotChroma(data, sample):
     librosa.feature.chroma_stft(y=data, sr=sample)
 
@@ -30,3 +32,7 @@ def plotChroma(data, sample):
     ax[0].label_outer()
     img = librosa.display.specshow(chroma, y_axis='chroma', x_axis='time', ax=ax[1])
     fig.colorbar(img, ax=[ax[1]])
+    
+    
+# If we want to manually split the song
+#def splitSong(path):
