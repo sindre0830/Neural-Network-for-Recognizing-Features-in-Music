@@ -1,9 +1,11 @@
-# paths
+# api info
+VERSION = 'v1'
+# endpoint paths
+DIAGNOSIS_PATH = '/' + VERSION + '/diag'
+# directory paths
 BASE_DIR = "Data"
-
-# Extensions for conversion to wav
+# extensions for conversion to wav
 EXTENSIONS = [".m4v", ".webm", ".mp3", ".mp4"]
-
 # status messages
 DONE = 'DONE'
 SUCCESS = 'SUCCESS'
@@ -17,5 +19,4 @@ def printOperation(message):
 
 # Print divider in console.
 def printDivider():
-    print("\n") 
-    
+    print("\n")

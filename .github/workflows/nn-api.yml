@@ -1,9 +1,9 @@
-name: Model Training
+name: NN Internal API
 
 on:
   push:
     paths:
-    - 'NN/Model-Training/**'
+    - 'NN/API**'
   pull_request:
 
 jobs:
@@ -18,18 +18,18 @@ jobs:
         python-version: '3.9.10'
 
     - name: Install dependencies
-      working-directory: ./NN/Model-Training
+      working-directory: ./NN/API
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip freeze > requirements.txt
 
     - name: Build
-      working-directory: ./NN/Model-Training
+      working-directory: ./NN/API
       run: python -m py_compile ./main.py
 
     - name: Syntax checker
-      working-directory: ./NN/Model-Training
+      working-directory: ./NN/API
       run: |
         pip install flake8
         flake8 . --max-line-length 150
