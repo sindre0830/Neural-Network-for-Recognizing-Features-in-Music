@@ -24,6 +24,6 @@ func getResults(w http.ResponseWriter) {
 		return
 	}
 
-	// Encode data
+	// encode data
 	json.NewEncoder(w).Encode(data)
 }
