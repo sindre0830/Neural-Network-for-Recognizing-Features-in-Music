@@ -9,6 +9,7 @@ import (
 func MethodHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:
+		post(w, r)
 	default:
 		var errorMsg debug.Debug
 		errorMsg.Update(
@@ -17,5 +18,6 @@ func MethodHandler(w http.ResponseWriter, r *http.Request) {
 			"method validation: validating method",
 			"Method not implemented",
 		)
+		errorMsg.Print()
 	}
 }
