@@ -19,7 +19,7 @@ jobs:
 
     - name: Install dependencies
       working-directory: ./Web/song-analysis-app
-      run: npm install # add dependencies here
+      run: npm install
 
     - name: Build
       working-directory: ./Web/song-analysis-app
