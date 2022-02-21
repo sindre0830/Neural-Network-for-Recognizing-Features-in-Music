@@ -51,7 +51,7 @@ def plotChroma(data, sample, duration):
         new_chroma = np.swapaxes(chroma,0,1)
         for pitch in new_chroma:
             oneD = pitch.flatten()
-            pitches.append(getChord(oneD))
+            pitches.append(getPitch(oneD))
         
         # Basic handling of pitches - currently either prints each frame,
         # or prints the dominant pitch (if any) for the section (6 seconds windows)
@@ -86,8 +86,13 @@ def plotSong(chroma, source):
     fig.colorbar(img, ax=[ax[1]])
 
 
-# Defines the chord of one frame from the pitch values
-def getChord(pitch):
+# Defines the dominant pitch of one frame from the pitch values
+def getPitch(pitch):
     max_value = np.max(pitch)
     max_index = np.where(pitch == max_value)
     return dict.pitches[max_index[0][0]]
+
+
+# To be implemented
+#def getChord(pitch):
+    
