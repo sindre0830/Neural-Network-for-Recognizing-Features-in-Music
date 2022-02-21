@@ -50,4 +50,14 @@ func post(w http.ResponseWriter, r *http.Request) {
 		errorMsg.Print()
 		return
 	}
+
+	// get the id from the link
+	linkArr := strings.Split(song.Link, "=")
+	var id string
+	// there are two ways to send a link, so we will have to check which link format is sent to be able to retrieve the id
+	if len(linkArr) <= 1 {
+		id = strings.Split(song.Link, "/")[3]
+	} else {
+		id = linkArr[1]
+	}
 }
