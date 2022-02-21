@@ -21,6 +21,7 @@ func getResults(w http.ResponseWriter) {
 			err.Error(),
 			"Unknown",
 		)
+		errorMsg.Print()
 		return
 	}
 
