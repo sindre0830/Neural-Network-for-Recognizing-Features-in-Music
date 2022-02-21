@@ -1,5 +1,5 @@
 package songanalysis
 
 type Song struct {
-	Link string
+	Link string `json:"link"`
 }
