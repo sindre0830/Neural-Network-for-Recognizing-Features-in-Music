@@ -8,8 +8,8 @@ import (
 	"strings"
 )
 
-// post sends a YouTube link
-func post(w http.ResponseWriter, r *http.Request) {
+// post handles post request to the song analysis endpoint
+func (song *Song) post(w http.ResponseWriter, r *http.Request) {
 	// validate URL
 	path := strings.Split(r.URL.Path, "/")
 	if len(path) != 2 {
@@ -25,7 +25,6 @@ func post(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// decode body to song structure
-	var song Song
 	err := json.NewDecoder(r.Body).Decode(&song)
 	if err != nil {
 		var errorMsg debug.Debug

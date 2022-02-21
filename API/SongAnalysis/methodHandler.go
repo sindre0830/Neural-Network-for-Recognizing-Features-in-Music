@@ -9,7 +9,8 @@ import (
 func MethodHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:
-		post(w, r)
+		var song Song
+		song.post(w, r)
 	default:
 		var errorMsg debug.Debug
 		errorMsg.Update(
