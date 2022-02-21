@@ -2,6 +2,7 @@ package songanalysis
 
 import (
 	"encoding/json"
+	"fmt"
 	debug "main/Debug"
 	"net/http"
 	"strings"
@@ -60,4 +61,6 @@ func post(w http.ResponseWriter, r *http.Request) {
 	} else {
 		id = linkArr[1]
 	}
+
+	fmt.Println(id)
 }
