@@ -44,23 +44,23 @@ def plotChroma(data, sample, duration):
         
         # This is where we want to be instead analyzing the data and getting
         # the chord from the pitches
-        #plotSong(chroma, source)
-        pitches = []
-        dominant_pitch = ""
-
-        new_chroma = np.swapaxes(chroma,0,1)
-        for pitch in new_chroma:
-            oneD = pitch.flatten()
-            pitches.append(getPitch(oneD))
+        plotSong(chroma, source)
+        # pitches = []
+        # dominant_pitch = ""
         
-        # Basic handling of pitches - currently either prints each frame,
-        # or prints the dominant pitch (if any) for the section (6 seconds windows)
-        most_frequent = mode(pitches)
-        if pitches.count(most_frequent) / len(pitches) > 0.3:
-            dominant_pitch = most_frequent
-            print("The dominant pitch is: " + dominant_pitch)
-        else:
-            print("No dominant pitch found for this part.")
+        # new_chroma = np.swapaxes(chroma,0,1)
+        # for pitch in new_chroma:
+        #     oneD = pitch.flatten()
+        #     pitches.append(getPitch(oneD))      # We want to get Chords instead
+        
+        # # Basic handling of pitches - currently either prints each frame,
+        # # or prints the dominant pitch (if any) for the section (6 seconds windows)
+        # most_frequent = mode(pitches)
+        # if pitches.count(most_frequent) / len(pitches) > 0.3:
+        #     dominant_pitch = most_frequent
+        #     print("The dominant pitch is: " + dominant_pitch)
+        # else:
+        #     print("No dominant pitch found for this part.")
             
     
 # Splits song into small windows
