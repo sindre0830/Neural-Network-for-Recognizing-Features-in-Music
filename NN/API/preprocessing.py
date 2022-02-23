@@ -28,11 +28,12 @@ def downloadAudio(id):
 
 
 # Attempts to convert a file into wav.
-def convertToWav(file, folder=""):
-    newpath = "../Data/" + folder + "/" + Path(file).stem + ".wav"
-    if os.path.exists(newpath) is False and testExt(file):
-        sound = AudioSegment.from_file(file)
-        sound.export(newpath, format="wav")
+def convertToWav(file):
+    path = "Data/Audio/" + file
+    newPath = "Data/Audio/" + Path(file).stem + ".wav"
+    if os.path.exists(newPath) is False and testExt(file):
+        sound = AudioSegment.from_file(path)
+        sound.export(newPath, format="wav")
     else:
         pass
 

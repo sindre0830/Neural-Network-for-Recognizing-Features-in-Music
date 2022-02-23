@@ -1,4 +1,5 @@
 # import local modules
+from lib2to3.pytree import convert
 import dictionary as dict
 import preprocessing
 # import foreign modules
@@ -32,11 +33,12 @@ def analysis():
     id = flask.request.args.get('id', None)
     if id is None:
         error = {
-            "Msg": "Requires a YouTube ID like this '.../v1/analysis?id=dQw4w9WgXcQ'"
+            "Msg": "Requires a YouTube ID, example: '.../v1/analysis?id=dQw4w9WgXcQ'"
         }
         return error
     # preprocess audio file
-    preprocessing.downloadAudio(id)
+    filename = preprocessing.downloadAudio(id)
+    preprocessing.convertToWav(filename)
     # return output
     output = {
         "id": id
