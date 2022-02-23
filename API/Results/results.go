@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-// get gets all song results from the database.
+// get all song results from the database.
 func get(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
 
@@ -19,7 +19,7 @@ func get(w http.ResponseWriter, r *http.Request) {
 		var errorMsg debug.Debug
 		errorMsg.Update(
 			http.StatusInternalServerError,
-			"getResults() -> Getting results from database",
+			"getResults() -> database.GetAll() -> Getting results from database",
 			err.Error(),
 			"Unknown",
 		)
@@ -31,7 +31,7 @@ func get(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(data)
 }
 
-// update updates a song in the database.
+// update a song in the database.
 func update(w http.ResponseWriter, r *http.Request) {
 	var errorMsg debug.Debug
 
@@ -80,7 +80,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		errorMsg.Update(
 			http.StatusInternalServerError,
-			"update() -> Updating data in database",
+			"update() -> database.Update() -> Updating data in database",
 			err.Error(),
 			"Unknown",
 		)
