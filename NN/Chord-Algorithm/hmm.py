@@ -1,7 +1,12 @@
 """Automatic chord recogniton with HMM, as suggested by Juan P. Bello in
 'A mid level representation for harmonic content in music signals'
 @author ORCHISAMA
-Source: https://github.com/orchidas/Chord-Recognition"""
+Source: https://github.com/orchidas/Chord-Recognition
+Other uses:
+https://github.com/salilnavgire/Chord-recognition (couldn't get audiolab to download)
+https://github.com/alexanderlerch/pyACA/
+
+"""
 
 # external
 from __future__ import division
