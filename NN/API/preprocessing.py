@@ -8,7 +8,8 @@ import pafy
 
 
 # Downloads an audio file from given URL.
-def downloadAudio(url):
+def downloadAudio(id):
+    url = "https://www.youtube.com/watch?v=" + id
     video = pafy.new(url)
     audiostreams = video.audiostreams
     best = 0
@@ -18,9 +19,9 @@ def downloadAudio(url):
             best = idx
         print(val.bitrate, val.extension, val.get_filesize())
     filename = (video.title + "." + audiostreams[best].extension).replace(" ", "_")
-    if os.path.exists("../Data/Download/" + filename) is False:
+    if os.path.exists("Data/Audio/" + filename) is False:
         # DL is randomly throttled @ 60kb/s...
-        audiostreams[best].download(filepath="../Data/Download/" + filename)
+        audiostreams[best].download(filepath="Data/Audio/" + filename)
     else:
         print("File exists: " + filename)
     return filename

@@ -1,5 +1,6 @@
 # import local modules
 import dictionary as dict
+import preprocessing
 # import foreign modules
 import flask
 import time
@@ -34,6 +35,8 @@ def analysis():
             "Msg": "Requires a YouTube ID like this '.../v1/analysis?id=dQw4w9WgXcQ'"
         }
         return error
+    # preprocess audio file
+    preprocessing.downloadAudio(id)
     # return output
     output = {
         "id": id
