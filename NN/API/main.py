@@ -37,9 +37,8 @@ def analysis():
         return error
     # preprocess audio file
     filename = preprocessing.downloadAudio(id)
-    preprocessing.convertToWav(filename)
     # return output
     output = {
-        "id": id
+        "path": filename
     }
     return output
