@@ -77,6 +77,12 @@ func (db *Database) Add(collection string, id string, data interface{}) error {
 	return err
 }
 
+// Update a document.
+func (db *Database) Update(collection string, id string, data interface{}) error {
+	_, err := db.Client.Collection(collection).Doc(id).Set(db.Ctx, data, firestore.MergeAll)
+	return err
+}
+
 // Delete a document from a collection.
 func (db *Database) Delete(collection string, id string) error {
 	_, err := db.Client.Collection(collection).Doc(id).Delete(db.Ctx)
