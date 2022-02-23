@@ -27,7 +27,15 @@ def diagnosis():
 # Analysis endpoint.
 @app.route(dict.ANALYSIS_PATH)
 def analysis():
+    # get youtube id
+    id = flask.request.args.get('id', None)
+    if id is None:
+        error = {
+            "Msg": "Requires a YouTube ID like this '.../v1/analysis?id=dQw4w9WgXcQ'"
+        }
+        return error
+    # return output
     output = {
-        "field": "value"
+        "id": id
     }
     return output
