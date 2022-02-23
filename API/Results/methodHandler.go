@@ -9,7 +9,9 @@ import (
 func MethodHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
-		getResults(w)
+		get(w, r)
+	case http.MethodPut:
+		update(w, r)
 	default:
 		var errorMsg debug.Debug
 		errorMsg.Update(
