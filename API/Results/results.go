@@ -33,13 +33,14 @@ func get(w http.ResponseWriter, r *http.Request) {
 
 // update updates a song in the database.
 func update(w http.ResponseWriter, r *http.Request) {
+	var errorMsg debug.Debug
+
 	// validate URL
 	path := strings.Split(r.URL.Path, "/")
 	if len(path) != 3 {
-		var errorMsg debug.Debug
 		errorMsg.Update(
 			http.StatusBadRequest,
-			"post() -> Validating URL",
+			"update() -> Validating URL",
 			"url validation: incorrect format",
 			"URL format not valid",
 		)
@@ -50,14 +51,41 @@ func update(w http.ResponseWriter, r *http.Request) {
 	// make sure an ID is provided by the user
 	id := path[2]
 	if len(id) < 1 {
-		var errorMsg debug.Debug
 		errorMsg.Update(
 			http.StatusBadRequest,
-			"post() -> Validating URL",
+			"update() -> Validating URL",
 			"url validation: incorrect format",
 			"URL format not valid",
 		)
 		errorMsg.Print()
 		return
 	}
+
+	// decode body to a map
+	var data map[string]interface{}
+	err := json.NewDecoder(r.Body).Decode(&data)
+	if err != nil {
+		errorMsg.Update(
+			http.StatusBadRequest,
+			"update() -> Decoding body",
+			err.Error(),
+			"Unknown",
+		)
+		errorMsg.Print()
+		return
+	}
+
+	// update data in database
+	err = database.Firestore.Update("songs", id, data)
+	if err != nil {
+		errorMsg.Update(
+			http.StatusInternalServerError,
+			"update() -> Updating data in database",
+			err.Error(),
+			"Unknown",
+		)
+		return
+	}
+
+	http.Error(w, "Document successfully updated", http.StatusOK)
 }
