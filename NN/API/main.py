@@ -1,5 +1,4 @@
 # import local modules
-from lib2to3.pytree import convert
 import dictionary as dict
 import preprocessing
 # import foreign modules
