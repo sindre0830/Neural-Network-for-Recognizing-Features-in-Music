@@ -84,6 +84,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 			err.Error(),
 			"Unknown",
 		)
+		errorMsg.Print()
 		return
 	}
 
