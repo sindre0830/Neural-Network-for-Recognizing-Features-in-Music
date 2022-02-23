@@ -79,7 +79,15 @@ func (db *Database) Add(collection string, id string, data interface{}) error {
 
 // Update a document.
 func (db *Database) Update(collection string, id string, data interface{}) error {
-	_, err := db.Client.Collection(collection).Doc(id).Set(db.Ctx, data, firestore.MergeAll)
+	// check if the ID is a valid document
+	_, err := db.Client.Collection(collection).Doc(id).Get(db.Ctx)
+	if err != nil {
+		// returning prevents the creation of a new document
+		return err
+	}
+
+	// update with new data
+	_, err = db.Client.Collection(collection).Doc(id).Set(db.Ctx, data, firestore.MergeAll)
 	return err
 }
 
