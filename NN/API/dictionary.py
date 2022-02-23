@@ -2,6 +2,7 @@
 VERSION = 'v1'
 # endpoint paths
 DIAGNOSIS_PATH = '/' + VERSION + '/diag'
+ANALYSIS_PATH = '/' + VERSION + '/analysis'
 # directory paths
 BASE_DIR = "Data"
 # extensions for conversion to wav

@@ -22,3 +22,12 @@ def diagnosis():
         "Uptime": getUptime()
     }
     return output
+
+
+# Analysis endpoint.
+@app.route(dict.ANALYSIS_PATH)
+def analysis():
+    output = {
+        "field": "value"
+    }
+    return output
