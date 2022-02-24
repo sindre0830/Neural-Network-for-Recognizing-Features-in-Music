@@ -1,6 +1,7 @@
 # import local modules
 import dictionary as dict
 import preprocessing
+import beat_algorithm
 # import foreign modules
 import flask
 import time
@@ -37,6 +38,8 @@ def analysis():
         return error
     # preprocess audio file
     filename = preprocessing.downloadAudio(id)
+    # analyze song
+    beat_algorithm.analyseBeats(dict.AUDIO_DIR + filename)
     # return output
     output = {
         "path": filename
