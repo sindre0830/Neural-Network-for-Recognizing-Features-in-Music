@@ -14,7 +14,7 @@ def analyseBeats(path):
     if bpm is not None:
         print(bpm)
     if beats is not None:
-        print(beats)   
+        print(beats)
     print(info['sample_rate'])
 
 
@@ -38,7 +38,7 @@ def beats_to_bpm(beats, path):
 # output: can specify only BPM or only timestamp output
 # Function modified from official Aubio demo file
 # Source: https://github.com/aubio/aubio/blob/master/python/demos/demo_bpm_extract.py
-def get_file_bpm(path, samplerate=48000, win_s=512, hop_s=256, output=None): 
+def get_file_bpm(path, samplerate=48000, win_s=512, hop_s=256, output=None):
     src = aubio.source(path, samplerate, hop_s)
     samplerate = src.samplerate
     o = aubio.tempo("specdiff", win_s, hop_s, samplerate)
