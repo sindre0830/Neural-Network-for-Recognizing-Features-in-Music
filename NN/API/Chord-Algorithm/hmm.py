@@ -15,9 +15,11 @@ import os
 from scipy.io.wavfile import read
 import numpy as np 
 import json
+import matplotlib.pyplot as plt
 
 #internal
 import dictionary as dict
+
 
 """calculates multivariate gaussian matrix from mean and covariance matrices"""
 def multivariate_gaussian(x, meu, cov):
@@ -104,9 +106,7 @@ def initialize(chroma, chords, templates, nested_cof):
     return (PI,A,B)
     
 
-
 """Viterbi algorithm to find Path with highest probability - dynamic programming"""
-
 def viterbi(PI,A,B):
     (nrow, ncol) = np.shape(B)
     path = np.zeros((nrow, ncol))
@@ -123,9 +123,8 @@ def viterbi(PI,A,B):
     return (path,states)
 
 
-
 # Handles analysing and finding chords using a hidden markov matrix
-def chordHandler(path):
+def getMarkovChords(path):
     """read from JSON file to get chord templates"""
     with open('chord_templates.json', 'r') as fp:
         templates_json = json.load(fp)
@@ -182,14 +181,15 @@ def chordHandler(path):
     indices = np.argmax(path,axis=0)
     final_states = np.zeros(nFrames)
 
-    print(indices)
-
+    print(indices) # debug
+    
     #find no chord zone
     set_zero = np.where(np.max(path,axis=0) < 0.3*np.max(path))[0]
     if np.size(set_zero) != 0:
         indices[set_zero] = -1
 
-    print(indices)
+    print(indices) # debug
+    
     #identify chords
     for i in range(nFrames):
         if indices[i] == -1:
@@ -202,13 +202,13 @@ def chordHandler(path):
     # for i in range(nFrames):
     #     print(timestamp[i], final_chords[i])
         
-    import matplotlib.pyplot as plt
     id_chord = np.zeros(nFrames, dtype='int32')
+    
     plt.figure(2)
     plt.yticks(np.arange(24), dict.chords)
     plt.plot(timestamp, final_chords)
     plt.xlabel('Time in seconds')
     plt.ylabel('Chords')
-    plt.title('Identified chords')
+    plt.title('Identified chords - HMM')
     plt.grid(True)
     plt.show()

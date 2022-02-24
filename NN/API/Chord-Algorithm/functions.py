@@ -4,20 +4,33 @@ import librosa
 import librosa.display
 import numpy as np
 from pydub.utils import mediainfo
+from pydub import AudioSegment
 from math import floor
 from statistics import mode
+from pathlib import Path, PurePosixPath
 
 # internal
 import dictionary as dict
+import chordACA
+import hmm
+import match_templates as temp
+
+
+# handles running various chord recognition algorithms
+def songHandler(path):
+    chordACA.getChords(path)        
+    hmm.getMarkovChords(path)
+    temp.templateMatch(path)        # Seems really bad
+    
 
 # Loads with librosa
 # If we want to split and use those for  NN training, we might have to manually keep
 # track of the splits by passing in individually and storing in arrays...
-def songHandler(path):
+def getLibRosaChords(path):
     data, sample = librosa.load(path, sr = int(mediainfo(path)['sample_rate']))
     plotChroma(data, sample, floor(float(mediainfo(path)['duration'])))        # Not sure we want floor?
-    
-    
+        
+
 # Performs plotting
 # Rather than plot, we want to just get the data out
 def plotChroma(data, sample, duration):
@@ -95,4 +108,16 @@ def getPitch(pitch):
 
 # To be implemented
 #def getChord(pitch):
+
+def splitSong(path):
+    info = mediainfo(path)
+    d = floor(float(info["duration"]))
+    slices = d // dict.win_s
+    m = 1000
+    
+    for slice in range(slices):
+        newAudio = AudioSegment.from_wav(path)
+        newAudio = newAudio[dict.win_s*slice*m : (dict.win_s*(slice+1)*m) - 1]
+        newAudio.export(dict.BASE_DIR + dict.SLICE_DIR + PurePosixPath(path).stem + str(slice)+".wav", format="wav")
+    print("Song " + PurePosixPath(path).stem + " successfully split into " + str(slices) + " slices.")
     

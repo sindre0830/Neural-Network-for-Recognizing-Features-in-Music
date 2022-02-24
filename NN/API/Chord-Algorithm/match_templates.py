@@ -71,15 +71,14 @@ def templateMatch(path):
     #if max_cor[n] < threshold, then no chord is played
     #might need to change threshold value
     id_chord[np.where(max_cor < 0.8*np.max(max_cor))] = 0
-    for n in range(nFrames):
-        print(timestamp[n],chords[id_chord[n]])
-
+    # for n in range(nFrames):
+    #     print(timestamp[n],chords[id_chord[n]])
 
     #Plotting all figures
     plt.figure(1)
     notes = ['G','G#','A','A#','B','C','C#','D','D#','E','F','F#']
     plt.xticks(np.arange(12),notes)
-    plt.title('Pitch Class Profile')
+    plt.title('Pitch Class Profile - templateMatch')
     plt.xlabel('Note')
     plt.grid(True)
 
@@ -88,6 +87,6 @@ def templateMatch(path):
     plt.plot(timestamp, id_chord)
     plt.xlabel('Time in seconds')
     plt.ylabel('Chords')
-    plt.title('Identified chords')
+    plt.title('Identified chords - templateMatch')
     plt.grid(True)
     plt.show()
