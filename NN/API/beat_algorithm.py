@@ -10,12 +10,7 @@ def analyseBeats(path):
     # gets timestamps and bpm - use arguments if only one is wanted
     (beats, bpm) = get_file_bpm(path, samplerate=int(info['sample_rate']))
     # decide what to do with output here - currently just prints
-    print(path)
-    if bpm is not None:
-        print(bpm)
-    if beats is not None:
-        print(beats)
-    print(info['sample_rate'])
+    return beats, bpm
 
 
 # Improve error handling here

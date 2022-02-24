@@ -39,9 +39,10 @@ def analysis():
     # preprocess audio file
     filename = preprocessing.downloadAudio(id)
     # analyze song
-    beat_algorithm.analyseBeats(dict.AUDIO_DIR + filename)
+    beats, bpm = beat_algorithm.analyseBeats(dict.AUDIO_DIR + filename)
     # return output
     output = {
-        "path": filename
+        "bpm": bpm,
+        "beats": beats
     }
     return output
