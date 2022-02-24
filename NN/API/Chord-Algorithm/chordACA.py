@@ -13,6 +13,6 @@ def getChords(path):
     #print(index)    
     # print(t)
     # print(P_E)
-    plt.plot(time, label[0])
-    plt.plot(time, index[0])
+    #plt.plot(time, label[0])
+    #plt.plot(time, index[0])
     #plt.plot(time, P_E)

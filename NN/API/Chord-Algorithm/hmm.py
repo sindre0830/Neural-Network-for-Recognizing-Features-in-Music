@@ -135,6 +135,7 @@ def chordHandler(path):
     for chord in dict.chords:
         templates.append(templates_json[chord])
 
+    print(path)
     """read audio and compute chromagram"""
     (fs,s) = read(path)
 
@@ -181,12 +182,14 @@ def chordHandler(path):
     indices = np.argmax(path,axis=0)
     final_states = np.zeros(nFrames)
 
+    print(indices)
 
     #find no chord zone
     set_zero = np.where(np.max(path,axis=0) < 0.3*np.max(path))[0]
     if np.size(set_zero) != 0:
         indices[set_zero] = -1
 
+    print(indices)
     #identify chords
     for i in range(nFrames):
         if indices[i] == -1:
@@ -195,6 +198,17 @@ def chordHandler(path):
             final_states[i] = states[indices[i],i]
             final_chords.append(dict.chords[int(final_states[i])])
 
-    print('Time(s)','Chords')
-    for i in range(nFrames):
-        print(timestamp[i], final_chords[i])
+    # print('Time(s)','Chords')
+    # for i in range(nFrames):
+    #     print(timestamp[i], final_chords[i])
+        
+    import matplotlib.pyplot as plt
+    id_chord = np.zeros(nFrames, dtype='int32')
+    plt.figure(2)
+    plt.yticks(np.arange(24), dict.chords)
+    plt.plot(timestamp, final_chords)
+    plt.xlabel('Time in seconds')
+    plt.ylabel('Chords')
+    plt.title('Identified chords')
+    plt.grid(True)
+    plt.show()
