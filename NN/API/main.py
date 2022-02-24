@@ -1,5 +1,7 @@
 # import local modules
 import dictionary as dict
+import preprocessing
+import beat_algorithm
 # import foreign modules
 import flask
 import time
@@ -27,7 +29,20 @@ def diagnosis():
 # Analysis endpoint.
 @app.route(dict.ANALYSIS_PATH)
 def analysis():
+    # get youtube id
+    id = flask.request.args.get('id', None)
+    if id is None:
+        error = {
+            "Msg": "Requires a YouTube ID, example: '.../v1/analysis?id=dQw4w9WgXcQ'"
+        }
+        return error
+    # preprocess audio file
+    filename = preprocessing.downloadAudio(id)
+    # analyze song
+    beats, bpm = beat_algorithm.analyseBeats(dict.AUDIO_DIR + filename)
+    # return output
     output = {
-        "field": "value"
+        "bpm": bpm,
+        "beats": beats
     }
     return output
