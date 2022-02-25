@@ -2,8 +2,9 @@
 VERSION = 'v1'
 # endpoint paths
 DIAGNOSIS_PATH = '/' + VERSION + '/diag'
+ANALYSIS_PATH = '/' + VERSION + '/analysis'
 # directory paths
-BASE_DIR = "Data"
+AUDIO_DIR = "Data/Audio/"
 # extensions for conversion to wav
 EXTENSIONS = [".m4v", ".webm", ".mp3", ".mp4"]
 # status messages
