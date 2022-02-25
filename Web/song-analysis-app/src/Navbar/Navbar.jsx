@@ -14,16 +14,16 @@ const Menu = () => (
 const Navbar = () => {
     const [toggleMenu, setToggleMenu] = useState(false);
     return (
-        <div>
-            <div>
+        <div className='navbar'>
+            <div className='navbar__title'>
                 <h1>Neural Network for Recognizing Features in Music</h1>
             </div>
-            <div>
+            <div className='navbar__menu'>
                 {toggleMenu
                     ? <button onClick={() => setToggleMenu(false)}>Close</button>
                     : <button onClick={() => setToggleMenu(true)}>Open</button>}
                 {toggleMenu && (
-                    <div>
+                    <div className='navbar__menu-links'>
                         <Menu />
                     </div>
                 )}
