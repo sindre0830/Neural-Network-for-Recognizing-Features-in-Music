@@ -4,9 +4,9 @@ import './navbar.css';
 const Menu = () => (
     <>
         <ul>
-            <li><a>Add song</a> </li>
-            <li><a>Results</a></li>
-            <li><a>Status</a> </li>
+            <li><a href='#'>Add song</a> </li>
+            <li><a href='#'>Results</a></li>
+            <li><a href='#'>Status</a> </li>
         </ul>
     </>
 )
