@@ -18,8 +18,9 @@ def main():
     # preprocess audio file
     filename = preprocessing.downloadAudio(id)
     # analyze song
-    beats, _ = beat_algorithm.analyseBeats(dict.AUDIO_DIR + filename)
-    beat_algorithm.plotBeats(dict.AUDIO_DIR + filename, beats, start=0, end=10)
+    aubioBeats, _ = beat_algorithm.analyseBeats(dict.AUDIO_DIR + filename)
+    librosaBeats, _ = beat_algorithm.librosaBeatAnalysis(dict.AUDIO_DIR + filename)
+    beat_algorithm.plotBeats(dict.AUDIO_DIR + filename, aubioBeats=aubioBeats, librosaBeats=librosaBeats, start=0, end=5)
 
 
 # Calculate time since program started in seconds.

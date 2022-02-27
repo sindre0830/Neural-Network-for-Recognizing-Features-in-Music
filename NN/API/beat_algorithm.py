@@ -8,6 +8,13 @@ import librosa.display
 import librosa.beat
 
 
+# Get beats and BPM from Librosa's beat tracker.
+def librosaBeatAnalysis(path):
+    y, sr = librosa.load(path)
+    bpm, beats = librosa.beat.beat_track(y=y, sr=sr, units="time")
+    return beats, bpm
+
+
 # Handler for aubio analysis.
 def analyseBeats(path):
     info = pydub.utils.mediainfo(path)
@@ -67,21 +74,23 @@ def get_file_bpm(path, samplerate=48000, win_s=512, hop_s=256, output=None):
 
 
 # Plots beat timestamps.
-def plotBeats(path, beats, start=None, end=None):
+def plotBeats(path, aubioBeats=None, librosaBeats=None, start=None, end=None):
     # load audio file
-    y, sr = librosa.load(path)
-    _, librosa_beats = librosa.beat.beat_track(y=y, sr=sr, units="time")
+    y, _ = librosa.load(path)
     # plot waveform
     librosa.display.waveshow(y, alpha=0.6)
     # plot beat timestamps
-    plt.vlines(beats, -1, 1, color="r", label="Aubio")
-    plt.vlines(librosa_beats, -1, 1, color="g", label="Librosa")
+    if aubioBeats is not None:
+        plt.vlines(aubioBeats, -1, 1, color="r", label="Aubio")
+    if librosaBeats is not None:
+        plt.vlines(librosaBeats, -1, 1, color="g", label="Librosa")
     plt.ylim(-1, 1)
-    # branch if start time is set
+    # trim figure between two timestamps
     if start is not None:
         plt.xlim(left=start)
-    # branch if end time is set
     if end is not None:
         plt.xlim(right=end)
-    plt.legend()
+    # show results
+    if aubioBeats is not None or librosaBeats is not None:
+        plt.legend()
     plt.show()
