@@ -1,4 +1,5 @@
 # import foreign modules
+from turtle import right
 import pydub.utils
 import aubio
 import numpy as np
@@ -65,11 +66,17 @@ def get_file_bpm(path, samplerate=48000, win_s=512, hop_s=256, output=None):
 
 
 # Plots beat timestamps over spectogram.
-def plotBeats(path, beats):
+def plotBeats(path, beats, start=None, end=None):
     Fs, aud = wavfile.read(path)
     aud = aud[:,0]
     
     plt.plot(beats, np.repeat(20000, len(beats)), '-|')
     powerSpectrum, frequenciesFound, time, imageAxis = plt.specgram(aud, Fs=Fs)
+
+    if start is not None:
+        plt.xlim(left=start)
+    
+    if end is not None:
+        plt.xlim(right=end)
 
     plt.show()
