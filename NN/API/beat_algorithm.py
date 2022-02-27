@@ -2,6 +2,8 @@
 import pydub.utils
 import aubio
 import numpy as np
+import matplotlib.pyplot as plt
+import scipy.io.wavfile as wavfile
 
 
 # Handler for aubio analysis.
@@ -60,3 +62,11 @@ def get_file_bpm(path, samplerate=48000, win_s=512, hop_s=256, output=None):
         return(beats, None)
     else:
         return (beats, bpmResult)
+
+
+# Plots found beat timestamps over spectogram.
+def plotBeats(path):
+    Fs, aud = wavfile.read(path)
+    aud = aud[:,0]
+    powerSpectrum, frequenciesFound, time, imageAxis = plt.specgram(aud, Fs=Fs)
+    plt.show()
