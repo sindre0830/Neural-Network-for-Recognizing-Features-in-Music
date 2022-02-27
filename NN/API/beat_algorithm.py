@@ -3,7 +3,8 @@ import pydub.utils
 import aubio
 import numpy as np
 import matplotlib.pyplot as plt
-import scipy.io.wavfile as wavfile
+import librosa
+import librosa.display
 
 
 # Handler for aubio analysis.
@@ -64,18 +65,19 @@ def get_file_bpm(path, samplerate=48000, win_s=512, hop_s=256, output=None):
         return (beats, bpmResult)
 
 
-# Plots beat timestamps over spectogram.
+# Plots beat timestamps.
 def plotBeats(path, beats, start=None, end=None):
-    Fs, aud = wavfile.read(path)
-    aud = aud[:, 0]
-
-    plt.plot(beats, np.repeat(20000, len(beats)), '-|')
-    powerSpectrum, frequenciesFound, time, imageAxis = plt.specgram(aud, Fs=Fs)
-
+    # load audio file
+    x, sr = librosa.load(path)
+    # plot waveform
+    librosa.display.waveshow(x, alpha=0.6)
+    # plot beat timestamps
+    plt.vlines(beats, -1, 1, color="r", label="Aubio")
+    plt.ylim(-1, 1)
+    # branch if start time is set
     if start is not None:
         plt.xlim(left=start)
-
+    # branch if end time is set
     if end is not None:
         plt.xlim(right=end)
-
     plt.show()
