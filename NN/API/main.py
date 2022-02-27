@@ -19,7 +19,7 @@ def main():
     filename = preprocessing.downloadAudio(id)
     # analyze song
     beats, _ = beat_algorithm.analyseBeats(dict.AUDIO_DIR + filename)
-    beat_algorithm.plotBeats(dict.AUDIO_DIR + filename)
+    beat_algorithm.plotBeats(dict.AUDIO_DIR + filename, beats)
 
 
 # Calculate time since program started in seconds.

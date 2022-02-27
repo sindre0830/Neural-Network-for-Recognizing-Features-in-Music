@@ -64,9 +64,12 @@ def get_file_bpm(path, samplerate=48000, win_s=512, hop_s=256, output=None):
         return (beats, bpmResult)
 
 
-# Plots found beat timestamps over spectogram.
-def plotBeats(path):
+# Plots beat timestamps over spectogram.
+def plotBeats(path, beats):
     Fs, aud = wavfile.read(path)
     aud = aud[:,0]
+    
+    plt.plot(beats, np.repeat(20000, len(beats)), '-|')
     powerSpectrum, frequenciesFound, time, imageAxis = plt.specgram(aud, Fs=Fs)
+
     plt.show()
