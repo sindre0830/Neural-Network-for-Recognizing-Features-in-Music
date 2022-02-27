@@ -74,16 +74,18 @@ def get_file_bpm(path, samplerate=48000, win_s=512, hop_s=256, output=None):
 
 
 # Plots beat timestamps.
-def plotBeats(path, aubioBeats=None, librosaBeats=None, start=None, end=None):
+def plotBeats(path, manualBeats=None, aubioBeats=None, librosaBeats=None, start=None, end=None):
     # load audio file
     y, _ = librosa.load(path)
     # plot waveform
     librosa.display.waveshow(y, alpha=0.6)
     # plot beat timestamps
+    if manualBeats is not None:
+        plt.vlines(manualBeats, -1, 1, color="black", label="Manual tracking")
     if aubioBeats is not None:
-        plt.vlines(aubioBeats, -1, 1, color="r", label="Aubio")
+        plt.vlines(aubioBeats, -1, 1, color="r", label="Aubio Algorithm")
     if librosaBeats is not None:
-        plt.vlines(librosaBeats, -1, 1, color="g", label="Librosa")
+        plt.vlines(librosaBeats, -1, 1, color="g", label="Librosa Algorithm")
     plt.ylim(-1, 1)
     # trim figure between two timestamps
     if start is not None:
@@ -91,6 +93,6 @@ def plotBeats(path, aubioBeats=None, librosaBeats=None, start=None, end=None):
     if end is not None:
         plt.xlim(right=end)
     # show results
-    if aubioBeats is not None or librosaBeats is not None:
+    if manualBeats is not None or aubioBeats is not None or librosaBeats is not None:
         plt.legend()
     plt.show()
