@@ -5,6 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import librosa
 import librosa.display
+import librosa.beat
 
 
 # Handler for aubio analysis.
@@ -68,11 +69,13 @@ def get_file_bpm(path, samplerate=48000, win_s=512, hop_s=256, output=None):
 # Plots beat timestamps.
 def plotBeats(path, beats, start=None, end=None):
     # load audio file
-    x, sr = librosa.load(path)
+    y, sr = librosa.load(path)
+    _, librosa_beats = librosa.beat.beat_track(y=y, sr=sr, units="time")
     # plot waveform
-    librosa.display.waveshow(x, alpha=0.6)
+    librosa.display.waveshow(y, alpha=0.6)
     # plot beat timestamps
     plt.vlines(beats, -1, 1, color="r", label="Aubio")
+    plt.vlines(librosa_beats, -1, 1, color="g", label="Librosa")
     plt.ylim(-1, 1)
     # branch if start time is set
     if start is not None:
@@ -80,4 +83,5 @@ def plotBeats(path, beats, start=None, end=None):
     # branch if end time is set
     if end is not None:
         plt.xlim(right=end)
+    plt.legend()
     plt.show()
