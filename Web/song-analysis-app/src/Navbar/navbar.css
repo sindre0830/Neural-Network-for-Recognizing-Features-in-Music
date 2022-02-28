@@ -50,7 +50,33 @@
     cursor: pointer;
 }
 
-/* medium sized screens and desktop */
+/* tablet sized */
+@media (min-width: 768px) {
+    .navbar__title {
+        margin: 30px 0 0 30px;
+        width: 300px;
+        font-size: 16px;
+    }
+
+    .navbar__links {
+        margin: 30px 30px 0 0;
+        display: block;
+        align-self: center;
+    }
+
+    .navbar__links li {
+        font-size: 20px;
+        display: inline-block;
+        padding-left: 50px;
+        cursor: pointer;
+    }
+
+    .navbar__menu {
+        display: none;
+    }
+}
+
+/* desktop sized */
 @media (min-width: 900px) {
     .navbar__title {
         margin: 40px 0 0 40px;
@@ -60,22 +86,10 @@
 
     .navbar__links {
         margin: 40px 40px 0 0;
-        display: block;
-        align-self: center;
-    }
-
-    .navbar__links ul {
-        list-style-type: none;
     }
 
     .navbar__links li {
         font-size: 22px;
-        display: inline-block;
         padding-left: 60px;
-        cursor: pointer;
-    }
-
-    .navbar__menu {
-        display: none;
     }
 }
