@@ -18,8 +18,8 @@ import match_templates as temp
 
 # handles running various chord recognition algorithms
 def songHandler(path):
-    chordACA.getChords(path)        
-    hmm.getMarkovChords(path)
+    #chordACA.getChords(path)        
+    #hmm.getMarkovChords(path)
     temp.templateMatch(path)        # Seems really bad
     
 

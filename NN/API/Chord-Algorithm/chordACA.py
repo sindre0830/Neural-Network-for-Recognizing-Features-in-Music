@@ -7,7 +7,6 @@ import os
 import functions as func
 import dictionary as dict
 
-
 # Requires pip install pyACA
 
 # Not entirely sure how to plot this, believe 'label' array matched with 'time' array is correct for chord at timestamps
@@ -16,12 +15,12 @@ def getChords(path):
     
     (label, index, time, P_E) = pyACA.computeChordsCl(path)
     print("\tpyACA algorithm results: ")
-    print(label)
-    print(index)
-    plt.title("Identified chords - pyACA")
-    plt.plot(time, label[0])        # Believe this is correct one but not sure
-    #plt.plot(time, index[0])   
-    print("\n")
+    print(np.shape(label))
+    # print(index)
+    # plt.title("Identified chords - pyACA")
+    # plt.plot(time, label[0])        # Believe this is correct one but not sure
+    # #plt.plot(time, index[0])   
+    # print("\n")
 
     # If we want many chords
     # for file in os.listdir(dict.BASE_DIR + dict.SLICE_DIR):
