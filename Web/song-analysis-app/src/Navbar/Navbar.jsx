@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { FiMenu, FiX } from 'react-icons/fi'; 
 import './navbar.css';
 
 const Menu = () => (
@@ -12,7 +13,7 @@ const Menu = () => (
 )
 
 const Navbar = () => {
-    const [toggleMenu, setToggleMenu] = useState(false);
+    const [toggleMenu, setToggle] = useState(false);
     return (
         <div className='navbar'>
             <div className='navbar__title'>
@@ -20,14 +21,15 @@ const Navbar = () => {
             </div>
             <div className='navbar__menu'>
                 {toggleMenu
-                    ? <button onClick={() => setToggleMenu(false)}>Close</button>
-                    : <button onClick={() => setToggleMenu(true)}>Open</button>}
+                    ? <FiX size={32} onClick={() => setToggle(false)}/>
+                    : <FiMenu size={32} onClick={() => setToggle(true)}/> }
                 {toggleMenu && (
                     <div className='navbar__menu-links'>
                         <Menu />
                     </div>
                 )}
             </div>
+            
         </div>
     )
 };
