@@ -1,0 +1,61 @@
+.add-song {
+    margin-top: 200px;
+}
+
+.add-song__message {
+    display: block;
+    font-family: var(--font-family);
+    font-size: 22px;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.add-song__input form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.add-song__input input {
+    height: 50px;
+    width: 75%;
+    border-radius: 10px;
+    padding: 10px;
+    font-family: var(--font-family);
+    font-size: 22px;
+}
+
+.add-song__input button {
+    margin-top: 30px;
+    height: 50px;
+    padding: 10px;
+    border: none;
+    border-radius: 10px;
+    background-color: var(--color-accent);
+    color: white;
+    font-family: var(--font-family);
+    font-style: bold;
+    font-size: 22px;
+    cursor: pointer;
+}
+
+/* small devices (tablets etc.) */
+@media (min-width: 768px) {
+    .add-song__input input {
+        width: 50%;
+    }
+}
+
+/* medium devices */
+@media (min-width: 992px) {
+    .add-song__input input {
+        width: 40%;
+    }
+}
+
+/* large devices */
+@media (min-width: 1200px) {
+    .add-song__input input {
+        width: 25%;
+    }
+}
