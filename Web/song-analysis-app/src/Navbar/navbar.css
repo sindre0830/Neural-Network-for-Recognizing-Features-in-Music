@@ -30,7 +30,7 @@
     right: 0;
     top: 100px;
     margin-top: 1rem;
-    min-width: 210px;
+    min-width: 200px;
     border-radius: 7px;
     color: white;
     text-align: center;
@@ -42,7 +42,7 @@
 }
 
 .navbar__menu-links li {
-    font-size: 32px;
+    font-size: 24px;
     padding: 35px;
     cursor: pointer;
 }
