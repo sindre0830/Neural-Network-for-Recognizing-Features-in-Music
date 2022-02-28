@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { FiMenu, FiX } from 'react-icons/fi'; 
 import './navbar.css';
 
+/** 
+ *   Displaying of the menu links.
+ */
 const Menu = () => (
     <>
         <ul>
@@ -12,6 +15,9 @@ const Menu = () => (
     </>
 )
 
+/**
+ *  Naviagtion bar.
+ */
 const Navbar = () => {
     const [toggleMenu, setToggle] = useState(false);
     return (
@@ -22,6 +28,7 @@ const Navbar = () => {
             <div className='navbar__links'>
                 <Menu />
             </div>
+            {/* div for dropdown menu, only showed on small screens */}
             <div className='navbar__menu'>
                 {toggleMenu
                     ? <FiX size={32} onClick={() => setToggle(false)}/>
