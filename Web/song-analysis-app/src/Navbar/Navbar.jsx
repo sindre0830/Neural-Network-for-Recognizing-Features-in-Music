@@ -17,7 +17,7 @@ const Navbar = () => {
     return (
         <div className='navbar'>
             <div className='navbar__title'>
-                <h1>Neural Network for <br/> Recognizing <br/> Features in Music</h1>
+                <h1>Neural Network for Recognizing Features in Music</h1>
             </div>
             <div className='navbar__links'>
                 <Menu />
