@@ -80,12 +80,12 @@ def plotBeats(path, manualBeats=None, aubioBeats=None, librosaBeats=None, start=
     # plot waveform
     librosa.display.waveshow(y, alpha=0.6)
     # plot beat timestamps
-    if manualBeats is not None:
-        plt.vlines(manualBeats, -1, 1, color="black", label="Manual tracking")
     if aubioBeats is not None:
-        plt.vlines(aubioBeats, -1, 1, color="r", label="Aubio Algorithm")
+        plt.vlines(aubioBeats, 0.33, 1, color="r", linestyle="--", label="Aubio Algorithm")
+    if manualBeats is not None:
+        plt.vlines(manualBeats, -0.33, 0.33, color="black", linestyle="--", label="Manual tracking")
     if librosaBeats is not None:
-        plt.vlines(librosaBeats, -1, 1, color="g", label="Librosa Algorithm")
+        plt.vlines(librosaBeats, -1, -0.33, color="g", linestyle="--", label="Librosa Algorithm")
     plt.ylim(-1, 1)
     # trim figure between two timestamps
     if start is not None:
@@ -94,5 +94,5 @@ def plotBeats(path, manualBeats=None, aubioBeats=None, librosaBeats=None, start=
         plt.xlim(right=end)
     # show results
     if manualBeats is not None or aubioBeats is not None or librosaBeats is not None:
-        plt.legend()
+        plt.legend(bbox_to_anchor=(1.04, 1), loc="upper left")
     plt.show()
