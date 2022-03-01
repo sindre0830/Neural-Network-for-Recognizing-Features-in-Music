@@ -10,7 +10,7 @@ import librosa.beat
 
 # Get beats and BPM from Librosa's beat tracker.
 def librosaBeatAnalysis(path):
-    y, sr = librosa.load(path)
+    y, sr = librosa.load(path, sr=None)
     bpm, beats = librosa.beat.beat_track(y=y, sr=sr, units="time")
     return beats, bpm
 
