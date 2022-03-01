@@ -1,15 +1,39 @@
 import React, { useState } from 'react';
 import './addSong.css';
 
+
 /**
- * Input page.
+ *  Check if the input is a URL.
+ * 
+ *  @param {text} link
+ */
+const validateInput = (link) => {
+    var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
+    return regexp.test(link);
+}
+
+/**
+ *  Input of YouTube link.
  */
 const AddSong = () => {
     const [link, setLink] = useState("");
     const [message, setMessage] = useState("");
 
-    let submitLink = async (e) => {
+    /**
+     *  Send the link to the API.
+     * 
+     *  @param {event} e
+     */
+    const submitLink = async (e) => {
         e.preventDefault();
+        setMessage("Parsing link...");
+
+        // validate link
+        if (!validateInput(link)) {
+            setMessage("Not a valid link");
+            return;
+        }
+
         try {
             const options = {
                 method: 'POST',
@@ -17,6 +41,7 @@ const AddSong = () => {
             }
 
             const res = await fetch('/post', options);
+
             if (res.status === 200) {
                 setLink("");
                 setMessage("Link successfully parsed, result will be uploaded to the result page.");
@@ -35,7 +60,7 @@ const AddSong = () => {
             <div className='add-song__message'>
                 {message
                     ? <p>{message}</p>
-                    : null
+                    : <br></br>
                 }
             </div>
             <div className='add-song__input'>
