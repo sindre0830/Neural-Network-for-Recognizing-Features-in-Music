@@ -1,4 +1,9 @@
 # external
+import libfmp.c4
+import libfmp.c3
+import libfmp.b
+import os
+import sys
 import matplotlib.pyplot as plt
 import librosa
 import librosa.display
@@ -19,20 +24,21 @@ import match_templates as temp
 # handles running various chord recognition algorithms
 def songHandler(path, timeframe=None):
     # Chroma
-    getChromagram(path, timeframe)
-    #Chords
-    chordACA.getChords(path, timeframe)        
+    #getChromagram(path, timeframe)
+    # Chords
+    chordACA.getChords(path, timeframe)
     #hmm.getMarkovChords(path, timeframe)
-    temp.templateMatch(path, timeframe)        # Seems really bad
-    
+    # temp.templateMatch(path, timeframe)        # Seems really bad
+
 
 # Loads with librosa
 # If we want to split and use those for  NN training, we might have to manually keep
 # track of the splits by passing in individually and storing in arrays...
 def getLibRosaChords(path):
-    data, sample = librosa.load(path, sr = int(mediainfo(path)['sample_rate']))
-    plotChromaSlices(data, sample, floor(float(mediainfo(path)['duration'])))        # Not sure we want floor?
-        
+    data, sample = librosa.load(path, sr=int(mediainfo(path)['sample_rate']))
+    # Not sure we want floor?
+    plotChromaSlices(data, sample, floor(float(mediainfo(path)['duration'])))
+
 
 # plots chromagram
 def getChromagram(path, timeframe=None):
@@ -40,7 +46,8 @@ def getChromagram(path, timeframe=None):
 
     chroma = librosa.feature.chroma_stft(y=y, sr=sr)
     fig, ax = plt.subplots()
-    img = librosa.display.specshow(chroma, y_axis='chroma', x_axis='time', ax=ax)
+    img = librosa.display.specshow(
+        chroma, y_axis='chroma', x_axis='time', ax=ax)
     ax.set(title='Chromagram demonstration')
     fig.colorbar(img, ax=ax)
     if timeframe is not None:
@@ -58,7 +65,7 @@ def plotChromaSlices(data, sample, duration):
 
     # Power spectrogram
     S = np.abs(librosa.stft(data, n_fft=4096))**2
-    
+
     # get number of windows and set hop size relative to window size (cover half of window each time)
     windows = duration // dict.win_s
     hop = windows * 2
@@ -71,18 +78,18 @@ def plotChromaSlices(data, sample, duration):
         chroma = librosa.feature.chroma_stft(S=source, sr=sample)
         # Also consider trying CQT chromagram
         # chroma = librosa.feature.chroma_cqt(S=source, sr=sample)
-        
+
         # This is where we want to be instead analyzing the data and getting
         # the chord from the pitches
         plotSong(chroma, source)
         # pitches = []
         # dominant_pitch = ""
-        
+
         # new_chroma = np.swapaxes(chroma,0,1)
         # for pitch in new_chroma:
         #     oneD = pitch.flatten()
         #     pitches.append(getPitch(oneD))      # We want to get Chords instead
-        
+
         # # Basic handling of pitches - currently either prints each frame,
         # # or prints the dominant pitch (if any) for the section (6 seconds windows)
         # most_frequent = mode(pitches)
@@ -91,28 +98,30 @@ def plotChromaSlices(data, sample, duration):
         #     print("The dominant pitch is: " + dominant_pitch)
         # else:
         #     print("No dominant pitch found for this part.")
-            
-    
+
+
 # Splits song into small windows
 # Function assumes 2d numpy array where y-axis represents time
-def splitSong(path, duration):   
+def splitSong(path, duration):
     windows = duration // dict.win_s
     hop = windows * 2
 
     # We use sliding_window_view to get windows, set the size of each window with the variables above,
-    # and use slicing with our hop size so we do not get a window for every frame 
+    # and use slicing with our hop size so we do not get a window for every frame
     return np.lib.stride_tricks.sliding_window_view(
-                    path,
-                    window_shape=(np.shape(path)[0], np.shape(path)[1]//windows))[:, ::np.shape(path)[1]//hop]
-    
+        path,
+        window_shape=(np.shape(path)[0], np.shape(path)[1]//windows))[:, ::np.shape(path)[1]//hop]
+
 
 # Plots the song as a diagram - mostly used for debugging/testing
 def plotSong(chroma, source):
     fig, ax = plt.subplots(nrows=2, sharex=True)
-    img = librosa.display.specshow(librosa.amplitude_to_db(source,ref=np.max), y_axis='log', x_axis='time', ax=ax[0])
+    img = librosa.display.specshow(librosa.amplitude_to_db(
+        source, ref=np.max), y_axis='log', x_axis='time', ax=ax[0])
     fig.colorbar(img, ax=[ax[0]])
     ax[0].label_outer()
-    img = librosa.display.specshow(chroma, y_axis='chroma', x_axis='time', ax=ax[1])
+    img = librosa.display.specshow(
+        chroma, y_axis='chroma', x_axis='time', ax=ax[1])
     fig.colorbar(img, ax=[ax[1]])
 
 
@@ -124,16 +133,18 @@ def getPitch(pitch):
 
 
 # To be implemented
-#def getChord(pitch):
+# def getChord(pitch):
 
 def splitSong(path):
     info = mediainfo(path)
     d = floor(float(info["duration"]))
     slices = d // dict.win_s
     m = 1000
-    
+
     for slice in range(slices):
         newAudio = AudioSegment.from_wav(path)
-        newAudio = newAudio[dict.win_s*slice*m : (dict.win_s*(slice+1)*m) - 1]
-        newAudio.export(dict.BASE_DIR + dict.SLICE_DIR + PurePosixPath(path).stem + str(slice)+".wav", format="wav")
-    print("Song " + PurePosixPath(path).stem + " successfully split into " + str(slices) + " slices.")
+        newAudio = newAudio[dict.win_s*slice*m: (dict.win_s*(slice+1)*m) - 1]
+        newAudio.export(dict.BASE_DIR + dict.SLICE_DIR +
+                        PurePosixPath(path).stem + str(slice)+".wav", format="wav")
+    print("Song " + PurePosixPath(path).stem +
+          " successfully split into " + str(slices) + " slices.")
