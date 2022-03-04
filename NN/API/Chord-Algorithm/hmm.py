@@ -124,7 +124,7 @@ def viterbi(PI,A,B):
 
 
 # Handles analysing and finding chords using a hidden markov matrix
-def getMarkovChords(path):
+def getMarkovChords(path, timeframe):
     """read from JSON file to get chord templates"""
     with open('chord_templates.json', 'r') as fp:
         templates_json = json.load(fp)
@@ -187,8 +187,6 @@ def getMarkovChords(path):
     set_zero = np.where(np.max(path,axis=0) < 0.3*np.max(path))[0]
     if np.size(set_zero) != 0:
         indices[set_zero] = -1
-
-    print(indices) # debug
     
     #identify chords
     for i in range(nFrames):
@@ -198,14 +196,12 @@ def getMarkovChords(path):
             final_states[i] = states[indices[i],i]
             final_chords.append(dict.chords[int(final_states[i])])
 
-    # print('Time(s)','Chords')
-    # for i in range(nFrames):
-    #     print(timestamp[i], final_chords[i])
-        
     id_chord = np.zeros(nFrames, dtype='int32')
     
     plt.figure(2)
     plt.yticks(np.arange(24), dict.chords)
+    if timeframe is not None:  
+        plt.xlim(timeframe)
     plt.plot(timestamp, final_chords)
     plt.xlabel('Time in seconds')
     plt.ylabel('Chords')

@@ -16,7 +16,7 @@ from chromagram import compute_chroma
 
 
 """Correlate chord with existing binary chord templates to find best batch"""
-def templateMatch(path):
+def templateMatch(path, timeframe):
 
     """read from JSON file to get chord templates"""
     with open('chord_templates.json', 'r') as fp:
@@ -35,7 +35,7 @@ def templateMatch(path):
     (fs,s) = read(path)
 
     x = s[::4]
-    x = x[:,1]
+    #x = x[:,1]
     fs = int(fs/4)
 
     #framing audio, window length = 8192, hop size = 1024 and computing PCP
@@ -70,9 +70,7 @@ def templateMatch(path):
 
     #if max_cor[n] < threshold, then no chord is played
     #might need to change threshold value
-    id_chord[np.where(max_cor < 0.5*np.max(max_cor))] = 0
-    # for n in range(nFrames):
-    #     print(timestamp[n],chords[id_chord[n]])
+    id_chord[np.where(max_cor < 0.1*np.max(max_cor))] = 0
 
     #Plotting all figures
     print(np.shape(timestamp))
@@ -85,7 +83,9 @@ def templateMatch(path):
 
     plt.figure(2)
     plt.yticks(np.arange(25), chords)
-    plt.plot(timestamp, id_chord)
+    if timeframe is not None:
+        plt.xlim(timeframe)
+    plt.scatter(timestamp, id_chord)
     plt.xlabel('Time in seconds')
     plt.ylabel('Chords')
     plt.title('Identified chords - templateMatch')

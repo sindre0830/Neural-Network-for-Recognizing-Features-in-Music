@@ -17,10 +17,13 @@ import match_templates as temp
 
 
 # handles running various chord recognition algorithms
-def songHandler(path):
-    #chordACA.getChords(path)        
-    #hmm.getMarkovChords(path)
-    temp.templateMatch(path)        # Seems really bad
+def songHandler(path, timeframe=None):
+    # Chroma
+    getChromagram(path, timeframe)
+    #Chords
+    chordACA.getChords(path, timeframe)        
+    #hmm.getMarkovChords(path, timeframe)
+    temp.templateMatch(path, timeframe)        # Seems really bad
     
 
 # Loads with librosa
@@ -28,12 +31,26 @@ def songHandler(path):
 # track of the splits by passing in individually and storing in arrays...
 def getLibRosaChords(path):
     data, sample = librosa.load(path, sr = int(mediainfo(path)['sample_rate']))
-    plotChroma(data, sample, floor(float(mediainfo(path)['duration'])))        # Not sure we want floor?
+    plotChromaSlices(data, sample, floor(float(mediainfo(path)['duration'])))        # Not sure we want floor?
         
+
+# plots chromagram
+def getChromagram(path, timeframe=None):
+    y, sr = librosa.load(path)
+
+    chroma = librosa.feature.chroma_stft(y=y, sr=sr)
+    fig, ax = plt.subplots()
+    img = librosa.display.specshow(chroma, y_axis='chroma', x_axis='time', ax=ax)
+    ax.set(title='Chromagram demonstration')
+    fig.colorbar(img, ax=ax)
+    if timeframe is not None:
+        plt.xlim(timeframe)    # set timeframe
+    plt.show()
+
 
 # Performs plotting
 # Rather than plot, we want to just get the data out
-def plotChroma(data, sample, duration):
+def plotChromaSlices(data, sample, duration):
     librosa.feature.chroma_stft(y=data, sr=sample)
 
     # Energy spectrogram
@@ -120,4 +137,3 @@ def splitSong(path):
         newAudio = newAudio[dict.win_s*slice*m : (dict.win_s*(slice+1)*m) - 1]
         newAudio.export(dict.BASE_DIR + dict.SLICE_DIR + PurePosixPath(path).stem + str(slice)+".wav", format="wav")
     print("Song " + PurePosixPath(path).stem + " successfully split into " + str(slices) + " slices.")
-    
