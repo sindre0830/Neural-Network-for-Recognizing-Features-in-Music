@@ -14,16 +14,16 @@ import os
 # Get beats and BPM from Librosa's beat tracker.
 def librosaBeatAnalysis(id):
     # loads audio file and gets bpm and beat timestamps
-    y, sr = librosa.load(dict.NATIVE_DIR + id + dict.WAV_FORMAT, sr=None)
+    y, sr = librosa.load(dict.getNativeAudioPath(id), sr=None)
     return librosa.beat.beat_track(y=y, sr=sr, units="time")
 
 
 # Handler for aubio analysis.
 def aubioBeatAnalysis(id):
     # read metadata of audio file to get the samplerate
-    info = pydub.utils.mediainfo(dict.NATIVE_DIR + id + dict.WAV_FORMAT)
+    info = pydub.utils.mediainfo(dict.getNativeAudioPath(id))
     # gets timestamps and bpm
-    beats = extractBeats(dict.NATIVE_DIR + id + dict.WAV_FORMAT, samplerate=int(info['sample_rate']))
+    beats = extractBeats(dict.getNativeAudioPath(id), samplerate=int(info['sample_rate']))
     bpm = getBPM(beats)
     return bpm, beats
 
@@ -61,7 +61,7 @@ def extractBeats(path, samplerate, win_s=512, hop_s=256):
 # Plots beat timestamps.
 def plotBeats(id, manual_beats=None, aubio_beats=None, librosa_beats=None, start=None, end=None):
     # load audio file
-    y, _ = librosa.load(dict.NATIVE_DIR + id + dict.WAV_FORMAT)
+    y, _ = librosa.load(dict.getNativeAudioPath(id))
     # plot waveform
     librosa.display.waveshow(y, alpha=0.6)
     # plot beat timestamps
@@ -87,5 +87,5 @@ def plotBeats(id, manual_beats=None, aubio_beats=None, librosa_beats=None, start
     if not os.path.exists(dict.PLOTS_DIR):
         os.makedirs(dict.PLOTS_DIR)
     # save plot as PNG and show results
-    plt.savefig("Data/Plots/" + id + ".png", dpi=300, transparent=True, bbox_inches="tight")
+    plt.savefig(dict.getPlotPath(id), dpi=300, transparent=True, bbox_inches="tight")
     plt.show()

@@ -13,8 +13,7 @@ def downloadAudio(id):
     if not os.path.exists(dict.NATIVE_DIR):
         os.makedirs(dict.NATIVE_DIR)
     # branch if audio file doesn't exist
-    filename = id + dict.WAV_FORMAT
-    if not os.path.isfile(dict.NATIVE_DIR + filename):
+    if not os.path.isfile(dict.getNativeAudioPath(id)):
         url = "https://www.youtube.com/watch?v=" + id
         audiostreams = pafy.new(url).audiostreams
         # get audio format with best quality
@@ -29,14 +28,14 @@ def downloadAudio(id):
         if os.path.exists(dict.NATIVE_DIR + tempFilename) is False:
             audiostreams[best].download(filepath=dict.NATIVE_DIR + tempFilename)
         # convert file to wav format and remove temporary file
-        convertToWav(tempFilename)
+        convertToWav(id, tempFilename)
         os.remove(dict.NATIVE_DIR + tempFilename)
 
 
 # Attempts to convert a file into wav format.
-def convertToWav(file):
+def convertToWav(id, file):
     path = dict.NATIVE_DIR + file
-    newPath = dict.NATIVE_DIR + Path(file).stem + dict.WAV_FORMAT
+    newPath = dict.getNativeAudioPath(id)
     if os.path.exists(newPath) is False and testExt(file):
         sound = AudioSegment.from_file(path)
         sound.export(newPath, format="wav")
