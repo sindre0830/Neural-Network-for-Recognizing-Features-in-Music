@@ -1,8 +1,8 @@
 flask
 pydub
-pafy
 youtube-dl==2020.12.02
 numpy==1.21
 librosa
 matplotlib
 aubio
+yt-dlp
