@@ -14,13 +14,13 @@ app = flask.Flask(__name__)
 # Main program.
 def main():
     # define youtube id
-    id = "hPOYc4a2RPY"
+    id = "EX7oWSbVbGY"
     # preprocess audio file
     filename = preprocessing.downloadAudio(id)
     # analyze song
-    aubioBeats, _ = beat_algorithm.analyseBeats(dict.AUDIO_DIR + filename)
-    librosaBeats, _ = beat_algorithm.librosaBeatAnalysis(dict.AUDIO_DIR + filename)
-    beat_algorithm.plotBeats(dict.AUDIO_DIR + filename, aubioBeats=aubioBeats, librosaBeats=librosaBeats, start=0, end=5)
+    _, aubioBeats = beat_algorithm.aubioBeatAnalysis(dict.AUDIO_DIR + filename)
+    _, librosaBeats = beat_algorithm.librosaBeatAnalysis(dict.AUDIO_DIR + filename)
+    beat_algorithm.plotBeats(dict.AUDIO_DIR + filename, manual_beats=None, aubio_beats=aubioBeats, librosa_beats=librosaBeats, start=0, end=10)
 
 
 # Calculate time since program started in seconds.
@@ -51,7 +51,7 @@ def analysis():
     # preprocess audio file
     filename = preprocessing.downloadAudio(id)
     # analyze song
-    beats, bpm = beat_algorithm.analyseBeats(dict.AUDIO_DIR + filename)
+    bpm, beats = beat_algorithm.librosaBeatAnalysis(dict.AUDIO_DIR + filename)
     # return output
     output = {
         "bpm": bpm,
