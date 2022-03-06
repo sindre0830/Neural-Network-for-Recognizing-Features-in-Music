@@ -16,11 +16,11 @@ def main():
     # define youtube id
     id = "EX7oWSbVbGY"
     # preprocess audio file
-    filename = preprocessing.downloadAudio(id)
+    preprocessing.downloadAudio(id)
     # analyze song
-    _, aubioBeats = beat_algorithm.aubioBeatAnalysis(dict.AUDIO_DIR + filename)
-    _, librosaBeats = beat_algorithm.librosaBeatAnalysis(dict.AUDIO_DIR + filename)
-    beat_algorithm.plotBeats(dict.AUDIO_DIR + filename, manual_beats=None, aubio_beats=aubioBeats, librosa_beats=librosaBeats, start=0, end=10)
+    _, aubioBeats = beat_algorithm.aubioBeatAnalysis(id)
+    _, librosaBeats = beat_algorithm.librosaBeatAnalysis(id)
+    beat_algorithm.plotBeats(id, manual_beats=None, aubio_beats=aubioBeats, librosa_beats=librosaBeats, start=0, end=10)
 
 
 # Calculate time since program started in seconds.
@@ -49,9 +49,9 @@ def analysis():
         }
         return error
     # preprocess audio file
-    filename = preprocessing.downloadAudio(id)
+    preprocessing.downloadAudio(id)
     # analyze song
-    bpm, beats = beat_algorithm.librosaBeatAnalysis(dict.AUDIO_DIR + filename)
+    bpm, beats = beat_algorithm.librosaBeatAnalysis(id)
     # return output
     output = {
         "bpm": bpm,

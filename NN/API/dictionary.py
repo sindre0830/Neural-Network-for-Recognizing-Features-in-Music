@@ -4,10 +4,12 @@ VERSION = 'v1'
 DIAGNOSIS_PATH = '/' + VERSION + '/diag'
 ANALYSIS_PATH = '/' + VERSION + '/analysis'
 # directory paths
-AUDIO_DIR = "Data/Audio/"
 PLOTS_DIR = "Data/Plots/"
+NATIVE_DIR = "Data/Audio/Native/"
+MODIFIED_DIR = "Data/Audio/Modified/"
 # extensions for conversion to wav
 EXTENSIONS = [".m4v", ".webm", ".mp3", ".mp4"]
+WAV_FORMAT = ".wav"
 # status messages
 DONE = 'DONE'
 SUCCESS = 'SUCCESS'

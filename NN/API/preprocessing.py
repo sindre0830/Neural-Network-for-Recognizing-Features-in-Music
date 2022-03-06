@@ -10,11 +10,11 @@ import pafy
 # Downloads an audio file from given URL.
 def downloadAudio(id):
     # branch if audio directory doesn't exist
-    if not os.path.exists(dict.AUDIO_DIR):
-        os.makedirs(dict.AUDIO_DIR)
+    if not os.path.exists(dict.NATIVE_DIR):
+        os.makedirs(dict.NATIVE_DIR)
     # branch if audio file doesn't exist
-    filename = id + ".wav"
-    if not os.path.isfile(dict.AUDIO_DIR + filename):
+    filename = id + dict.WAV_FORMAT
+    if not os.path.isfile(dict.NATIVE_DIR + filename):
         url = "https://www.youtube.com/watch?v=" + id
         audiostreams = pafy.new(url).audiostreams
         # get audio format with best quality
@@ -26,18 +26,17 @@ def downloadAudio(id):
             print(val.bitrate, val.extension, val.get_filesize())
         tempFilename = id + "." + audiostreams[best].extension
         # download audio file
-        if os.path.exists(dict.AUDIO_DIR + tempFilename) is False:
-            audiostreams[best].download(filepath=dict.AUDIO_DIR + tempFilename)
+        if os.path.exists(dict.NATIVE_DIR + tempFilename) is False:
+            audiostreams[best].download(filepath=dict.NATIVE_DIR + tempFilename)
         # convert file to wav format and remove temporary file
         convertToWav(tempFilename)
-        os.remove(dict.AUDIO_DIR + tempFilename)
-    return filename
+        os.remove(dict.NATIVE_DIR + tempFilename)
 
 
 # Attempts to convert a file into wav format.
 def convertToWav(file):
-    path = dict.AUDIO_DIR + file
-    newPath = dict.AUDIO_DIR + Path(file).stem + ".wav"
+    path = dict.NATIVE_DIR + file
+    newPath = dict.NATIVE_DIR + Path(file).stem + dict.WAV_FORMAT
     if os.path.exists(newPath) is False and testExt(file):
         sound = AudioSegment.from_file(path)
         sound.export(newPath, format="wav")
@@ -51,20 +50,3 @@ def testExt(file):
         return True
     else:
         return False
-
-
-# Function iterating through folders containing files to be converted to wav.
-def convertDataset(path):
-    dirs = [folder for folder in os.listdir(path) if os.path.isdir(os.path.join(path, folder))]
-    print("Folders acquired, entering...")
-    if os.path.exists("Data/" + dirs[0]) is False:
-        convertFolder(path + "/" + dirs[0])
-
-
-# Iterates through a folder and runs convertToWav on each file.
-def convertFolder(path):
-    print("Folder opened, converting...")
-    for file in os.listdir(path):
-        convertToWav(path + "/" + file, os.path.basename(path))
-        print(file + " converted to wav!")
-    print("Conversion of " + os.path.basename(path) + " done!")
