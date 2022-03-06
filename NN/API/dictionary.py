@@ -5,6 +5,7 @@ DIAGNOSIS_PATH = '/' + VERSION + '/diag'
 ANALYSIS_PATH = '/' + VERSION + '/analysis'
 # directory paths
 AUDIO_DIR = "Data/Audio/"
+PLOTS_DIR = "Data/Plots/"
 # extensions for conversion to wav
 EXTENSIONS = [".m4v", ".webm", ".mp3", ".mp4"]
 # status messages

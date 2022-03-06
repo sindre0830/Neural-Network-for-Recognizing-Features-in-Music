@@ -9,7 +9,7 @@ import pafy
 
 # Downloads an audio file from given URL.
 def downloadAudio(id):
-    # branch if audio dictionary doesn't exist
+    # branch if audio directory doesn't exist
     if not os.path.exists(dict.AUDIO_DIR):
         os.makedirs(dict.AUDIO_DIR)
     # branch if audio file doesn't exist

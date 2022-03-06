@@ -1,3 +1,5 @@
+# import local modules
+import dictionary as dict
 # import foreign modules
 import pydub.utils
 import aubio
@@ -6,6 +8,7 @@ import matplotlib.pyplot as plt
 import librosa
 import librosa.display
 import librosa.beat
+import os
 
 
 # Get beats and BPM from Librosa's beat tracker.
@@ -62,19 +65,27 @@ def plotBeats(path, manual_beats=None, aubio_beats=None, librosa_beats=None, sta
     # plot waveform
     librosa.display.waveshow(y, alpha=0.6)
     # plot beat timestamps
+    n = 0
     if aubio_beats is not None:
-        plt.vlines(aubio_beats, 0.33, 1, color="r", linestyle="--", label="Aubio Algorithm")
+        plt.vlines(aubio_beats, 0.33, 1, color="r", linestyle="--", label="Aubio")
+        n += 1
     if manual_beats is not None:
-        plt.vlines(manual_beats, -0.33, 0.33, color="black", linestyle="--", label="Manual tracking")
+        plt.vlines(manual_beats, -0.33, 0.33, color="black", linestyle="--", label="Manual")
+        n += 1
     if librosa_beats is not None:
-        plt.vlines(librosa_beats, -1, -0.33, color="g", linestyle="--", label="Librosa Algorithm")
+        plt.vlines(librosa_beats, -1, -0.33, color="g", linestyle="--", label="Librosa")
+        n += 1
     plt.ylim(-1, 1)
+    if manual_beats is not None or aubio_beats is not None or librosa_beats is not None:
+        plt.legend(bbox_to_anchor=(0, 1.02, 1, 0.2), loc="lower left", mode="expand", ncol=n)
     # trim figure between two timestamps
     if start is not None:
         plt.xlim(left=start)
     if end is not None:
         plt.xlim(right=end)
-    # show results
-    if manual_beats is not None or aubio_beats is not None or librosa_beats is not None:
-        plt.legend(bbox_to_anchor=(1.04, 1), loc="upper left")
+    # branch if plot directory doesn't exist
+    if not os.path.exists(dict.PLOTS_DIR):
+        os.makedirs(dict.PLOTS_DIR)
+    # save plot as PNG and show results
+    plt.savefig("Data/Plots/tmp.png", dpi=300, transparent=True, bbox_inches="tight")
     plt.show()
