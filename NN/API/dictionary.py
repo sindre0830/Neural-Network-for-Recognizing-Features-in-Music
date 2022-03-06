@@ -12,6 +12,8 @@ EXTENSIONS = [".m4v", ".webm", ".mp3", ".mp4"]
 # formats
 WAV_FORMAT = ".wav"
 PNG_FORMAT = ".png"
+# parameters
+SAMPLERATE = 22050
 # status messages
 DONE = 'DONE'
 SUCCESS = 'SUCCESS'
@@ -20,6 +22,10 @@ FAILED = 'FAILED'
 
 def getNativeAudioPath(id):
     return NATIVE_DIR + id + WAV_FORMAT
+
+
+def getModifiedAudioPath(id):
+    return MODIFIED_DIR + id + WAV_FORMAT
 
 
 def getPlotPath(id):

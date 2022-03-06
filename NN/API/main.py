@@ -14,9 +14,10 @@ app = flask.Flask(__name__)
 # Main program.
 def main():
     # define youtube id
-    id = "EX7oWSbVbGY"
+    id = "hPOYc4a2RPY"
     # preprocess audio file
     preprocessing.downloadAudio(id)
+    preprocessing.resampleAudio(id)
     # analyze song
     _, aubioBeats = beat_algorithm.aubioBeatAnalysis(id)
     _, librosaBeats = beat_algorithm.librosaBeatAnalysis(id)
@@ -50,6 +51,7 @@ def analysis():
         return error
     # preprocess audio file
     preprocessing.downloadAudio(id)
+    preprocessing.resampleAudio(id)
     # analyze song
     bpm, beats = beat_algorithm.librosaBeatAnalysis(id)
     # return output

@@ -1,7 +1,6 @@
 # import local modules
 import dictionary as dict
 # import foreign modules
-import pydub.utils
 import aubio
 import numpy as np
 import matplotlib.pyplot as plt
@@ -14,34 +13,23 @@ import os
 # Get beats and BPM from Librosa's beat tracker.
 def librosaBeatAnalysis(id):
     # loads audio file and gets bpm and beat timestamps
-    y, sr = librosa.load(dict.getNativeAudioPath(id), sr=None)
+    y, sr = librosa.load(dict.getModifiedAudioPath(id), sr=None)
     return librosa.beat.beat_track(y=y, sr=sr, units="time")
 
 
 # Handler for aubio analysis.
 def aubioBeatAnalysis(id):
-    # read metadata of audio file to get the samplerate
-    info = pydub.utils.mediainfo(dict.getNativeAudioPath(id))
     # gets timestamps and bpm
-    beats = extractBeats(dict.getNativeAudioPath(id), samplerate=int(info['sample_rate']))
+    beats = extractBeats(dict.getModifiedAudioPath(id))
     bpm = getBPM(beats)
     return bpm, beats
 
 
-# Calculate beats per minute.
-def getBPM(beats):
-    # if enough beats are found, convert to periods then to bpm
-    if len(beats) > 1:
-        return np.median(60. / np.diff(beats))
-    else:
-        return None
-
-
 # Get timestamps for each beat extracted.
 # Source: https://github.com/aubio/aubio/blob/master/python/demos/demo_bpm_extract.py
-def extractBeats(path, samplerate, win_s=512, hop_s=256):
+def extractBeats(path, win_s=512, hop_s=256):
     # load file and get tempo
-    src = aubio.source(path, samplerate, hop_s)
+    src = aubio.source(path, dict.SAMPLERATE, hop_s)
     o = aubio.tempo("specdiff", win_s, hop_s, src.samplerate)
     # read through the frames and save the timestamp of each found beat
     beats = []
@@ -58,10 +46,19 @@ def extractBeats(path, samplerate, win_s=512, hop_s=256):
     return beats
 
 
+# Calculate beats per minute.
+def getBPM(beats):
+    # if enough beats are found, convert to periods then to bpm
+    if len(beats) > 1:
+        return np.median(60. / np.diff(beats))
+    else:
+        return None
+
+
 # Plots beat timestamps.
 def plotBeats(id, manual_beats=None, aubio_beats=None, librosa_beats=None, start=None, end=None):
     # load audio file
-    y, _ = librosa.load(dict.getNativeAudioPath(id))
+    y, _ = librosa.load(dict.getModifiedAudioPath(id))
     # plot waveform
     librosa.display.waveshow(y, alpha=0.6)
     # plot beat timestamps
