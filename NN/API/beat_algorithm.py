@@ -85,5 +85,6 @@ def plotBeats(id, manual_beats=None, aubio_beats=None, librosa_beats=None, start
     if not os.path.exists(dict.PLOTS_DIR):
         os.makedirs(dict.PLOTS_DIR)
     # save plot as PNG and show results
+    plt.subplots_adjust(top=0.8)
     plt.savefig(dict.getPlotPath(id), dpi=300, transparent=True, bbox_inches="tight")
     plt.show()
