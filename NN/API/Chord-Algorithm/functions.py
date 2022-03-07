@@ -13,6 +13,7 @@ from pydub import AudioSegment
 from math import floor
 from statistics import mode
 from pathlib import Path, PurePosixPath
+import soundfile as sf
 
 # internal
 import dictionary as dict
@@ -148,3 +149,83 @@ def splitSong(path):
                         PurePosixPath(path).stem + str(slice)+".wav", format="wav")
     print("Song " + PurePosixPath(path).stem +
           " successfully split into " + str(slices) + " slices.")
+
+
+def librosaVocalFilter(path):
+# Compute chroma features
+    fn_wav = path
+    N = 4096
+    H = 2048
+    y, sr = librosa.load(fn_wav)
+    
+    S_full, phase = librosa.magphase(librosa.stft(y))
+    
+    S_filter = librosa.decompose.nn_filter(S_full,
+                                       aggregate=np.median,
+                                       metric='cosine',
+                                       width=int(librosa.time_to_frames(2, sr=sr)))
+    S_filter = np.minimum(S_full, S_filter)
+    
+    margin_i, margin_v = 2,10
+    power = 2
+
+    mask_i = librosa.util.softmask(S_filter,
+                                margin_i * (S_full - S_filter),
+                                power=power)
+
+    mask_v = librosa.util.softmask(S_full - S_filter,
+                                margin_v * S_filter,
+                                power=power)
+
+    # Once we have the masks, simply multiply them with the input spectrum
+    # to separate the components
+
+    S_foreground = mask_v * S_full
+    S_background = mask_i * S_full
+
+    # not great results...must look at
+    S_fore = np.abs(S_foreground)**2
+    S_back = np.abs(S_background)**2
+
+    fore = librosa.feature.chroma_stft(S=S_fore, sr=sr, n_chroma=12, n_fft=4096)
+    #print(np.shape(fore))
+    
+    back = librosa.feature.chroma_stft(S=S_back, sr=sr)
+    
+    orig = librosa.feature.chroma_stft(S=S_full, sr=sr)
+
+    # cqt - doesn't work because of shape...    
+    # fore = librosa.feature.chroma_cqt(y=S_fore, sr=sr)
+    # print(np.shape(fore))
+
+    # back = librosa.feature.chroma_cqt(y=S_back, sr=sr)
+    
+    # orig = librosa.feature.chroma_cqt(y=S_full, sr=sr)
+
+
+    fig, ax = plt.subplots()
+    plt.xlim(29, 34)
+    img = librosa.display.specshow(orig, y_axis='chroma', x_axis='time', ax=ax)
+    ax.set(title='Original')
+    fig.colorbar(img, ax=ax)
+    plt.show()
+
+
+    fig, ax = plt.subplots()
+    plt.xlim(29, 34)
+    img = librosa.display.specshow(fore, y_axis='chroma', x_axis='time', ax=ax)
+    ax.set(title='Foreground mask')
+    fig.colorbar(img, ax=ax)
+    plt.show()
+    
+    
+    fig, ax = plt.subplots()
+    plt.xlim(29, 34)
+    img = librosa.display.specshow(back, y_axis='chroma', x_axis='time', ax=ax)
+    ax.set(title='Background mask')
+    fig.colorbar(img, ax=ax)
+    plt.show()
+    
+    # not actually doing a good job
+    new_y = librosa.istft(S_background*phase)
+    sf.write("../Data/background.wav", new_y, sr)
