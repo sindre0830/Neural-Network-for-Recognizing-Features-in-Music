@@ -1,33 +1,40 @@
 import React, { useState, useEffect } from 'react';
 import './songs.css';
+import Song from '../Song/Song';
+import '../testData.json';
 
 /**
  *  Displaying of all analyzed songs.
  */
 const Songs = () => {
-    const [Songs, fetchSongs] = useState([])
+    const [songs, fetchSongs] = useState([])
 
-    const getData = () => {
-        fetch('https://jsonplaceholder.typicode.com/users')
-        .then((res) => res.json())
-        .then((res) => {
+    const getSongs = () => {
+        const jsonData= require('../testData.json'); 
+        console.log(jsonData);
+        fetchSongs(jsonData);
+
+        {/*try {
+            fetch('../testData.json')
+            .then((res) => res.json())
+            .then((res) => {
             console.log(res)
             fetchSongs(res)
-        })
+            })
+        } catch (err) {
+            console.log(err)
+        } */}
     }
 
     useEffect(() => {
-        getData()
+        getSongs()
     }, [])
 
     return (
         <div className='songs'>
-            <h2>React Fetch API Example</h2>
-            <ul>
-                {Songs.map((song, i) => {
-                return <li key={i}>{song.name}</li>
-                })}
-            </ul>
+            {songs.map( (song, index) => (
+                <Song value={song} key={index} />
+            ))}
         </div>
     )
 };
