@@ -30,15 +30,8 @@ def songHandler(path, timeframe=None):
     chordACA.getChords(path, timeframe)
     #hmm.getMarkovChords(path, timeframe)
     # temp.templateMatch(path, timeframe)        # Seems really bad
-
-
-# Loads with librosa
-# If we want to split and use those for  NN training, we might have to manually keep
-# track of the splits by passing in individually and storing in arrays...
-def getLibRosaChords(path):
-    data, sample = librosa.load(path, sr=int(mediainfo(path)['sample_rate']))
-    # Not sure we want floor?
-    plotChromaSlices(data, sample, floor(float(mediainfo(path)['duration'])))
+    #librosaChords(path, timeframe)
+    spleeter(path, timeframe)       # chromagram
 
 
 # plots chromagram
@@ -55,50 +48,6 @@ def getChromagram(path, timeframe=None):
         plt.xlim(timeframe)    # set timeframe
     plt.show()
 
-
-# Performs plotting
-# Rather than plot, we want to just get the data out
-def plotChromaSlices(data, sample, duration):
-    librosa.feature.chroma_stft(y=data, sr=sample)
-
-    # Energy spectrogram
-    #S = np.abs(librosa.stft(data))
-
-    # Power spectrogram
-    S = np.abs(librosa.stft(data, n_fft=4096))**2
-
-    # get number of windows and set hop size relative to window size (cover half of window each time)
-    windows = duration // dict.win_s
-    hop = windows * 2
-
-    # We split our spectrogram data into windows
-    sources = splitSong(S, duration)
-
-    # Elegant way to get rid of extra nesting?
-    for source in sources[0]:
-        chroma = librosa.feature.chroma_stft(S=source, sr=sample)
-        # Also consider trying CQT chromagram
-        # chroma = librosa.feature.chroma_cqt(S=source, sr=sample)
-
-        # This is where we want to be instead analyzing the data and getting
-        # the chord from the pitches
-        plotSong(chroma, source)
-        # pitches = []
-        # dominant_pitch = ""
-
-        # new_chroma = np.swapaxes(chroma,0,1)
-        # for pitch in new_chroma:
-        #     oneD = pitch.flatten()
-        #     pitches.append(getPitch(oneD))      # We want to get Chords instead
-
-        # # Basic handling of pitches - currently either prints each frame,
-        # # or prints the dominant pitch (if any) for the section (6 seconds windows)
-        # most_frequent = mode(pitches)
-        # if pitches.count(most_frequent) / len(pitches) > 0.3:
-        #     dominant_pitch = most_frequent
-        #     print("The dominant pitch is: " + dominant_pitch)
-        # else:
-        #     print("No dominant pitch found for this part.")
 
 
 # Splits song into small windows
@@ -151,12 +100,32 @@ def splitSong(path):
           " successfully split into " + str(slices) + " slices.")
 
 
+def librosaChords(path, timeframe):
+    y, sr = librosa.load(path)
+    stft = librosa.feature.chroma_stft(y=y, sr=sr)
+    cqt = librosa.feature.chroma_cqt(y=y, sr=sr)
+
+    fig, ax = plt.subplots()
+    img = librosa.display.specshow(stft, y_axis='chroma', x_axis='time', ax=ax)
+    ax.set(title='STFT' + " - " + Path(path).stem)
+    plt.xlim(timeframe)
+    fig.colorbar(img, ax=ax)
+    plt.show()
+
+    fig, ax = plt.subplots()
+    img = librosa.display.specshow(cqt, y_axis='chroma', x_axis='time', ax=ax)
+    ax.set(title='CQT' + " - " + Path(path).stem)
+    plt.xlim(timeframe)
+    fig.colorbar(img, ax=ax)
+    plt.show()
+
+
+# Librosa function to get vocal filter
 def librosaVocalFilter(path):
-# Compute chroma features
-    fn_wav = path
+    y, sr = librosa.load(path)
+
     N = 4096
     H = 2048
-    y, sr = librosa.load(fn_wav)
     
     S_full, phase = librosa.magphase(librosa.stft(y))
     
@@ -229,3 +198,8 @@ def librosaVocalFilter(path):
     # not actually doing a good job
     new_y = librosa.istft(S_background*phase)
     sf.write("../Data/background.wav", new_y, sr)
+
+# Analyzes all spleeter files
+def spleeter(path, timeframe):
+    for file in os.listdir(path):
+        librosaChords(path + '/' + file, timeframe)

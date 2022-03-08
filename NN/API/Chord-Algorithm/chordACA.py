@@ -17,11 +17,10 @@ def getChords(path, timeframe):
     
     (label, index, time, P_E) = pyACA.computeChordsCl(path)
     
-    print(np.shape(label))
-    # plt.title("Identified chords - pyACA")
-    # plt.xlim(timeframe)                   # only 50 - 60 sec
-    # plt.scatter(time, label[0])        # Believe this is correct one but not sure
-    # plt.show()
+    plt.title("Identified chords - pyACA")
+    plt.xlim(timeframe)                   # only 50 - 60 sec
+    plt.scatter(time, label[0])        # Believe this is correct one but not sure
+    plt.show()
 
     # If we want many chords
     # for file in os.listdir(dict.BASE_DIR + dict.SLICE_DIR):
