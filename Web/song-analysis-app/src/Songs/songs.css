@@ -1,0 +1,8 @@
+.songs {
+    margin: auto;
+    margin-top: 100px;
+    width: 75%;
+    height: 350px;
+    border-style: solid;
+    border-radius: 10px;
+}
