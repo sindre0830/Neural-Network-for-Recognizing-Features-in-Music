@@ -1,47 +1,39 @@
+# import local modules
+import dictionary as dict
 # import foreign modules
-import pydub.utils
 import aubio
 import numpy as np
+import matplotlib.pyplot as plt
+import librosa
+import librosa.display
+import librosa.beat
+import os
+
+
+# Get beats and BPM from Librosa's beat tracker.
+def librosaBeatAnalysis(id):
+    # loads audio file and gets bpm and beat timestamps
+    y, sr = librosa.load(dict.getModifiedAudioPath(id), sr=None)
+    return librosa.beat.beat_track(y=y, sr=sr, units="time")
 
 
 # Handler for aubio analysis.
-def analyseBeats(path):
-    info = pydub.utils.mediainfo(path)
-    # gets timestamps and bpm - use arguments if only one is wanted
-    (beats, bpm) = get_file_bpm(path, samplerate=int(info['sample_rate']))
-    # decide what to do with output here - currently just prints
-    return beats, bpm
+def aubioBeatAnalysis(id):
+    # gets timestamps and bpm
+    beats = extractBeats(dict.getModifiedAudioPath(id))
+    bpm = getBPM(beats)
+    return bpm, beats
 
 
-# Improve error handling here
-def beats_to_bpm(beats, path):
-    # if enough beats are found, convert to periods then to bpm
-    if len(beats) > 1:
-        if len(beats) < 4:
-            print("few beats found in {:s}".format(path))
-        bpms = 60. / np.diff(beats)
-        return np.median(bpms)
-    else:
-        print("not enough beats found in {:s}".format(path))
-        return None
-
-
-# path: path to the file
-# samplerate: samplerate of file - once normalized, this should not be a parameter
-# win_s: window size in frames
-# hop_s: frame jump between windows (default half of window size)
-# output: can specify only BPM or only timestamp output
-# Function modified from official Aubio demo file
+# Get timestamps for each beat extracted.
 # Source: https://github.com/aubio/aubio/blob/master/python/demos/demo_bpm_extract.py
-def get_file_bpm(path, samplerate=48000, win_s=512, hop_s=256, output=None):
-    src = aubio.source(path, samplerate, hop_s)
-    samplerate = src.samplerate
-    o = aubio.tempo("specdiff", win_s, hop_s, samplerate)
-    # List of beats, in samples
+def extractBeats(path, win_s=512, hop_s=256):
+    # load file and get tempo
+    src = aubio.source(path, dict.SAMPLERATE, hop_s)
+    o = aubio.tempo("specdiff", win_s, hop_s, src.samplerate)
+    # read through the frames and save the timestamp of each found beat
     beats = []
-    # Total number of frames read
     total_frames = 0
-
     while True:
         samples, read = src()
         is_beat = o(samples)
@@ -51,12 +43,48 @@ def get_file_bpm(path, samplerate=48000, win_s=512, hop_s=256, output=None):
         total_frames += read
         if read < hop_s:
             break
+    return beats
 
-    bpmResult = beats_to_bpm(beats, path)
-    # Could use match here instead if Python 3.10
-    if output == "bpm":
-        return(None, bpmResult)
-    elif output == "beats":
-        return(beats, None)
+
+# Calculate beats per minute.
+def getBPM(beats):
+    # if enough beats are found, convert to periods then to bpm
+    if len(beats) > 1:
+        return np.median(60. / np.diff(beats))
     else:
-        return (beats, bpmResult)
+        return None
+
+
+# Plots beat timestamps.
+def plotBeats(id, manual_beats=None, aubio_beats=None, librosa_beats=None, start=None, end=None):
+    # load audio file
+    y, _ = librosa.load(dict.getModifiedAudioPath(id))
+    # plot waveform and add title
+    librosa.display.waveshow(y, alpha=0.6)
+    plt.title(id + "  -  " + str(dict.SAMPLERATE) + " samplerate", pad=40.)
+    # plot beat timestamps
+    n = 0
+    if aubio_beats is not None:
+        plt.vlines(aubio_beats, 0.33, 1, color="r", linestyle="--", label="Aubio")
+        n += 1
+    if manual_beats is not None:
+        plt.vlines(manual_beats, -0.33, 0.33, color="black", linestyle="--", label="Manual")
+        n += 1
+    if librosa_beats is not None:
+        plt.vlines(librosa_beats, -1, -0.33, color="g", linestyle="--", label="Librosa")
+        n += 1
+    plt.ylim(-1, 1)
+    if manual_beats is not None or aubio_beats is not None or librosa_beats is not None:
+        plt.legend(bbox_to_anchor=(0, 1.02, 1, 0.2), loc="lower left", mode="expand", ncol=n)
+    # trim figure between two timestamps
+    if start is not None:
+        plt.xlim(left=start)
+    if end is not None:
+        plt.xlim(right=end)
+    # branch if plot directory doesn't exist
+    if not os.path.exists(dict.PLOTS_DIR):
+        os.makedirs(dict.PLOTS_DIR)
+    # save plot as PNG and show results
+    plt.subplots_adjust(top=0.8)
+    plt.savefig(dict.getPlotPath(id), dpi=300, transparent=True, bbox_inches="tight")
+    plt.show()

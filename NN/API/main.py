@@ -11,6 +11,19 @@ start_time = time.time()
 app = flask.Flask(__name__)
 
 
+# Main program.
+def main():
+    # define youtube id
+    id = "hPOYc4a2RPY"
+    # preprocess audio file
+    preprocessing.downloadAudio(id)
+    preprocessing.resampleAudio(id)
+    # analyze song
+    _, aubioBeats = beat_algorithm.aubioBeatAnalysis(id)
+    _, librosaBeats = beat_algorithm.librosaBeatAnalysis(id)
+    beat_algorithm.plotBeats(id, manual_beats=None, aubio_beats=aubioBeats, librosa_beats=librosaBeats, start=0, end=10)
+
+
 # Calculate time since program started in seconds.
 def getUptime():
     return ("%i seconds" % math.floor(time.time() - start_time))
@@ -37,12 +50,18 @@ def analysis():
         }
         return error
     # preprocess audio file
-    filename = preprocessing.downloadAudio(id)
+    preprocessing.downloadAudio(id)
+    preprocessing.resampleAudio(id)
     # analyze song
-    beats, bpm = beat_algorithm.analyseBeats(dict.AUDIO_DIR + filename)
+    bpm, beats = beat_algorithm.librosaBeatAnalysis(id)
     # return output
     output = {
         "bpm": bpm,
         "beats": beats
     }
     return output
+
+
+# branch if program is run through 'python main.py'
+if __name__ == "__main__":
+    main()

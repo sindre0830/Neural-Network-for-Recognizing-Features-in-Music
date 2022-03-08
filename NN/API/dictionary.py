@@ -4,10 +4,17 @@ VERSION = 'v1'
 DIAGNOSIS_PATH = '/' + VERSION + '/diag'
 ANALYSIS_PATH = '/' + VERSION + '/analysis'
 # directory paths
-AUDIO_DIR = "Data/Audio/"
 SPLIT_DIR = "Data/Audio/Split/"
+PLOTS_DIR = "Data/Plots/"
+NATIVE_DIR = "Data/Audio/Native/"
+MODIFIED_DIR = "Data/Audio/Modified/"
 # extensions for conversion to wav
 EXTENSIONS = [".m4v", ".webm", ".mp3", ".mp4"]
+# formats
+WAV_FORMAT = ".wav"
+PNG_FORMAT = ".png"
+# parameters
+SAMPLERATE = 22050
 # status messages
 DONE = 'DONE'
 SUCCESS = 'SUCCESS'
@@ -16,6 +23,18 @@ FAILED = 'FAILED'
 STEMS2 = ["accompaniment", "vocals"]
 STEMS4 = ["bass", "drums", "other", "vocals"]
 STEMS5 = ["piano", "bass", "drums", "other", "vocals"]
+
+
+def getNativeAudioPath(id):
+    return NATIVE_DIR + id + WAV_FORMAT
+
+
+def getModifiedAudioPath(id):
+    return MODIFIED_DIR + id + WAV_FORMAT
+
+
+def getPlotPath(id):
+    return PLOTS_DIR + id + PNG_FORMAT
 
 
 # Print operation that allows status message on the same line.
