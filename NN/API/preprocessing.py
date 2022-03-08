@@ -57,7 +57,7 @@ def splitAudio(path, stemVer, stem):
 
     audio_loader = AudioAdapter.default()
     sample_rate = 44100
-    waveform, _ = audio_loader.load(path, sample_rate=sample_rate)
+    waveform, _ = audio_loader.load(dict.NATIVE_DIR + path, sample_rate=sample_rate)
 
     # Perform the separation :
     prediction = separator.separate(waveform)

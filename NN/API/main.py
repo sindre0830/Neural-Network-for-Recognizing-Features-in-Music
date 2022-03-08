@@ -17,6 +17,7 @@ def main():
     id = "hPOYc4a2RPY"
     # preprocess audio file
     preprocessing.downloadAudio(id)
+    preprocessing.splitAudio(id, 0, "accompaniment")
     preprocessing.resampleAudio(id)
     # analyze song
     _, aubioBeats = beat_algorithm.aubioBeatAnalysis(id)
