@@ -5,6 +5,8 @@ import os
 from pathlib import Path
 from pydub import AudioSegment
 import pafy
+from scipy.io.wavfile import write
+from spleeter.separator import Separator
 
 
 # Downloads an audio file from given URL.
@@ -68,3 +70,28 @@ def convertFolder(path):
         convertToWav(path + "/" + file, os.path.basename(path))
         print(file + " converted to wav!")
     print("Conversion of " + os.path.basename(path) + " done!")
+
+
+def splitAudio(path, stemVer, stem):
+    stems = ""
+    if stemVer == 2:
+        stems = "2stems"
+    elif stemVer == 4:
+        stems = "4stems"
+    elif stemVer == 5:
+        stems = "5stems"
+    separator = Separator('spleeter:'+ stems)
+    from spleeter.audio.adapter import AudioAdapter
+
+    audio_loader = AudioAdapter.default()
+    sample_rate = 44100
+    waveform, _ = audio_loader.load(path, sample_rate=sample_rate)
+
+    # Perform the separation :
+    prediction = separator.separate(waveform)
+    
+    if not os.path.exists(dict.SPLIT_DIR):
+        os.makedirs(dict.SPLIT_DIR)
+    # Write relevant 
+    write("../Data/Audio/Split/P6mxaFORJ1M-" + stem + ".wav", sample_rate, prediction[stem])
+    
