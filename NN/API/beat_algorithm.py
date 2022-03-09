@@ -14,6 +14,7 @@ def librosaBeatAnalysis(id):
     y, sr = librosa.load(dict.getModifiedAudioPath(id), sr=None)
     return librosa.beat.beat_track(y=y, sr=sr, units="time")
 
+
 # Plots beat timestamps.
 def plotBeats(id, manual_beats=None, aubio_beats=None, librosa_beats=None, start=None, end=None):
     # load audio file
