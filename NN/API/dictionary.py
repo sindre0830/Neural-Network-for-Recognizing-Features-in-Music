@@ -20,9 +20,16 @@ DONE = 'DONE'
 SUCCESS = 'SUCCESS'
 FAILED = 'FAILED'
 # stem options for spleeter
-STEMS2 = ["accompaniment", "vocals"]
-STEMS4 = ["bass", "drums", "other", "vocals"]
-STEMS5 = ["piano", "bass", "drums", "other", "vocals"]
+NO_STEMS = None
+STEMS2 = "2stems"
+STEMS4 = "4stems"
+STEMS5 = "5stems"
+VOCALS = "/vocals" + WAV_FORMAT
+OTHER = "/other" + WAV_FORMAT
+BASS = "/bass" + WAV_FORMAT
+DRUMS = "/drums" + WAV_FORMAT
+PIANO = "/piano" + WAV_FORMAT
+ACCOMPANIMENT = "/accompaniment" + WAV_FORMAT
 
 
 def getNativeAudioPath(id):

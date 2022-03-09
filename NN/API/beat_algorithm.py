@@ -1,8 +1,8 @@
 # import local modules
 import dictionary as dict
 # import foreign modules
-import aubio
-import numpy as np
+#import aubio
+#import numpy as np
 import matplotlib.pyplot as plt
 import librosa
 import librosa.display
@@ -16,7 +16,7 @@ def librosaBeatAnalysis(id):
     y, sr = librosa.load(dict.getModifiedAudioPath(id), sr=None)
     return librosa.beat.beat_track(y=y, sr=sr, units="time")
 
-
+""""
 # Handler for aubio analysis.
 def aubioBeatAnalysis(id):
     # gets timestamps and bpm
@@ -53,14 +53,14 @@ def getBPM(beats):
         return np.median(60. / np.diff(beats))
     else:
         return None
-
+"""
 
 # Plots beat timestamps.
 def plotBeats(id, manual_beats=None, aubio_beats=None, librosa_beats=None, start=None, end=None):
     # load audio file
-    y, _ = librosa.load(dict.getModifiedAudioPath(id))
+    y, _ = librosa.load(dict.getModifiedAudioPath(id), sr=dict.SAMPLERATE)
     # plot waveform and add title
-    librosa.display.waveshow(y, alpha=0.6)
+    librosa.display.waveplot(y, alpha=0.6)
     plt.title(id + "  -  " + str(dict.SAMPLERATE) + " samplerate", pad=40.)
     # plot beat timestamps
     n = 0
