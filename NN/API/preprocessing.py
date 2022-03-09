@@ -5,6 +5,7 @@ import os
 import librosa
 import soundfile as sf
 import shutil
+import numpy as np
 
 
 # Downloads an audio file from given URL.
@@ -58,4 +59,12 @@ def resampleAudio(id):
             y = librosa.resample(y=y, orig_sr=sr, target_sr=dict.SAMPLERATE)
         # save resampled audio file to disk
         sf.write(dict.getModifiedAudioPath(id), data=y, samplerate=dict.SAMPLERATE)
+
+
+def filterAudio(id):
+    y, _ = librosa.load(path=dict.getModifiedAudioPath(id), sr=None)
+    threshold = lambda t: 0. if t < 0.15 else t
+    applyFilter = np.vectorize(threshold)
+    y = applyFilter(y)
+    sf.write(dict.getModifiedAudioPath(id), data=y, samplerate=dict.SAMPLERATE)
     

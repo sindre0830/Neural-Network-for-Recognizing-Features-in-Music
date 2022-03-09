@@ -14,7 +14,7 @@ EXTENSIONS = [".m4v", ".webm", ".mp3", ".mp4"]
 WAV_FORMAT = ".wav"
 PNG_FORMAT = ".png"
 # parameters
-SAMPLERATE = 22050
+SAMPLERATE = 10000
 # status messages
 DONE = 'DONE'
 SUCCESS = 'SUCCESS'
