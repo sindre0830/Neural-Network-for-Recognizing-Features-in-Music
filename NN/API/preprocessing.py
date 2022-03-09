@@ -61,10 +61,9 @@ def resampleAudio(id):
         sf.write(dict.getModifiedAudioPath(id), data=y, samplerate=dict.SAMPLERATE)
 
 
+# Filter audio by threshold.
 def filterAudio(id):
     y, _ = librosa.load(path=dict.getModifiedAudioPath(id), sr=None)
-    threshold = lambda t: 0. if t < 0.15 else t
-    applyFilter = np.vectorize(threshold)
+    applyFilter = np.vectorize(lambda t: 0. if t < 0.15 else t)
     y = applyFilter(y)
     sf.write(dict.getModifiedAudioPath(id), data=y, samplerate=dict.SAMPLERATE)
-    

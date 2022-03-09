@@ -19,9 +19,8 @@ def main():
     preprocessing.downloadAudio(id)
     preprocessing.splitAudio(id, mode=dict.STEMS2, output=dict.ACCOMPANIMENT)
     preprocessing.resampleAudio(id)
-    #preprocessing.filterAudio(id)
+    # preprocessing.filterAudio(id)
     # analyze song
-    #_, aubioBeats = beat_algorithm.aubioBeatAnalysis(id)
     _, librosaBeats = beat_algorithm.librosaBeatAnalysis(id)
     manual = [
             0.3,
