@@ -20,13 +20,13 @@ def main():
     preprocessing.downloadAudio(id)
     preprocessing.splitAudio(id, mode=dict.NO_STEMS)
     preprocessing.resampleAudio(id, dict.SAMPLERATE_BEATS)
-    # preprocessing.filterAudio(id)
     # analyze song
     _, librosaBeats = beat_algorithm.librosaBeatAnalysis(id)
     beat_algorithm.plotBeats(id, manual_beats=None, aubio_beats=None, librosa_beats=librosaBeats, start=None, end=None)
-    preprocessing.splitAudio(id, mode=dict.STEMS4, output=dict.OTHER)
+    preprocessing.splitAudio(id, mode=dict.STEMS2, output=dict.ACCOMPANIMENT)
     preprocessing.resampleAudio(id, dict.SAMPLERATE_CHORDS)
-    chord_algorithm.plotChromagram(id)
+    #chord_algorithm.plotChromagram(id)
+    chord_algorithm.getChord(id, librosaBeats[2], librosaBeats[3])
 
 
 # Calculate time since program started in seconds.

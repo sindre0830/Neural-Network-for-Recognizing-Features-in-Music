@@ -2,11 +2,17 @@
 import pyACA
 import matplotlib.pyplot as plt
 import numpy as np
+# external
 import librosa
 import librosa.display
-
-#internal
+# internal
 import dictionary as dict
+
+# gets chords between timestamps
+def getChord(id: str, start: float, end: float):
+    y, sr = librosa.load(dict.getModifiedAudioPath(id), sr=None, offset=start, duration=(end - start))
+    (label, _, _, _) = pyACA.computeChords(y, sr)
+    print(label[0])
 
 
 # get chroma with chordACA
