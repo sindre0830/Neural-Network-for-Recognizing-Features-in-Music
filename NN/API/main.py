@@ -14,14 +14,15 @@ app = flask.Flask(__name__)
 # Main program.
 def main():
     # define youtube id
-    id = "hPOYc4a2RPY"
+    id = "N8BXtM6onEY"
     # preprocess audio file
     preprocessing.downloadAudio(id)
+    preprocessing.splitAudio(id, mode=dict.STEMS2, output=dict.ACCOMPANIMENT)
     preprocessing.resampleAudio(id)
+    # preprocessing.filterAudio(id)
     # analyze song
-    _, aubioBeats = beat_algorithm.aubioBeatAnalysis(id)
     _, librosaBeats = beat_algorithm.librosaBeatAnalysis(id)
-    beat_algorithm.plotBeats(id, manual_beats=None, aubio_beats=aubioBeats, librosa_beats=librosaBeats, start=0, end=10)
+    beat_algorithm.plotBeats(id, manual_beats=None, aubio_beats=None, librosa_beats=librosaBeats, start=None, end=None)
 
 
 # Calculate time since program started in seconds.

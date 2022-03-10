@@ -13,11 +13,22 @@ EXTENSIONS = [".m4v", ".webm", ".mp3", ".mp4"]
 WAV_FORMAT = ".wav"
 PNG_FORMAT = ".png"
 # parameters
-SAMPLERATE = 22050
+SAMPLERATE = 10000
 # status messages
 DONE = 'DONE'
 SUCCESS = 'SUCCESS'
 FAILED = 'FAILED'
+# stem options for spleeter
+NO_STEMS = None
+STEMS2 = "2stems"
+STEMS4 = "4stems"
+STEMS5 = "5stems"
+VOCALS = "/vocals" + WAV_FORMAT
+OTHER = "/other" + WAV_FORMAT
+BASS = "/bass" + WAV_FORMAT
+DRUMS = "/drums" + WAV_FORMAT
+PIANO = "/piano" + WAV_FORMAT
+ACCOMPANIMENT = "/accompaniment" + WAV_FORMAT
 
 
 def getNativeAudioPath(id):
