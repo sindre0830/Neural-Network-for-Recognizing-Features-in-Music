@@ -11,7 +11,9 @@ import dictionary as dict
 
 # get chroma with chordACA
 def chordACA(id, timeframe=None):
-    (label, index, time, P_E) = pyACA.computeChordsCl(dict.getModifiedAudioPath(id))
+    #(label, index, time, P_E) = pyACA.computeChordsCl(dict.getModifiedAudioPath(id))
+    y, sr = librosa.load(dict.getModifiedAudioPath(id), sr=None)
+    (label, index, time, P_E) = pyACA.computeChords(y, sr)
     plt.title("Identified chords - pyACA")
     if timeframe is not None:
         plt.xlim(timeframe)
