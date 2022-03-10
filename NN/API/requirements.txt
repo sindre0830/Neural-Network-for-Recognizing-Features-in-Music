@@ -1,8 +1,6 @@
 flask
-youtube-dl==2020.12.02
 librosa
 matplotlib
-aubio
 yt-dlp
 spleeter
-numpy==1.19.3
+numpy==1.19.5
