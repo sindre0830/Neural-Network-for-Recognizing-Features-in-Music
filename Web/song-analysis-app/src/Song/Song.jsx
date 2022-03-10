@@ -18,7 +18,7 @@ const Song = (props) => {
                     <button>Approve</button>
                 }
 
-                {/* checks if the arrow is going to point up or down*/}
+                {/* check if the arrow is going to point up or down*/}
                 {toggleSong
                     ? <FiChevronUp size={28} onClick={() => setToggle(false)} style={{cursor: 'pointer'}}/>
                     : <FiChevronDown size={28} onClick={() => setToggle(true)} style={{ cursor: 'pointer' }}/>
@@ -26,7 +26,7 @@ const Song = (props) => {
             </div>
             <hr />
             <div className='song__result'>
-                {/* displays result */}
+                {/* display result */}
                 {toggleSong &&
                     <div>
                         <pre>{JSON.stringify(props.value, null, 2)}</pre>

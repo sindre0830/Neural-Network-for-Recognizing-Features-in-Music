@@ -5,3 +5,29 @@
     width: 75%;
     font-family: var(--font-family);
 }
+
+/* small devices */
+@media (min-width: 768px) {
+    .songs {
+        padding: 0 20px 0 20px;
+        width: 70%;
+        border: 1px solid;
+        border-radius: 10px;
+    }
+}
+
+/* medium devices */
+@media (min-width: 992px) {
+    .songs {
+        padding: 5px 30px 5px 30px;
+        width: 65%;
+    }
+}
+
+/* large devices */
+@media (min-width: 1200px) {
+    .songs {
+        padding: 20px 50px 20px 50px;
+        width: 50%;
+    }
+}
