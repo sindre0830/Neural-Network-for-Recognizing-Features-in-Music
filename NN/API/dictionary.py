@@ -4,7 +4,6 @@ VERSION = 'v1'
 DIAGNOSIS_PATH = '/' + VERSION + '/diag'
 ANALYSIS_PATH = '/' + VERSION + '/analysis'
 # directory paths
-SPLIT_DIR = "Data/Audio/Split/"
 PLOTS_DIR = "Data/Plots/"
 NATIVE_DIR = "Data/Audio/Native/"
 MODIFIED_DIR = "Data/Audio/Modified/"
