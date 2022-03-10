@@ -2,12 +2,8 @@
 import pyACA
 import matplotlib.pyplot as plt 
 import numpy as np
-import os 
 import librosa
-
-#internal
-import dictionary as dict
-
+import librosa.display
 
 # get chroma with chordACA
 def chordACA(path, timeframe):
