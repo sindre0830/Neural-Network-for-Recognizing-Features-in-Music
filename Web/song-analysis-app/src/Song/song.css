@@ -3,6 +3,10 @@
     padding-top: 25px;
 }
 
+.song hr {
+    border: none;
+}
+
 .song__title {
     display: flex;
     margin-bottom: 10px;
@@ -10,14 +14,15 @@
 
 .song__title hr {
     height: 20px;
+    width: 7px;
 }
 
 .song__title-approved {
-    border:3px solid var(--color-approved);
+    background-color: var(--color-approved);
 }
 
 .song__title-pending {
-    border:3px solid var(--color-pending);
+    background-color: var(--color-pending);
 }
 
 .song__title h1 {
@@ -38,6 +43,11 @@
     font-style: bold;
     font-size: 14px;
     cursor: pointer;
+}
+
+.song__line hr {
+    background-color: black;
+    height: 1px;
 }
 
 .song__result {

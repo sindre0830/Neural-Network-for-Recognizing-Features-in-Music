@@ -24,7 +24,9 @@ const Song = (props) => {
                     : <FiChevronDown size={28} onClick={() => setToggle(true)} style={{ cursor: 'pointer' }}/>
                 }
             </div>
-            <hr />
+            <div className='song__line'>
+                <hr />
+            </div>
             <div className='song__result'>
                 {/* display result */}
                 {toggleSong &&
