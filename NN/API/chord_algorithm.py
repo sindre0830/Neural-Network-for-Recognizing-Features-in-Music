@@ -5,33 +5,24 @@ import numpy as np
 import librosa
 import librosa.display
 
+#internal
+import dictionary as dict
+
 
 # get chroma with chordACA
-def chordACA(path, timeframe):
-    (label, index, time, P_E) = pyACA.computeChordsCl(path)
+def chordACA(id, timeframe=None):
+    (label, index, time, P_E) = pyACA.computeChordsCl(dict.getModifiedAudioPath(id))
     plt.title("Identified chords - pyACA")
-    plt.xlim(timeframe)
+    if timeframe is not None:
+        plt.xlim(timeframe)
     plt.scatter(time, label[0])
     plt.show()
 
 
-# get chroma with librosa
-def chordLibrosa(path, timeframe=None):
-    y, sr = librosa.load(path)
+# Plots the song as a chromagram - mostly used for debugging/testing
+def plotChromagram(id):
+    y, sr = librosa.load(dict.getModifiedAudioPath(id), sr=None)
     chroma = librosa.feature.chroma_stft(y=y, sr=sr)
-
-    plotChord(chroma, y, timeframe)
-
-
-# Plots the song as a diagram - mostly used for debugging/testing
-def plotChord(chroma, source, timeframe=None):
-    fig, ax = plt.subplots(nrows=2, sharex=True)
-    img = librosa.display.specshow(librosa.amplitude_to_db(
-        source, ref=np.max), y_axis='log', x_axis='time', ax=ax[0])
-    if timeframe is not None:
-        plt.xlim(timeframe)
-    fig.colorbar(img, ax=[ax[0]])
-    ax[0].label_outer()
-    img = librosa.display.specshow(
-        chroma, y_axis='chroma', x_axis='time', ax=ax[1])
-    fig.colorbar(img, ax=[ax[1]])
+    plt.figure(figsize=(15, 5))
+    librosa.display.specshow(chroma, x_axis='time', y_axis='chroma')
+    plt.show()
