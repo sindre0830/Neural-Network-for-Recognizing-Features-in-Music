@@ -103,7 +103,8 @@ def parseJson(path):
             with open("Data/processedSongs.json", "r+") as outfile:
                 outfile.write(json_object)
             print("Successfully updated processedSongs.json")
-        else: print("No new data")
+        else: 
+            print("No new data")
     else:
         print("Missing songs.json")
 
@@ -163,8 +164,7 @@ def flattenSongData(song):
     return {"id": song["youtubeLink"], "chords": chordsWithoutDuplicates, "beats": beatTimes}
 
 
-# Turns a chord on the format in the EC-Play app into one of the chords in the array: 
-# ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B', 'Cm', 'C#m', 'Dm', 'D#m', 'Em', 'Fm', 'F#m', 'Gm', 'G#m', 'Am', 'A#m', 'Bm']
+# Turns a chord on the format in the EC-Play app into one of the chords in the array.
 def chordToString(chordNum: int, minor: bool):
     if chordNum > 11 or chordNum < 0:
         return ""
@@ -172,14 +172,14 @@ def chordToString(chordNum: int, minor: bool):
     charNum = chordNum//2 + 1
 
     if chordNum <= 2 or chordNum == 4 or chordNum == 6:
-        charNum -= 1 
+        charNum -= 1
 
     char = chr(charNum + 65)
 
     if chordNum == 1 or chordNum == 4 or chordNum == 6 or chordNum == 9 or chordNum == 11:
         char += "#"
 
-    if minor: 
+    if minor:
         char += "m"
 
     return char
