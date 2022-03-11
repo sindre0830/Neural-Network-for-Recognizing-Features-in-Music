@@ -72,7 +72,7 @@ def filterAudio(id):
     sf.write(dict.getModifiedAudioPath(id), data=y, samplerate=sr)
 
 
-# Parses songs.json from website
+# Parses songs.json to a simplified JSON object.
 def parseJson(path):
     if os.path.exists(dict.JSON_PATH):
         dict.FLAG_DATABASE = True
@@ -80,14 +80,14 @@ def parseJson(path):
             document = json.loads(f.read())
 
         current = {}
-        with open(dict.PROCESSED_JSON_PATH, "r+") as f:
+        with open(dict.PROCESSED_JSON_PATH, "w+") as f:
             if os.path.getsize(dict.PROCESSED_JSON_PATH) != 0:
                 current = json.loads(f.read())
 
         songs = {}
-        s = {}
 
         for key in document:
+            s = {}
             song = flattenSongData(key)
             s["chords"] = song["chords"]
             s["beats"] = song["beats"]
@@ -99,7 +99,7 @@ def parseJson(path):
         # Overwrite if new data
         if len(songs) > len(current):
             json_object = json.dumps(songs, indent=3)
-            with open("Data/processedSongs.json", "r+") as outfile:
+            with open(dict.PROCESSED_JSON_PATH, "r+") as outfile:
                 outfile.write(json_object)
             print("Successfully updated processedSongs.json")
         else:
@@ -108,59 +108,38 @@ def parseJson(path):
         print("Missing songs.json")
 
 
-# Extracts relevant song data for testing from songs.json
+# Extracts relevant song data for testing from songs.json.
 def flattenSongData(song):
     arrangement = song["arrangement"]
     parts = song["parts"]
     beats = song["beats"]
     flattenedChords = []
-    beatIndexes = []
-    beatCounter = 0
 
-    # Going through every part and repetition in song
+    # going through every part and repetition in song
     for arr in arrangement:
         partIndex = int(arr["part"])
         part = parts[partIndex]
-        partLength = int(part["length"])
         repetitions = int(arr["repetitions"])
         bars = part["bars"]
         chordsInRepetition = []
-        beatIndexesInRepetition = []
 
-        # Going though every chord in the part
+        # going though every chord in the part
         for bar in bars:
             chords = bar["chords"]
+            length = bar["length"]
             for chord in chords:
                 if ("pause" in chord and chord["pause"]) or chord["chord"] == "pause":
-                    chordsInRepetition.append("")
+                    for _ in range(length):
+                        chordsInRepetition.append("")
                 else:
-                    chordsInRepetition.append(chordToString(
-                        int(chord["chord"]), chord["minor"]))
-                beatIndexesInRepetition.append(beatCounter)
-                beatCounter += int(chord["length"])
+                    for _ in range(length):
+                        chordsInRepetition.append(chordToString(int(chord["chord"]), chord["minor"]))
 
-        # Adding a duplicate for each repetition
-
-        for i in range(repetitions):
+        # adding a duplicate for each repetition
+        for _ in range(repetitions):
             flattenedChords += chordsInRepetition
-            beatIndexes += [beatIndex + i *
-                            partLength for beatIndex in beatIndexesInRepetition]
 
-        beatCounter += partLength*(repetitions-1)
-
-    # Removing all duplicates
-    chordsWithoutDuplicates = [flattenedChords[0]]
-    beatIndexesWithoutDuplicates = [beatIndexes[0]]
-
-    for i in range(len(flattenedChords) - 1):
-        if flattenedChords[i] != flattenedChords[i+1]:
-            chordsWithoutDuplicates.append(flattenedChords[i+1])
-            beatIndexesWithoutDuplicates.append(beatIndexes[i+1])
-
-    beatTimes = [beats[beatIndex]
-                 for beatIndex in beatIndexesWithoutDuplicates]
-
-    return {"id": song["youtubeLink"], "chords": chordsWithoutDuplicates, "beats": beatTimes}
+    return {"id": song["youtubeLink"], "chords": flattenedChords, "beats": beats}
 
 
 # Turns a chord on the format in the EC-Play app into one of the chords in the array.
