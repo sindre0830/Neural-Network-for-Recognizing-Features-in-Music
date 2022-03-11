@@ -17,6 +17,7 @@ def main():
     # define youtube id
     id = "N8BXtM6onEY"
     # preprocess audio file and perform beat tracking
+    preprocessing.parseJson(dict.JSON_PATH)
     preprocessing.downloadAudio(id)
     preprocessing.splitAudio(id, mode=dict.NO_STEMS)
     preprocessing.resampleAudio(id, dict.SAMPLERATE_BEATS)
