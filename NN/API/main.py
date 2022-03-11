@@ -16,16 +16,15 @@ app = flask.Flask(__name__)
 def main():
     # define youtube id
     id = "N8BXtM6onEY"
-    # preprocess audio file
+    # preprocess audio file and perform beat tracking
     preprocessing.downloadAudio(id)
     preprocessing.splitAudio(id, mode=dict.NO_STEMS)
     preprocessing.resampleAudio(id, dict.SAMPLERATE_BEATS)
-    # analyze song
     _, librosaBeats = beat_algorithm.librosaBeatAnalysis(id)
     beat_algorithm.plotBeats(id, manual_beats=None, aubio_beats=None, librosa_beats=librosaBeats, start=None, end=None)
+    # preprocess audio file and perform chord recognition
     preprocessing.splitAudio(id, mode=dict.STEMS2, output=dict.ACCOMPANIMENT)
     preprocessing.resampleAudio(id, dict.SAMPLERATE_CHORDS)
-    #chord_algorithm.plotChromagram(id)
     chord_algorithm.getChord(id, librosaBeats[2], librosaBeats[3])
 
 
