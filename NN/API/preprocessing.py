@@ -103,7 +103,7 @@ def parseJson(path):
             with open("Data/processedSongs.json", "r+") as outfile:
                 outfile.write(json_object)
             print("Successfully updated processedSongs.json")
-        else: 
+        else:
             print("No new data")
     else:
         print("Missing songs.json")
