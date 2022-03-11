@@ -1,5 +1,6 @@
 flask
 librosa
+pyaca==0.3.0
 matplotlib
 yt-dlp
 spleeter

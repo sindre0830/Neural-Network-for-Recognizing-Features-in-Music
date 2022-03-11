@@ -15,7 +15,8 @@ EXTENSIONS = [".m4v", ".webm", ".mp3", ".mp4"]
 WAV_FORMAT = ".wav"
 PNG_FORMAT = ".png"
 # parameters
-SAMPLERATE = 10000
+SAMPLERATE_BEATS = 10000
+SAMPLERATE_CHORDS = 22050
 # status messages
 DONE = 'DONE'
 SUCCESS = 'SUCCESS'
@@ -45,6 +46,12 @@ def getModifiedAudioPath(id):
 
 def getPlotPath(id):
     return PLOTS_DIR + id + PNG_FORMAT
+
+
+chords = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B', 'Cm', 'C#m',
+          'Dm', 'D#m', 'Em', 'Fm', 'F#m', 'Gm', 'G#m', 'Am', 'A#m', 'Bm']
+nested_cof = ['G', 'Bm', 'D', 'F#m', 'A', 'C#m', 'E', 'G#m', 'B', 'D#m', 'F#', 'A#m',
+              'C#', "Fm", "G#", 'Cm', 'D#', 'Gm', 'A#', 'Dm', 'F', 'Am', 'C', 'Em']
 
 
 # Print operation that allows status message on the same line.

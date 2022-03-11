@@ -41,7 +41,7 @@ def splitAudio(id, mode, output=None):
 
 
 # Resamples audio file and saves the modified version to disk.
-def resampleAudio(id):
+def resampleAudio(id, samplerate):
     # branch if audio directory doesn't exist
     if not os.path.exists(dict.MODIFIED_DIR):
         os.makedirs(dict.MODIFIED_DIR)
@@ -51,26 +51,25 @@ def resampleAudio(id):
         flagResample = True
     else:
         _, sr = librosa.load(path=dict.getModifiedAudioPath(id), sr=None)
-        if sr is not dict.SAMPLERATE:
+        if sr is not samplerate:
             flagResample = True
     # branch if audio needs to be resampled
     if flagResample:
         y, sr = librosa.load(path=dict.getModifiedAudioPath(id), sr=None)
         # branch if audio file doesn't have the correct samplerate
-        if sr is not dict.SAMPLERATE:
+        if sr is not samplerate:
             # resample audio to samplerate defined in dictionary
-            y = librosa.resample(y=y, orig_sr=sr, target_sr=dict.SAMPLERATE)
+            y = librosa.resample(y=y, orig_sr=sr, target_sr=samplerate)
         # save resampled audio file to disk
-        sf.write(dict.getModifiedAudioPath(id),
-                 data=y, samplerate=dict.SAMPLERATE)
+        sf.write(dict.getModifiedAudioPath(id), data=y, samplerate=samplerate)
 
 
 # Filter audio by threshold.
 def filterAudio(id):
-    y, _ = librosa.load(path=dict.getModifiedAudioPath(id), sr=None)
+    y, sr = librosa.load(path=dict.getModifiedAudioPath(id), sr=None)
     applyFilter = np.vectorize(lambda t: 0. if t < 0.15 else t)
     y = applyFilter(y)
-    sf.write(dict.getModifiedAudioPath(id), data=y, samplerate=dict.SAMPLERATE)
+    sf.write(dict.getModifiedAudioPath(id), data=y, samplerate=sr)
 
 
 # Parses songs.json from website

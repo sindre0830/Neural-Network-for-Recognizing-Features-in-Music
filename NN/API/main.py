@@ -2,6 +2,7 @@
 import dictionary as dict
 import preprocessing
 import beat_algorithm
+import chord_algorithm
 # import foreign modules
 import flask
 import time
@@ -15,15 +16,17 @@ app = flask.Flask(__name__)
 def main():
     # define youtube id
     id = "N8BXtM6onEY"
-    # preprocess audio file
+    # preprocess audio file and perform beat tracking
     preprocessing.parseJson(dict.JSON_PATH)
     preprocessing.downloadAudio(id)
-    preprocessing.splitAudio(id, mode=dict.STEMS2, output=dict.ACCOMPANIMENT)
-    preprocessing.resampleAudio(id)
-    # preprocessing.filterAudio(id)
-    # analyze song
+    preprocessing.splitAudio(id, mode=dict.NO_STEMS)
+    preprocessing.resampleAudio(id, dict.SAMPLERATE_BEATS)
     _, librosaBeats = beat_algorithm.librosaBeatAnalysis(id)
     beat_algorithm.plotBeats(id, manual_beats=None, aubio_beats=None, librosa_beats=librosaBeats, start=None, end=None)
+    # preprocess audio file and perform chord recognition
+    preprocessing.splitAudio(id, mode=dict.STEMS2, output=dict.ACCOMPANIMENT)
+    preprocessing.resampleAudio(id, dict.SAMPLERATE_CHORDS)
+    chord_algorithm.getChord(id, librosaBeats[2], librosaBeats[3])
 
 
 # Calculate time since program started in seconds.

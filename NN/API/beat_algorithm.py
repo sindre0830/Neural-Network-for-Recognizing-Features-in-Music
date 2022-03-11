@@ -18,10 +18,10 @@ def librosaBeatAnalysis(id):
 # Plots beat timestamps.
 def plotBeats(id, manual_beats=None, aubio_beats=None, librosa_beats=None, start=None, end=None):
     # load audio file
-    y, _ = librosa.load(dict.getModifiedAudioPath(id), sr=dict.SAMPLERATE)
+    y, sr = librosa.load(dict.getModifiedAudioPath(id), sr=None)
     # plot waveform and add title
     librosa.display.waveplot(y, alpha=0.6)
-    plt.title(id + "  -  " + str(dict.SAMPLERATE) + " samplerate", pad=40.)
+    plt.title(id + "  -  " + str(sr) + " samplerate", pad=40.)
     # plot beat timestamps
     n = 0
     if aubio_beats is not None:
