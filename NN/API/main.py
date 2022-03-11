@@ -16,6 +16,7 @@ def main():
     # define youtube id
     id = "N8BXtM6onEY"
     # preprocess audio file
+    preprocessing.parseJson(dict.JSON_PATH)
     preprocessing.downloadAudio(id)
     preprocessing.splitAudio(id, mode=dict.STEMS2, output=dict.ACCOMPANIMENT)
     preprocessing.resampleAudio(id)
