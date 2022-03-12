@@ -17,11 +17,9 @@ class BeatRecognizer:
     beats: np.ndarray
     bpm: float
 
-
     # Construct BeatRecognizer object.
     def __init__(self, id: str):
         self.id = id
-
 
     # Compute beat recognizer.
     def run(self, verbose: bool = False):
@@ -34,13 +32,11 @@ class BeatRecognizer:
         if verbose:
             self.plot(start=None, end=None)
 
-
     # Get beats and BPM from Librosa's beat tracker.
     def librosaBeatAnalysis(self):
         # loads audio file and gets bpm and beat timestamps
         y, sr = librosa.load(dict.getModifiedAudioPath(self.id), sr=None)
         self.bpm, self.beats = librosa.beat.beat_track(y=y, sr=sr, units="time")
-
 
     # Plots beat timestamps.
     def plot(self, start=None, end=None):
