@@ -16,7 +16,7 @@ app = flask.Flask(__name__)
 def main():
     # define youtube id
     id = "N8BXtM6onEY"
-    # preprocess audio file and perform beat tracking
+    # download file
     preprocessing.parseJson(dict.JSON_PATH)
     preprocessing.downloadAudio(id)
     # run beat recognizer
@@ -55,13 +55,13 @@ def analysis():
         return error
     # preprocess audio file
     preprocessing.downloadAudio(id)
-    preprocessing.resampleAudio(id)
     # analyze song
-    bpm, beats = beat_algorithm.librosaBeatAnalysis(id)
+    beatRecognizer = beat_algorithm.BeatRecognizer(id)
+    beatRecognizer.run()
     # return output
     output = {
-        "bpm": bpm,
-        "beats": beats
+        "bpm": beatRecognizer.bpm,
+        "beats": beatRecognizer.beats
     }
     return output
 
