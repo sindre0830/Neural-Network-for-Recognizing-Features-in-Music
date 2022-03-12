@@ -16,17 +16,16 @@ app = flask.Flask(__name__)
 def main():
     # define youtube id
     id = "N8BXtM6onEY"
-    # preprocess audio file and perform beat tracking
+    # download file
     preprocessing.parseJson(dict.JSON_PATH)
     preprocessing.downloadAudio(id)
-    preprocessing.splitAudio(id, mode=dict.NO_STEMS)
-    preprocessing.resampleAudio(id, dict.SAMPLERATE_BEATS)
-    _, librosaBeats = beat_algorithm.librosaBeatAnalysis(id)
-    beat_algorithm.plotBeats(id, manual_beats=None, aubio_beats=None, librosa_beats=librosaBeats, start=None, end=None)
+    # run beat recognizer
+    beatRecognizer = beat_algorithm.BeatRecognizer(id)
+    beatRecognizer.run(verbose=True)
     # preprocess audio file and perform chord recognition
     preprocessing.splitAudio(id, mode=dict.STEMS2, output=dict.ACCOMPANIMENT)
     preprocessing.resampleAudio(id, dict.SAMPLERATE_CHORDS)
-    chord_algorithm.getChord(id, librosaBeats[2], librosaBeats[3])
+    chord_algorithm.getChord(id, beatRecognizer.beats[2], beatRecognizer.beats[3])
 
 
 # Calculate time since program started in seconds.
@@ -56,13 +55,13 @@ def analysis():
         return error
     # preprocess audio file
     preprocessing.downloadAudio(id)
-    preprocessing.resampleAudio(id)
     # analyze song
-    bpm, beats = beat_algorithm.librosaBeatAnalysis(id)
+    beatRecognizer = beat_algorithm.BeatRecognizer(id)
+    beatRecognizer.run()
     # return output
     output = {
-        "bpm": bpm,
-        "beats": beats
+        "bpm": beatRecognizer.bpm,
+        "beats": beatRecognizer.beats
     }
     return output
 
