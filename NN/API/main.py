@@ -14,6 +14,7 @@ app = flask.Flask(__name__)
 # suppress warnings from Librosa
 warnings.filterwarnings("ignore", category=Warning)
 
+
 # Main program.
 def main():
     # parse songs.json if it exists for comparison data
