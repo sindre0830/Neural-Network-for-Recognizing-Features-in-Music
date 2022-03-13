@@ -55,10 +55,18 @@ nested_cof = ['G', 'Bm', 'D', 'F#m', 'A', 'C#m', 'E', 'G#m', 'B', 'D#m', 'F#', '
 
 
 # Print operation that allows status message on the same line.
-def printOperation(message):
-    print('{:<60s}'.format(message), end="", flush=True)
+def printOperation(message, verbose=True):
+    if verbose:
+        print('{:<60s}'.format(message), end="", flush=True)
+
+
+# Print message if verbose parameter is set to true.
+def printMessage(message, verbose=True):
+    if verbose:
+        print(message)
 
 
 # Print divider in console.
-def printDivider():
-    print("\n")
+def printDivider(verbose=True):
+    if verbose:
+        print("\n")

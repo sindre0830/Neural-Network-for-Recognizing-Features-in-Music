@@ -24,13 +24,20 @@ class BeatRecognizer:
     # Compute beat recognizer.
     def run(self, verbose: bool = False):
         # preprocess
+        dict.printOperation("Preprocess data...", verbose=verbose)
         preprocessing.splitAudio(self.id, mode=dict.NO_STEMS)
         preprocessing.resampleAudio(self.id, dict.SAMPLERATE_BEATS)
+        dict.printMessage(dict.DONE, verbose=verbose)
         # get results
+        dict.printOperation("Running beat tracker...", verbose=verbose)
         self.librosaBeatAnalysis()
+        dict.printMessage(dict.DONE, verbose=verbose)
         # plot
         if verbose:
+            dict.printOperation("Plotting results...", verbose=verbose)
             self.plot(start=None, end=None)
+            dict.printMessage(dict.DONE, verbose=verbose)
+        dict.printDivider(verbose=verbose)
 
     # Get beats and BPM from Librosa's beat tracker.
     def librosaBeatAnalysis(self):
