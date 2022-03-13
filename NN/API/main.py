@@ -7,6 +7,7 @@ import chord_algorithm
 import flask
 import time
 import math
+import warnings
 
 start_time = time.time()
 app = flask.Flask(__name__)
@@ -14,6 +15,7 @@ app = flask.Flask(__name__)
 
 # Main program.
 def main():
+    warnings.filterwarnings("ignore", category=Warning)
     # define youtube id
     id = "N8BXtM6onEY"
     # download file
