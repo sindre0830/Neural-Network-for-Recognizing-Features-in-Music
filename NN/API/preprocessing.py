@@ -79,9 +79,12 @@ def parseJson(path):
             document = json.loads(f.read())
 
         current = {}
-        with open(dict.PROCESSED_JSON_PATH, "w+") as f:
-            if os.path.getsize(dict.PROCESSED_JSON_PATH) != 0:
-                current = json.loads(f.read())
+        if os.path.exists(dict.PROCESSED_JSON_PATH):
+            with open(dict.PROCESSED_JSON_PATH, "r+") as f:
+                if os.path.getsize(dict.PROCESSED_JSON_PATH) != 0:
+                    current = json.loads(f.read())
+        else:
+            current = {}
 
         songs = {}
 
@@ -98,7 +101,7 @@ def parseJson(path):
         # Overwrite if new data
         if len(songs) > len(current):
             json_object = json.dumps(songs, indent=3)
-            with open(dict.PROCESSED_JSON_PATH, "r+") as outfile:
+            with open(dict.PROCESSED_JSON_PATH, "w+") as outfile:
                 outfile.write(json_object)
             print("Successfully updated processedSongs.json")
         else:
