@@ -28,7 +28,7 @@ class ChordRecognizer:
         # get results
         dict.printOperation("Running chord tracker...", verbose=verbose)
         self.chords = self.getChord(beats[2], beats[3])
-        
+
         dict.printMessage(dict.DONE, verbose=verbose)
         # plot
         if verbose:
