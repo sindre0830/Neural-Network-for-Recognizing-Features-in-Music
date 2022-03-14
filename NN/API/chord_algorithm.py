@@ -7,12 +7,41 @@ import librosa
 import librosa.display
 
 
+def chordHandler(id, beats, verbose=False):
+    chords = []
+    for i in range(len(beats)-1):
+        chords += [getChord(id, beats[i], beats[i+1])]
+    if verbose:
+        pass    # Plot here, TBD
+    return chords
+        
+
 # gets chords between timestamps
 def getChord(id: str, start: float, end: float):
     y, sr = librosa.load(dict.getModifiedAudioPath(id), sr=None, offset=start, duration=(end - start))
     (label, _, _, _) = pyACA.computeChords(y, sr)
-    #print(label[0])
-    return label[0]
+    return pickChord(label[0])
+
+
+def pickChord(labels):
+    chords = {}
+    counter = len(labels)       # Weighting
+    for chord in labels:
+        if not chord in chords:
+            chords[chord] = 1
+        else:
+            chords[chord] += 1
+        chords[chord] += (counter / len(labels)) # Add weighting, prioritizing early #s
+        counter -= 1
+    mode = [i for i in set(labels) if labels.count(i) == max(map(labels.count, labels))]
+    # If one most common chord, return it
+    if len(mode) == 1:
+        return mode[0]
+    # If multiple most common, use weighting
+    else:
+        s = max(chords, key=chords.get)
+        return s
+    
 
 
 # get chroma with chordACA

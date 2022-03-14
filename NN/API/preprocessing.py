@@ -164,6 +164,8 @@ def chordToString(chordNum: int, minor: bool):
 
     return char
 
+
+# Handles batch process comparison of database
 def batchHandler(force:bool = False):
     # Make sure we have the dataset parsed
     if not os.path.exists(dict.PROCESSED_JSON_PATH):
@@ -175,7 +177,7 @@ def batchHandler(force:bool = False):
     with open(dict.ALGORITHM_JSON_PATH, 'r') as f:
         results = json.loads(f.read())
 
-    dict = {}
+    dictionary = {}
     # Check if we have existing data for comparison and data does not need to be reprocessed
     if os.path.getsize(dict.ALGORITHM_JSON_PATH) != 0 and not force:
         if len(dataset) == len(results):
@@ -187,10 +189,10 @@ def batchHandler(force:bool = False):
         if not dict.FLAG_RESULTS:
             downloadAudio(id)
             beatRecognizer = beat_algorithm.BeatRecognizer(id)
-            beatRecognizer.run(verbose=True)
+            beatRecognizer.run()
             splitAudio(id, mode=dict.STEMS2, output=dict.ACCOMPANIMENT)
             resampleAudio(id, dict.SAMPLERATE_CHORDS)
-            chords = chord_algorithm.getChord(id, beatRecognizer.beats[2], beatRecognizer.beats[3])
+            chords = chord_algorithm.chordHandler(id, beatRecognizer.beats)
             # Add to dictionary
             createJson(dict, id, chords, beatRecognizer.beats)
         # This is where the comparison happens!
