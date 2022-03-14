@@ -24,13 +24,20 @@ class BeatRecognizer:
     # Compute beat recognizer.
     def run(self, verbose: bool = False):
         # preprocess
+        dict.printOperation("Preprocess data...", verbose=verbose)
         preprocessing.splitAudio(self.id, mode=dict.NO_STEMS)
         preprocessing.resampleAudio(self.id, dict.SAMPLERATE_BEATS)
+        dict.printMessage(dict.DONE, verbose=verbose)
         # get results
+        dict.printOperation("Running beat tracker...", verbose=verbose)
         self.librosaBeatAnalysis()
+        dict.printMessage(dict.DONE, verbose=verbose)
         # plot
         if verbose:
+            dict.printOperation("Plotting results...", verbose=verbose)
             self.plot(start=None, end=None)
+            dict.printMessage(dict.DONE, verbose=verbose)
+        dict.printDivider(verbose=verbose)
 
     # Get beats and BPM from Librosa's beat tracker.
     def librosaBeatAnalysis(self):
@@ -42,23 +49,26 @@ class BeatRecognizer:
     def plot(self, start=None, end=None):
         # load audio file
         y, sr = librosa.load(dict.getModifiedAudioPath(self.id), sr=None)
-        # plot waveform and add title
-        librosa.display.waveplot(y, alpha=0.6)
-        plt.title(self.id + "  -  " + str(sr) + " samplerate", pad=40.)
+        # plot onset strength
+        onset_env = librosa.onset.onset_strength(y=y, sr=sr, aggregate=np.median)
+        times = librosa.times_like(onset_env, sr=sr, hop_length=512)
+        plt.plot(times, librosa.util.normalize(onset_env), alpha=0.6)
         # plot beat timestamps
         n = 1
         # branch if database has been loaded
         if dict.FLAG_DATABASE:
-            # open json file
+            plt.vlines(self.beats, 0.5, 1, color="g", linestyle="--", label="Librosa")
+            # read json file and plot data from database
             with open(dict.PROCESSED_JSON_PATH, 'r') as f:
                 document = json.loads(f.read())
-            plt.vlines(document[self.id]["beats"], 0, 1, color="black", linestyle="--", label="Manual")
-            plt.vlines(self.beats, -1, 0, color="g", linestyle="--", label="Librosa")
+            plt.vlines(document[self.id]["beats"], 0, 0.5, color="black", linestyle="--", label="Manual")
             n = 2
         else:
-            plt.vlines(self.beats, -1, 1, color="g", linestyle="--", label="Librosa")
-        plt.ylim(-1, 1)
+            plt.vlines(self.beats, 0, 1, color="g", linestyle="--", label="Librosa")
+        # set other parameters
+        plt.ylim(0, 1)
         plt.legend(bbox_to_anchor=(0, 1.02, 1, 0.2), loc="lower left", mode="expand", ncol=n)
+        plt.title(self.id + "  -  " + str(sr) + " samplerate", pad=40.)
         # trim figure between two timestamps
         if start is not None:
             plt.xlim(left=start)

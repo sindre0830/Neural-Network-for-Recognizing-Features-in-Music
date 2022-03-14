@@ -7,17 +7,22 @@ import chord_algorithm
 import flask
 import time
 import math
+import warnings
 
 start_time = time.time()
 app = flask.Flask(__name__)
+# suppress warnings from Librosa
+warnings.filterwarnings("ignore", category=Warning)
 
 
 # Main program.
 def main():
+    # parse songs.json if it exists for comparison data
+    preprocessing.parseJson(dict.JSON_PATH)
+    dict.printDivider()
     # define youtube id
     id = "N8BXtM6onEY"
     # download file
-    preprocessing.parseJson(dict.JSON_PATH)
     preprocessing.downloadAudio(id)
     # run beat recognizer
     beatRecognizer = beat_algorithm.BeatRecognizer(id)
@@ -53,15 +58,18 @@ def analysis():
             "Msg": "Requires a YouTube ID, example: '.../v1/analysis?id=dQw4w9WgXcQ'"
         }
         return error
+    dict.printDivider()
     # preprocess audio file
     preprocessing.downloadAudio(id)
     # analyze song
+    dict.printOperation("Run beat tracker...")
     beatRecognizer = beat_algorithm.BeatRecognizer(id)
     beatRecognizer.run()
+    dict.printMessage(dict.DONE)
     # return output
     output = {
         "bpm": beatRecognizer.bpm,
-        "beats": beatRecognizer.beats
+        "beats": beatRecognizer.beats.tolist()
     }
     return output
 
