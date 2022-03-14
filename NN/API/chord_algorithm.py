@@ -19,7 +19,7 @@ class ChordRecognizer:
         self.id = id
 
     # Compute chord recognizer.
-    def run(self, beats: np.ndarray, verbose: bool = False):
+    def run(self, beats: np.ndarray, plot: bool = False, verbose: bool = False):
         # preprocess
         dict.printOperation("Preprocess data...", verbose=verbose)
         preprocessing.splitAudio(self.id, mode=dict.STEMS2, output=dict.ACCOMPANIMENT)
@@ -27,21 +27,34 @@ class ChordRecognizer:
         dict.printMessage(dict.DONE, verbose=verbose)
         # get results
         dict.printOperation("Running chord tracker...", verbose=verbose)
-        self.chords = self.getChord(beats[2], beats[3])
-
+        self.getChords(beats)
         dict.printMessage(dict.DONE, verbose=verbose)
         # plot
-        if verbose:
+        if plot:
             dict.printOperation("Plotting results...", verbose=verbose)
             self.plot(start=beats[2], end=beats[3])
             dict.printMessage(dict.DONE, verbose=verbose)
         dict.printDivider(verbose=verbose)
+    
+    def getChords(self, beats: np.ndarray):
+        chords = []
+        for i in range(beats.shape[0]):
+            end = None
+            if i + 1 < len(beats):
+                end = beats[i+1]
+            chords.append(self.getChord(start=beats[i], end=end))
+        self.chords = np.array(chords)
 
-    # gets chords between timestamps
-    def getChord(self, start: float, end: float):
-        y, sr = librosa.load(dict.getModifiedAudioPath(self.id), sr=None, offset=start, duration=(end - start))
-        (label, _, _, _) = pyACA.computeChords(y, sr)
-        return np.array(label[0])
+    # Gets chord between beat
+    def getChord(self, start: float, end: float = None):
+        duration = None
+        if end is not None:
+            duration = (end - start)
+        y, sr = librosa.load(dict.getModifiedAudioPath(self.id), sr=None, offset=start, duration=duration)
+        (_, arrIndex, _, _) = pyACA.computeChords(y, sr)
+        chordIndex = np.bincount(arrIndex[0]).argmax()
+        chord = dict.chords[chordIndex]
+        return np.array(chord)
 
     # Plots the chromagram
     def plot(self, start: float = None, end: float = None):

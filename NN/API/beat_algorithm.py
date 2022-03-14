@@ -22,7 +22,7 @@ class BeatRecognizer:
         self.id = id
 
     # Compute beat recognizer.
-    def run(self, verbose: bool = False):
+    def run(self, plot: bool = False, verbose: bool = False):
         # preprocess
         dict.printOperation("Preprocess data...", verbose=verbose)
         preprocessing.splitAudio(self.id, mode=dict.NO_STEMS)
@@ -33,7 +33,7 @@ class BeatRecognizer:
         self.librosaBeatAnalysis()
         dict.printMessage(dict.DONE, verbose=verbose)
         # plot
-        if verbose:
+        if plot:
             dict.printOperation("Plotting results...", verbose=verbose)
             self.plot(start=None, end=None)
             dict.printMessage(dict.DONE, verbose=verbose)

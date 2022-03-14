@@ -29,7 +29,8 @@ def main():
     beatRecognizer.run(verbose=True)
     # run chord recognizer
     chordRecognizer = chord_algorithm.ChordRecognizer(id)
-    chordRecognizer.run(verbose=True, beats=beatRecognizer.beats)
+    chordRecognizer.run(beats=beatRecognizer.beats, verbose=True)
+    print(chordRecognizer.chords)
 
 
 # Calculate time since program started in seconds.
