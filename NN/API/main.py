@@ -27,10 +27,10 @@ def main():
     # run beat recognizer
     beatRecognizer = beat_algorithm.BeatRecognizer(id)
     beatRecognizer.run(verbose=True)
-    # preprocess audio file and perform chord recognition
-    preprocessing.splitAudio(id, mode=dict.STEMS2, output=dict.ACCOMPANIMENT)
-    preprocessing.resampleAudio(id, dict.SAMPLERATE_CHORDS)
-    chord_algorithm.getChord(id, beatRecognizer.beats[2], beatRecognizer.beats[3])
+    # run chord recognizer
+    chordRecognizer = chord_algorithm.ChordRecognizer(id)
+    chordRecognizer.run(beats=beatRecognizer.beats, verbose=True)
+    print(chordRecognizer.chords)
 
 
 # Calculate time since program started in seconds.
@@ -66,10 +66,15 @@ def analysis():
     beatRecognizer = beat_algorithm.BeatRecognizer(id)
     beatRecognizer.run()
     dict.printMessage(dict.DONE)
+    dict.printOperation("Run chord tracker...")
+    chordRecognizer = chord_algorithm.ChordRecognizer(id)
+    chordRecognizer.run(beats=beatRecognizer.beats)
+    dict.printMessage(dict.DONE)
     # return output
     output = {
         "bpm": beatRecognizer.bpm,
-        "beats": beatRecognizer.beats.tolist()
+        "beats": beatRecognizer.beats.tolist(),
+        "chords": chordRecognizer.chords.tolist()
     }
     return output
 
