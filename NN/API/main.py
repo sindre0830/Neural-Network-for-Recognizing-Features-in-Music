@@ -14,18 +14,19 @@ app = flask.Flask(__name__)
 
 # Main program.
 def main():
-    # define youtube id
-    id = "N8BXtM6onEY"
-    # download file
-    preprocessing.parseJson(dict.JSON_PATH)
-    preprocessing.downloadAudio(id)
-    # run beat recognizer
-    beatRecognizer = beat_algorithm.BeatRecognizer(id)
-    beatRecognizer.run(verbose=True)
-    # preprocess audio file and perform chord recognition
-    preprocessing.splitAudio(id, mode=dict.STEMS2, output=dict.ACCOMPANIMENT)
-    preprocessing.resampleAudio(id, dict.SAMPLERATE_CHORDS)
-    chord_algorithm.getChord(id, beatRecognizer.beats[2], beatRecognizer.beats[3])
+    # # define youtube id
+    # id = "N8BXtM6onEY"
+    # # download file
+    # preprocessing.parseJson(dict.JSON_PATH)
+    # preprocessing.downloadAudio(id)
+    # # run beat recognizer
+    # beatRecognizer = beat_algorithm.BeatRecognizer(id)
+    # beatRecognizer.run(verbose=True)
+    # # preprocess audio file and perform chord recognition
+    # preprocessing.splitAudio(id, mode=dict.STEMS2, output=dict.ACCOMPANIMENT)
+    # preprocessing.resampleAudio(id, dict.SAMPLERATE_CHORDS)
+    # chord_algorithm.getChord(id, beatRecognizer.beats[2], beatRecognizer.beats[3])
+    preprocessing.batchHandler()
 
 
 # Calculate time since program started in seconds.

@@ -9,6 +9,7 @@ NATIVE_DIR = "Data/Audio/Native/"
 MODIFIED_DIR = "Data/Audio/Modified/"
 JSON_PATH = "Data/songs.json"
 PROCESSED_JSON_PATH = "Data/processedSongs.json"
+ALGORITHM_JSON_PATH = "Data/algoSongs.json"
 # extensions for conversion to wav
 EXTENSIONS = [".m4v", ".webm", ".mp3", ".mp4"]
 # formats
@@ -34,6 +35,7 @@ PIANO = "/piano" + WAV_FORMAT
 ACCOMPANIMENT = "/accompaniment" + WAV_FORMAT
 
 FLAG_DATABASE = False
+FLAG_RESULTS = False
 
 
 def getNativeAudioPath(id):

@@ -1,5 +1,7 @@
 # import local modules
 import dictionary as dict
+import beat_algorithm
+import chord_algorithm
 # import foreign modules
 import os
 import librosa
@@ -161,3 +163,47 @@ def chordToString(chordNum: int, minor: bool):
         char += "m"
 
     return char
+
+def batchHandler(force:bool = False):
+    # Make sure we have the dataset parsed
+    if not os.path.exists(dict.PROCESSED_JSON_PATH):
+        parseJson(dict.JSON_PATH)
+
+    with open(dict.PROCESSED_JSON_PATH, 'r') as f:
+        dataset = json.loads(f.read())
+        
+    with open(dict.ALGORITHM_JSON_PATH, 'r') as f:
+        results = json.loads(f.read())
+
+    dict = {}
+    # Check if we have existing data for comparison and data does not need to be reprocessed
+    if os.path.getsize(dict.ALGORITHM_JSON_PATH) != 0 and not force:
+        if len(dataset) == len(results):
+            dict.FLAG_RESULTS = True
+            
+    # Go through dataset
+    for key in dataset:
+        # Get the data we need if not existing
+        if not dict.FLAG_RESULTS:
+            downloadAudio(id)
+            beatRecognizer = beat_algorithm.BeatRecognizer(id)
+            beatRecognizer.run(verbose=True)
+            splitAudio(id, mode=dict.STEMS2, output=dict.ACCOMPANIMENT)
+            resampleAudio(id, dict.SAMPLERATE_CHORDS)
+            chords = chord_algorithm.getChord(id, beatRecognizer.beats[2], beatRecognizer.beats[3])
+            # Add to dictionary
+            createJson(dict, id, chords, beatRecognizer.beats)
+        # This is where the comparison happens!
+        
+    # Write our new algorithm data to file
+    if not dict.FLAG_RESULTS:
+        with open(dict.ALGORITHM_JSON_PATH, 'w') as f:
+            f.write(dict)
+                
+                
+# Updates a dictionary with new key+values
+def createJson(dict, id: str, chords: str, beats: float):
+    s = {}
+    s["chords"] = chords
+    s["beats"] = beats
+    dict[id] = s
