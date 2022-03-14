@@ -35,7 +35,7 @@ class ChordRecognizer:
             self.plot(start=beats[2], end=beats[3])
             dict.printMessage(dict.DONE, verbose=verbose)
         dict.printDivider(verbose=verbose)
-    
+
     def getChords(self, beats: np.ndarray):
         chords = []
         for i in range(beats.shape[0]):
