@@ -31,7 +31,28 @@ const Song = (props) => {
                 {/* display result */}
                 {toggleSong &&
                     <div>
-                        <pre>{JSON.stringify(props.value, null, 2)}</pre>
+                        <form>
+                            <div className='song__result-group'>
+                                <label for='title'>Title</label>
+                                <input type='text' id='title' name='title' defaultValue={props.value.title} disabled={props.value.approved}/>
+                            </div>
+                            <div className='song__result-group'>
+                                <label for='link'>Link</label>
+                                <input type='text' id='link' name='link' defaultValue={props.value.link} disabled={props.value.approved}/>
+                            </div>
+                            <div className='song__result-group'>
+                                <label for='bpm'>Bpm</label>
+                                <input type='text' id='bpm' name='bpm' defaultValue={props.value.bpm} disabled={props.value.approved}/>
+                            </div>
+                            <div className='song__result-group'>
+                                <label for='beats'>Beats</label>
+                                <input type='text' id='beats' name='beats' defaultValue={props.value.beats} disabled={props.value.approved}/>    
+                            </div>
+                            <div className='song__result-group'>    
+                                <label for='chords'>Chords</label>
+                                <input type='text' id='chords' name='chords' defaultValue={props.value.chords} disabled={props.value.approved}/>
+                            </div>
+                        </form>
                     </div>
                 }
             </div>

@@ -52,12 +52,38 @@
 }
 
 .song__result {
-    margin: 20px 0 20px 0;
+    margin-top: 20px;
 }
 
-.song__result pre {
-    padding: 15px;
-    white-space: pre-wrap;
+.song__result form {
+    padding: 10px;
     background-color: #E8E8E8;
+}
+
+.song__result-group {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0 20px 0;
+    font-family: var(--font-family);
     font-size: 18px;
+}
+
+.song__result-group input {
+    height: 25px;
+    width: 85%;
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 18px;
+    background-color: white;
+}
+
+/* large devices */
+@media (min-width: 1200px) {
+    .song__result-group input {
+        height: 50px;
+        width: 75%;
+    }
 }
