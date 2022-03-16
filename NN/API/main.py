@@ -20,13 +20,14 @@ def main():
     # preprocessing.parseJson(dict.JSON_PATH)
     # preprocessing.downloadAudio(id)
     # run beat recognizer
-    beatRecognizer = beat_algorithm.BeatRecognizer(id)
-    beatRecognizer.run()
+    # beatRecognizer = beat_algorithm.BeatRecognizer(id)
+    # beatRecognizer.run()
     # preprocess audio file and perform chord recognition
     # preprocessing.splitAudio(id, mode=dict.STEMS2, output=dict.ACCOMPANIMENT)
     # preprocessing.resampleAudio(id, dict.SAMPLERATE_CHORDS)
     # chords = chord_algorithm.chordHandler(id, beatRecognizer.beats)
     #preprocessing.batchHandler()
+    preprocessing.test(id)
 
 # Calculate time since program started in seconds.
 def getUptime():

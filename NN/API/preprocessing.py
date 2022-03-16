@@ -154,13 +154,18 @@ def chordToString(chordNum: int, minor: bool):
     if chordNum <= 2 or chordNum == 4 or chordNum == 6:
         charNum -= 1
 
-    char = chr(charNum + 65)
+    if minor:
+        char = chr(charNum + 97)
+    else:
+        char = chr(charNum + 65)
 
     if chordNum == 1 or chordNum == 4 or chordNum == 6 or chordNum == 9 or chordNum == 11:
         char += "#"
 
     if minor:
-        char += "m"
+        char += " min"
+    else:
+        char += " Maj"
 
     return char
 
@@ -183,7 +188,7 @@ def batchHandler(force:bool = False):
         if len(dataset) == len(results):
             dict.FLAG_RESULTS = True
             
-    # Go through dataset
+    # # Go through dataset
     for key in dataset:
         # Get the data we need if not existing
         if not dict.FLAG_RESULTS:
@@ -196,6 +201,7 @@ def batchHandler(force:bool = False):
             # Add to dictionary
             createJson(dict, id, chords, beatRecognizer.beats)
         # This is where the comparison happens!
+
         
     # Write our new algorithm data to file
     if not dict.FLAG_RESULTS:
@@ -209,3 +215,40 @@ def createJson(dict, id: str, chords: str, beats: float):
     s["chords"] = chords
     s["beats"] = beats
     dict[id] = s
+
+
+# Compares two chord arrays based on matching indexes with their timestamp arrays
+def compareChords(gt_timestamp, gt_chord, alg_timestamp, alg_chord):
+    results = 0
+    print(len(alg_timestamp))
+    print(len(alg_chord))
+    for idx, timestamp in enumerate(gt_timestamp):
+        near = find_nearest(alg_timestamp, timestamp)
+        algoChord = alg_chord[min(near, len(alg_chord)-1)]        # Preferrably better solution here
+        print(timestamp)
+        print(algoChord + " " + gt_chord[idx])
+        if algoChord == gt_chord[idx]:
+            results += 1
+    # Return number of correct guesses divided by total guesses - can improve
+    print(results)
+    temp = results / len(gt_chord)
+    return temp
+
+
+# finds closest value in array
+def find_nearest(array, value):
+    array = np.asarray(array)
+    idx = (np.abs(array - value)).argmin()
+    return idx
+
+
+def test(id):
+    with open(dict.PROCESSED_JSON_PATH, 'r') as f:
+        dataset = json.loads(f.read())
+    beatRecognizer = beat_algorithm.BeatRecognizer(id)
+    beatRecognizer.run()
+    splitAudio(id, mode=dict.STEMS2, output=dict.ACCOMPANIMENT)
+    resampleAudio(id, dict.SAMPLERATE_CHORDS)
+    chords = chord_algorithm.chordHandler(id, beatRecognizer.beats)
+    result = compareChords(dataset[id]["beats"], dataset[id]["chords"], beatRecognizer.beats, chords)
+    print("The result is: " + str(result * 100) + chr(37) + " accuracy")
