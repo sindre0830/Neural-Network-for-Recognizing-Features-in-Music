@@ -6,11 +6,50 @@
     font-family: var(--font-family);
 }
 
+.songs__sort {
+    display: flex;
+    margin-left: 20px;
+}
+
+.songs__sort input {
+    margin-right: auto;
+    border: none;
+    border-bottom: 1px solid black;
+    font-size: 18px;
+}
+
+.songs__sort input:focus {
+    outline: none;
+}
+
+.songs__sort-approved {
+    width: 20px;
+    height: 20px;
+    background-color: var(--color-approved);
+}
+
+.songs__sort-pending {
+    width: 20px;
+    height: 20px;
+    background-color: var(--color-pending);
+}
+
+.songs__sort hr {
+    background-color: black;
+}
+
+.songs__list {
+    margin-top: 20px;
+}
+
 /* small devices */
 @media (min-width: 768px) {
     .songs {
-        padding: 0 20px 0 20px;
         width: 70%;
+    }
+
+    .songs__list {
+        padding: 0 20px 0 20px;
         border: 1px solid;
         border-radius: 10px;
     }
@@ -19,15 +58,21 @@
 /* medium devices */
 @media (min-width: 992px) {
     .songs {
-        padding: 5px 30px 5px 30px;
         width: 65%;
+    }
+
+    .songs__list {
+        padding: 5px 30px 5px 30px;
     }
 }
 
 /* large devices */
 @media (min-width: 1200px) {
     .songs {
+        width: 60%;
+    }
+
+    .songs__list {
         padding: 20px 50px 20px 50px;
-        width: 50%;
     }
 }

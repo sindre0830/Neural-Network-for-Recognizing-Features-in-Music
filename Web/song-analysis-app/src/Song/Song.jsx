@@ -11,7 +11,7 @@ const Song = (props) => {
         <div className='song'>
             <div className='song__title'>
                 <hr className={props.value.approved ? 'song__title-approved' : 'song__title-pending'} />
-                <h1>{props.value.name}</h1>
+                <h1>{props.value.title}</h1>
 
                 {/* show approve button if the song is pending */}
                 {!props.value.approved &&
