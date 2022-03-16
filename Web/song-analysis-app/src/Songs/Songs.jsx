@@ -3,6 +3,7 @@ import './songs.css';
 import Song from '../Song/Song';
 import '../testData.json';
 
+
 /**
  *  Displaying of all analyzed songs.
  */
@@ -11,7 +12,6 @@ const Songs = () => {
 
     const getSongs = () => {
         const jsonData= require('../testData.json'); 
-        console.log(jsonData);
         fetchSongs(jsonData);
 
         {/*try {
@@ -32,9 +32,20 @@ const Songs = () => {
 
     return (
         <div className='songs'>
-            {songs.map( (song, index) => (
-                <Song value={song} key={index} />
-            ))}
+            <div className='songs__sort'>
+                <input placeholder='Search for something...' type='text'></input>
+                <p>Filter:</p>
+                <div className='songs__sort-approved' />
+                <p>Approved</p>
+                <hr />
+                <div className='songs__sort-pending' />
+                <p>Pending</p>
+            </div>
+            <div className='songs__list'>
+                {songs.map( (song, index) => (
+                    <Song value={song} key={index} />
+                ))}
+            </div>
         </div>
     )
 };
