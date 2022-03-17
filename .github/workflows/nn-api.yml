@@ -23,6 +23,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip freeze > requirements.txt
+        pip install flake8
 
     - name: Build
       working-directory: ./NN/API
@@ -30,6 +31,4 @@ jobs:
 
     - name: Syntax checker
       working-directory: ./NN/API
-      run: |
-        pip install flake8
-        flake8 . --max-line-length 150
+      run: flake8 . --max-line-length 150

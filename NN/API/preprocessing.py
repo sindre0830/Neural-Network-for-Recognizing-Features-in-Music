@@ -90,10 +90,11 @@ def parseJson(path):
 
         for key in document:
             s = {}
-            song = flattenSongData(key)
-            s["chords"] = song["chords"]
-            s["beats"] = song["beats"]
-            songs[song["id"]] = s
+            if key["youtubeLink"] not in dict.BLACKLIST:
+                song = flattenSongData(key)
+                s["chords"] = song["chords"]
+                s["beats"] = song["beats"]
+                songs[song["id"]] = s
         # Overwrite if new data
         if len(songs) > len(current):
             json_object = json.dumps(songs, indent=3)
@@ -122,12 +123,13 @@ def flattenSongData(song):
         # going though every chord in the part
         for bar in bars:
             chords = bar["chords"]
-            length = bar["length"]
             for chord in chords:
+                length = chord["length"]
                 if ("pause" in chord and chord["pause"]) or chord["chord"] == "pause":
-                    for _ in range(length):
+                    for _ in range(int(length)):
                         chordsInRepetition.append("")
                 else:
+                    print(song["youtubeLink"])
                     for _ in range(length):
                         chordsInRepetition.append(chordToString(int(chord["chord"]), chord["minor"]))
 
