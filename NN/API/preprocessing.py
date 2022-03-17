@@ -19,8 +19,7 @@ def downloadAudio(id):
     # branch if audio file doesn't exist
     if not os.path.isfile(dict.getNativeAudioPath(id)):
         # download audio file with best quality then convert to wav
-        os.system("yt-dlp -q -f 'ba' -x --audio-format wav https://www.youtube.com/watch?v=" +
-                  id + " -o '" + dict.NATIVE_DIR + "%(id)s.%(ext)s'")
+        os.system("yt-dlp -q -f 'ba' -x --audio-format wav https://www.youtube.com/watch?v=" + id + " -o '" + dict.NATIVE_DIR + "%(id)s.%(ext)s'")
 
 
 # Seperates instruments and vocals from audio file.
@@ -29,9 +28,8 @@ def splitAudio(id, mode, output=None):
     if not os.path.exists(dict.MODIFIED_DIR):
         os.makedirs(dict.MODIFIED_DIR)
     if mode is not dict.NO_STEMS:
-        # split audio file according to the mode then move splitt4ed file according to output
-        os.system("spleeter separate -p spleeter:" + mode + " -o " +
-                  dict.MODIFIED_DIR + " " + dict.getNativeAudioPath(id))
+        # split audio file according to the mode then move splitted file according to output
+        os.system("spleeter separate -p spleeter:" + mode + " -o " + dict.MODIFIED_DIR + " " + dict.getNativeAudioPath(id) + " &> /dev/null")
         y, sr = librosa.load(path=dict.MODIFIED_DIR + id + output, sr=None)
         sf.write(dict.getModifiedAudioPath(id), data=y, samplerate=sr)
         # remove temporary directory
@@ -76,15 +74,19 @@ def filterAudio(id):
 
 # Parses songs.json to a simplified JSON object.
 def parseJson(path):
+    dict.printOperation("Parse songs.json for comparison data...")
     if os.path.exists(dict.JSON_PATH):
         dict.FLAG_DATABASE = True
         with open(path, 'r') as f:
             document = json.loads(f.read())
 
         current = {}
-        with open(dict.PROCESSED_JSON_PATH, "w+") as f:
-            if os.path.getsize(dict.PROCESSED_JSON_PATH) != 0:
-                current = json.loads(f.read())
+        if os.path.exists(dict.PROCESSED_JSON_PATH):
+            with open(dict.PROCESSED_JSON_PATH, "r+") as f:
+                if os.path.getsize(dict.PROCESSED_JSON_PATH) != 0:
+                    current = json.loads(f.read())
+        else:
+            current = {}
 
         songs = {}
 
@@ -94,20 +96,14 @@ def parseJson(path):
             s["chords"] = song["chords"]
             s["beats"] = song["beats"]
             songs[song["id"]] = s
-
-        print("Parsed " + str(len(songs)) + " songs from songs.json.")
-        print("Parsed " + str(len(current)) + " songs from processedSongs.json.")
-
         # Overwrite if new data
         if len(songs) > len(current):
             json_object = json.dumps(songs, indent=3)
-            with open(dict.PROCESSED_JSON_PATH, "r+") as outfile:
+            with open(dict.PROCESSED_JSON_PATH, "w+") as outfile:
                 outfile.write(json_object)
-            print("Successfully updated processedSongs.json")
-        else:
-            print("No new data")
+        print(dict.SUCCESS)
     else:
-        print("Missing songs.json")
+        print(dict.FAILED)
 
 
 # Extracts relevant song data for testing from songs.json.

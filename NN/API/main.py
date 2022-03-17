@@ -7,27 +7,35 @@ import chord_algorithm
 import flask
 import time
 import math
+import warnings
 
 start_time = time.time()
 app = flask.Flask(__name__)
+# suppress warnings from Librosa
+warnings.filterwarnings("ignore", category=Warning)
 
 
 # Main program.
 def main():
     # # define youtube id
-    id = "N8BXtM6onEY"
-    # # download file
+    # id = "N8BXtM6onEY"
+    # # parse songs.json if it exists for comparison data
     # preprocessing.parseJson(dict.JSON_PATH)
+    # dict.printDivider()
+    # # define youtube id
+    # id = "N8BXtM6onEY"
+    # # download file
     # preprocessing.downloadAudio(id)
-    # run beat recognizer
+    # # run beat recognizer
     # beatRecognizer = beat_algorithm.BeatRecognizer(id)
-    # beatRecognizer.run()
-    # preprocess audio file and perform chord recognition
-    # preprocessing.splitAudio(id, mode=dict.STEMS2, output=dict.ACCOMPANIMENT)
-    # preprocessing.resampleAudio(id, dict.SAMPLERATE_CHORDS)
-    # chords = chord_algorithm.chordHandler(id, beatRecognizer.beats)
+    # beatRecognizer.run(verbose=True)
+    # # run chord recognizer
+    # chordRecognizer = chord_algorithm.ChordRecognizer(id)
+    # chordRecognizer.run(beats=beatRecognizer.beats, verbose=True)
     #preprocessing.batchHandler()
     preprocessing.test(id)
+
+
 
 # Calculate time since program started in seconds.
 def getUptime():
@@ -54,15 +62,23 @@ def analysis():
             "Msg": "Requires a YouTube ID, example: '.../v1/analysis?id=dQw4w9WgXcQ'"
         }
         return error
+    dict.printDivider()
     # preprocess audio file
     preprocessing.downloadAudio(id)
     # analyze song
+    dict.printOperation("Run beat tracker...")
     beatRecognizer = beat_algorithm.BeatRecognizer(id)
     beatRecognizer.run()
+    dict.printMessage(dict.DONE)
+    dict.printOperation("Run chord tracker...")
+    chordRecognizer = chord_algorithm.ChordRecognizer(id)
+    chordRecognizer.run(beats=beatRecognizer.beats)
+    dict.printMessage(dict.DONE)
     # return output
     output = {
         "bpm": beatRecognizer.bpm,
-        "beats": beatRecognizer.beats
+        "beats": beatRecognizer.beats.tolist(),
+        "chords": chordRecognizer.chords.tolist()
     }
     return output
 
