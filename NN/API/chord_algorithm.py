@@ -51,9 +51,8 @@ class ChordRecognizer:
         if end is not None:
             duration = (end - start)
         y, sr = librosa.load(dict.getModifiedAudioPath(self.id), sr=None, offset=start, duration=duration)
-        (_, arrIndex, _, _) = pyACA.computeChords(y, sr)
-        chordIndex = np.bincount(arrIndex[0]).argmax()
-        chord = dict.chords[chordIndex]
+        (label, _, _, _) = pyACA.computeChords(y, sr)
+        chord = self.pickChord(label[0])
         return np.array(chord)
 
     # Plots the chromagram
@@ -67,3 +66,22 @@ class ChordRecognizer:
         if end is not None:
             plt.xlim(right=end)
         plt.show()
+
+    def pickChord(self, labels):
+        chords = {}
+        counter = len(labels)       # Weighting
+        for chord in labels:
+            if not chord in chords:
+                chords[chord] = 1
+            else:
+                chords[chord] += 1
+            chords[chord] += (counter / len(labels)) # Add weighting, prioritizing early #s
+            counter -= 1
+        mode = [i for i in set(labels) if labels.count(i) == max(map(labels.count, labels))]
+        # If one most common chord, return it
+        if len(mode) == 1:
+            return mode[0]
+        # If multiple most common, use weighting
+        else:
+            s = max(chords, key=chords.get)
+            return s

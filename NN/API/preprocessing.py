@@ -220,7 +220,7 @@ def compareChords(gt_timestamp, gt_chord, alg_timestamp, alg_chord):
     print(len(alg_chord))
     for idx, timestamp in enumerate(gt_timestamp):
         near = find_nearest(alg_timestamp, timestamp)
-        algoChord = alg_chord[min(near, len(alg_chord)-1)]        # Preferrably better solution here
+        algoChord = alg_chord[near]        # Preferrably better solution here
         print(timestamp)
         print(algoChord + " " + gt_chord[idx])
         if algoChord == gt_chord[idx]:
@@ -245,6 +245,7 @@ def test(id):
     beatRecognizer.run()
     splitAudio(id, mode=dict.STEMS2, output=dict.ACCOMPANIMENT)
     resampleAudio(id, dict.SAMPLERATE_CHORDS)
-    chords = chord_algorithm.chordHandler(id, beatRecognizer.beats)
-    result = compareChords(dataset[id]["beats"], dataset[id]["chords"], beatRecognizer.beats, chords)
+    chordRecognizer = chord_algorithm.ChordRecognizer(id)
+    chordRecognizer.run(beats=beatRecognizer.beats, verbose=True)
+    result = compareChords(dataset[id]["beats"], dataset[id]["chords"], beatRecognizer.beats, chordRecognizer.chords)
     print("The result is: " + str(result * 100) + chr(37) + " accuracy")

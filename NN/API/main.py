@@ -18,12 +18,10 @@ warnings.filterwarnings("ignore", category=Warning)
 # Main program.
 def main():
     # # define youtube id
-    # id = "N8BXtM6onEY"
+    id = "N8BXtM6onEY"
     # # parse songs.json if it exists for comparison data
     # preprocessing.parseJson(dict.JSON_PATH)
     # dict.printDivider()
-    # # define youtube id
-    # id = "N8BXtM6onEY"
     # # download file
     # preprocessing.downloadAudio(id)
     # # run beat recognizer
