@@ -10,12 +10,15 @@ import '../testData.json';
 const Songs = () => {
     const [songs, fetchSongs] = useState([])
 
+    /**
+     *  Get results from the API.
+     */
     const getSongs = () => {
-        const jsonData= require('../testData.json'); 
-        fetchSongs(jsonData);
+        {/*const jsonData= require('../testData.json'); 
+        fetchSongs(jsonData);*/}
 
-        {/*try {
-            fetch('../testData.json')
+        try {
+            fetch('/results')
             .then((res) => res.json())
             .then((res) => {
             console.log(res)
@@ -23,7 +26,7 @@ const Songs = () => {
             })
         } catch (err) {
             console.log(err)
-        } */}
+        }
     }
 
     useEffect(() => {
