@@ -9,15 +9,19 @@ import '../testData.json';
  */
 const Songs = () => {
     const [songs, fetchSongs] = useState([])
+    const [search, setSearch] = useState("")
+    const [filter, setFilter] = useState("")
+    const [approved, setApproved] = useState(true)
+    const [pending, setPending] = useState(true)
 
     /**
      *  Get results from the API.
      */
     const getSongs = () => {
-        {/*const jsonData= require('../testData.json'); 
-        fetchSongs(jsonData);*/}
+        const jsonData= require('../testData.json'); 
+        fetchSongs(jsonData);
 
-        try {
+        /*try {
             fetch('/results')
             .then((res) => res.json())
             .then((res) => {
@@ -26,26 +30,44 @@ const Songs = () => {
             })
         } catch (err) {
             console.log(err)
-        }
+        }*/
     }
 
     useEffect(() => {
         getSongs()
     }, [])
 
+    // filter between approved and pending songs
+    let filteredSongs;
+    if (filter === 'A') {
+        filteredSongs = songs.filter(song => song.approved)
+    } else if (filter ==='P') {
+        filteredSongs = songs.filter(song => !song.approved)
+    } else {
+        filteredSongs = songs;
+    }
+
+    /*if (approved && !pending) {
+        filteredSongs = songs.filter(song => song.apporved);
+    } else if (!approved && pending) {
+        filteredSongs = songs.filter(song => !song.apporved);
+    } else {
+        filteredSongs = songs;
+    }*/
+
     return (
         <div className='songs'>
             <div className='songs__sort'>
-                <input placeholder='Search for something...' type='text'></input>
+                <input type='search' placeholder='Search for something...' value={search} onChange={(e) => setSearch(e.target.value)}></input>
                 <p>Filter:</p>
-                <div className='songs__sort-approved' />
+                <button className='songs__sort-approved' onClick={() => { setFilter('A') }} />
                 <p>Approved</p>
                 <hr />
-                <div className='songs__sort-pending' />
+                <button className='songs__sort-pending' onClick={() => { setFilter('P') }} />
                 <p>Pending</p>
             </div>
             <div className='songs__list'>
-                {songs.map( (song, index) => (
+                {filteredSongs.map( (song, index) => (
                     <Song value={song} key={index} />
                 ))}
             </div>

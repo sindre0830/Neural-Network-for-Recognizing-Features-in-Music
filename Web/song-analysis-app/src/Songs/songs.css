@@ -22,15 +22,18 @@
     outline: none;
 }
 
-.songs__sort-approved {
+.songs__sort button {
     width: 20px;
     height: 20px;
+    border: none;
+    cursor: pointer;
+}
+
+.songs__sort-approved {
     background-color: var(--color-approved);
 }
 
 .songs__sort-pending {
-    width: 20px;
-    height: 20px;
     background-color: var(--color-pending);
 }
 

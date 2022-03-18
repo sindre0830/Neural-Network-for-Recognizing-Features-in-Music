@@ -67,7 +67,7 @@ const Song = (props) => {
                     <div>
                         <form onSubmit={handleSubmit}>
                             <div className='song__result-group'>
-                                <label for='title'>Title</label>
+                                <label htmlFor='title'>Title</label>
                                 <input type='text' id='title' name='title' onChange={(e) => setTitle(e.target.value)} defaultValue={props.value.title} disabled={props.value.approved}/>
                             </div>
                             {/*<div className='song__result-group'>
@@ -75,15 +75,15 @@ const Song = (props) => {
                                 <input type='text' id='link' name='link' defaultValue={props.value.link} disabled={props.value.approved}/>
                             </div>*/}
                             <div className='song__result-group'>
-                                <label for='bpm'>Bpm</label>
+                                <label htmlFor='bpm'>Bpm</label>
                                 <input type='text' id='bpm' name='bpm' onChange={(e) => setBpm(e.target.value)} defaultValue={props.value.bpm} disabled={props.value.approved}/>
                             </div>
                             <div className='song__result-group'>
-                                <label for='beats'>Beats</label>
+                                <label htmlFor='beats'>Beats</label>
                                 <input type='text' id='beats' name='beats' onChange={(e) => setBeats(e.target.value)} defaultValue={props.value.beats} disabled={props.value.approved}/>    
                             </div>
                             <div className='song__result-group'>    
-                                <label for='chords'>Chords</label>
+                                <label htmlFor='chords'>Chords</label>
                                 <input type='text' id='chords' name='chords' onChange={(e) => setChords(e.target.value)} defaultValue={props.value.chords} disabled={props.value.approved}/>
                             </div>
                             <button type='submit'>Submit</button>
