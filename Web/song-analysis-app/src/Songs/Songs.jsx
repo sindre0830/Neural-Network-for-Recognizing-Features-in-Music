@@ -10,9 +10,7 @@ import '../testData.json';
 const Songs = () => {
     const [songs, fetchSongs] = useState([])
     const [search, setSearch] = useState("")
-    const [filter, setFilter] = useState("")
-    const [approved, setApproved] = useState(true)
-    const [pending, setPending] = useState(true)
+    const [filter, setFilter] = useState("All")
 
     /**
      *  Get results from the API.
@@ -37,34 +35,32 @@ const Songs = () => {
         getSongs()
     }, [])
 
-    // filter between approved and pending songs
+    // filtering of songs based on status
     let filteredSongs;
-    if (filter === 'A') {
-        filteredSongs = songs.filter(song => song.approved)
-    } else if (filter ==='P') {
-        filteredSongs = songs.filter(song => !song.approved)
+    if (filter == 'Approved') {
+        filteredSongs = songs.filter(song => song.approved);
+    } else if (filter == 'Pending') {
+        filteredSongs = songs.filter(song => !song.approved);
     } else {
         filteredSongs = songs;
     }
 
-    /*if (approved && !pending) {
-        filteredSongs = songs.filter(song => song.apporved);
-    } else if (!approved && pending) {
-        filteredSongs = songs.filter(song => !song.apporved);
-    } else {
-        filteredSongs = songs;
-    }*/
-
     return (
         <div className='songs'>
-            <div className='songs__sort'>
-                <input type='search' placeholder='Search for something...' value={search} onChange={(e) => setSearch(e.target.value)}></input>
-                <p>Filter:</p>
-                <button className='songs__sort-approved' onClick={() => { setFilter('A') }} />
-                <p>Approved</p>
-                <hr />
-                <button className='songs__sort-pending' onClick={() => { setFilter('P') }} />
-                <p>Pending</p>
+            <div className='songs__filter'>
+                {/*<input type='search' placeholder='Search for something...' value={search} onChange={(e) => setSearch(e.target.value)}></input>*/}
+                <div className='songs__filter-option'>  
+                    <input type='radio' name='filter' value='all' onClick={() => setFilter("All")} />
+                    <label for='all'>All</label>
+                </div>
+                <div className='songs__filter-option'>
+                    <input type='radio' name='filter' value='approved' onClick={() => setFilter("Approved")} />
+                    <label for='approved'>Approved</label>
+                </div>
+                <div className='songs__filter-option'>
+                    <input type='radio' name='filter' value='pending' onClick={() => setFilter("Pending")} />
+                    <label for='pending'>Pending</label>
+                </div>
             </div>
             <div className='songs__list'>
                 {filteredSongs.map( (song, index) => (

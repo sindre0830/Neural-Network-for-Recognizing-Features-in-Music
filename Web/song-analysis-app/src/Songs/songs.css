@@ -1,4 +1,6 @@
 .songs {
+    display: flex;
+    flex-direction: column;
     margin: auto;
     margin-top: 50px;
     margin-bottom: 50px;
@@ -6,12 +8,24 @@
     font-family: var(--font-family);
 }
 
+.songs__filter {
+    width: 30%;
+    align-self: flex-end;
+    display: flex;
+    justify-content: space-around;
+}
+
+.songs__filter input[type='radio'] {
+    border: 4px;
+    cursor: pointer;
+}
+
 .songs__sort {
     display: flex;
     margin-left: 20px;
 }
-
-.songs__sort input {
+/*
+.songs__sort input[type='search'] {
     margin-right: auto;
     border: none;
     border-bottom: 1px solid black;
@@ -27,7 +41,7 @@
     height: 20px;
     border: none;
     cursor: pointer;
-}
+}*/
 
 .songs__sort-approved {
     background-color: var(--color-approved);
@@ -35,10 +49,6 @@
 
 .songs__sort-pending {
     background-color: var(--color-pending);
-}
-
-.songs__sort hr {
-    background-color: black;
 }
 
 .songs__list {
