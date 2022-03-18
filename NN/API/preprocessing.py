@@ -198,13 +198,13 @@ def batchHandler(force:bool = False):
             createJson(dict, id, chords, beatRecognizer.beats)
         # This is where the comparison happens!
 
-        
+
     # Write our new algorithm data to file
     if not dict.FLAG_RESULTS:
         with open(dict.ALGORITHM_JSON_PATH, 'w') as f:
             f.write(dict)
-                
-                
+
+
 # Updates a dictionary with new key+values
 def createJson(dict, id: str, chords: str, beats: float):
     s = {}
