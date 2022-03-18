@@ -1,54 +1,35 @@
 .songs {
-    display: flex;
-    flex-direction: column;
     margin: auto;
-    margin-top: 50px;
+    margin-top: 70px;
     margin-bottom: 50px;
     width: 75%;
     font-family: var(--font-family);
 }
 
-.songs__filter {
-    width: 30%;
-    align-self: flex-end;
-    display: flex;
-    justify-content: space-around;
+.songs__sort-search {
+    text-align: center;
 }
 
-.songs__filter input[type='radio'] {
-    border: 4px;
-    cursor: pointer;
-}
-
-.songs__sort {
-    display: flex;
-    margin-left: 20px;
-}
-/*
-.songs__sort input[type='search'] {
+.songs__sort-search input[type='search'] {
     margin-right: auto;
     border: none;
     border-bottom: 1px solid black;
     font-size: 18px;
 }
 
-.songs__sort input:focus {
+.songs__sort-search input:focus {
     outline: none;
 }
 
-.songs__sort button {
-    width: 20px;
-    height: 20px;
-    border: none;
-    cursor: pointer;
-}*/
-
-.songs__sort-approved {
-    background-color: var(--color-approved);
+.songs__sort-filter {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-around;
 }
 
-.songs__sort-pending {
-    background-color: var(--color-pending);
+.songs__sort-filter input[type='radio'] {
+    border: 4px;
+    cursor: pointer;
 }
 
 .songs__list {
@@ -72,6 +53,17 @@
 @media (min-width: 992px) {
     .songs {
         width: 65%;
+    }
+
+    .songs__sort {
+        display: flex;
+        align-items: flex-end;
+        margin-left: 10px;
+    }
+
+    .songs__sort-filter {
+        width: 40%;
+        margin-left: auto;
     }
 
     .songs__list {

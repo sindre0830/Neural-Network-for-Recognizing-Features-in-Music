@@ -35,35 +35,48 @@ const Songs = () => {
         getSongs()
     }, [])
 
-    // filtering of songs based on status
-    let filteredSongs;
-    if (filter == 'Approved') {
-        filteredSongs = songs.filter(song => song.approved);
-    } else if (filter == 'Pending') {
-        filteredSongs = songs.filter(song => !song.approved);
-    } else {
-        filteredSongs = songs;
+    /**
+     *  Filter songs based on search query and filters.
+     * 
+     *  @returns {Array} Filtered songs.
+     */
+    const filterSongs = () => {
+        // filter based on search query
+        let filteredSongs = songs.filter(song => song.title.toLowerCase().includes(search.toLowerCase()));
+
+        // filter based on status
+        if (filter === 'Approved') {
+            return filteredSongs.filter(song => song.approved);
+        } else if (filter === 'Pending') {
+            return filteredSongs.filter(song => !song.approved);
+        }
+
+        return filteredSongs;
     }
 
     return (
         <div className='songs'>
-            <div className='songs__filter'>
-                {/*<input type='search' placeholder='Search for something...' value={search} onChange={(e) => setSearch(e.target.value)}></input>*/}
-                <div className='songs__filter-option'>  
-                    <input type='radio' name='filter' value='all' onClick={() => setFilter("All")} />
-                    <label for='all'>All</label>
+            <div className='songs__sort'>
+                <div className='songs__sort-search'>
+                    <input type='search' placeholder='Search for something...' value={search} onChange={(e) => setSearch(e.target.value)}></input>
                 </div>
-                <div className='songs__filter-option'>
-                    <input type='radio' name='filter' value='approved' onClick={() => setFilter("Approved")} />
-                    <label for='approved'>Approved</label>
-                </div>
-                <div className='songs__filter-option'>
-                    <input type='radio' name='filter' value='pending' onClick={() => setFilter("Pending")} />
-                    <label for='pending'>Pending</label>
+                <div className='songs__sort-filter'>
+                    <div className='songs__sort-filter-option'>  
+                        <input type='radio' name='filter' value='all' onClick={() => setFilter("All")} />
+                        <label htmlFor='all'>All</label>
+                    </div>
+                    <div className='songs__sort-filter-option'>
+                        <input type='radio' name='filter' value='approved' onClick={() => setFilter("Approved")} />
+                        <label htmlFor='approved'>Approved</label>
+                    </div>
+                    <div className='songs__sort-filter-option'>
+                        <input type='radio' name='filter' value='pending' onClick={() => setFilter("Pending")} />
+                        <label htmlFor='pending'>Pending</label>
+                    </div>
                 </div>
             </div>
             <div className='songs__list'>
-                {filteredSongs.map( (song, index) => (
+                {filterSongs().map((song, index) => (
                     <Song value={song} key={index} />
                 ))}
             </div>
