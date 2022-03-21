@@ -19,8 +19,11 @@ def downloadAudio(id):
         os.makedirs(dict.NATIVE_DIR)
     # branch if audio file doesn't exist
     if not os.path.isfile(dict.getNativeAudioPath(id)):
-        # download audio file with best quality then convert to wav
+        # Try to download audio file with best quality then convert to wav
         os.system("yt-dlp -q -f 'ba' -x --audio-format wav https://www.youtube.com/watch?v=" + id + " -o '" + dict.NATIVE_DIR + "%(id)s.%(ext)s'")
+        if not os.path.exists(dict.NATIVE_DIR + id + ".wav"):
+            raise dict.YoutubeError
+
 
 
 # Seperates instruments and vocals from audio file.
@@ -174,47 +177,65 @@ def batchHandler(force:bool = False):
     if not os.path.exists(dict.PROCESSED_JSON_PATH):
         parseJson(dict.JSON_PATH)
 
+    dataSize = os.path.getsize(dict.PROCESSED_JSON_PATH)
     with open(dict.PROCESSED_JSON_PATH, 'r') as f:
         dataset = json.loads(f.read())
-        
-    with open(dict.ALGORITHM_JSON_PATH, 'r') as f:
-        results = json.loads(f.read())
+
+    algSize = os.path.getsize(dict.ALGORITHM_JSON_PATH)
+
+    # Check if we have existing data for comparison and data does not need to be reprocessed
+    if (algSize == 0 or algSize != dataSize or force):
+        dict.FLAG_RESULTS = False
+    else:
+        dict.FLAG_RESULTS = True
+        with open(dict.ALGORITHM_JSON_PATH, 'r') as f:
+            results = json.loads(f.read())
 
     dictionary = {}
-    # Check if we have existing data for comparison and data does not need to be reprocessed
-    if os.path.getsize(dict.ALGORITHM_JSON_PATH) != 0 and not force:
-        if len(dataset) == len(results):
-            dict.FLAG_RESULTS = True
-
     # store our results
     batch_data = {}
+    counter = 0
     # # Go through dataset
-    for key in dataset:
+    for id in dataset:
+        counter += 1
+        print(id)
         # Get the data we need if not existing
         if not dict.FLAG_RESULTS:
+            # try:
+            #     downloadAudio(id)
+            # except dict.YoutubeError:
+            #     continue
             downloadAudio(id)
             beatRecognizer = beat_algorithm.BeatRecognizer(id)
             beatRecognizer.run()
             chordRecognizer = chord_algorithm.ChordRecognizer(id)
-            chordRecognizer.run(beats=beatRecognizer.beats, verbose=True)
+            temp = np.array(dataset[id]["beats"])
+            chordRecognizer.run(beats=temp, verbose=True) #beatRecognizer.beats # We wamt the beats as numpy array...
             # Add to dictionary
-            createJson(dict, id, chordRecognizer.chords, beatRecognizer.beats)
-        result = compareChords(dataset[id]["beats"], dataset[id]["chords"], beatRecognizer.beats, chordRecognizer.chords)
-        batch_data[key] = result
-    
+            createJson(dictionary, id, chordRecognizer.chords, dataset[id]["beats"]) # replace with beatrecognizer
+            result1 = compareChords(dataset[id]["beats"], dataset[id]["chords"], dataset[id]["beats"], chordRecognizer.chords)
+        else:
+            result1 = compareChords(dataset[id]["beats"], dataset[id]["chords"], results[id]["beats"], results[id]["chords"])
+        chordRecognizer.run(beats=beatRecognizer.beats, verbose=True) #beatRecognizer.beats # We wamt the beats as numpy array...
+        result2 = compareChords(dataset[id]["beats"], dataset[id]["chords"], beatRecognizer.beats, chordRecognizer.chords)
+        batch_data[id] = result1
+        print("The result manual is: " + str(result1 * 100) + chr(37) + " accuracy")
+        print("The result algorithm is: " + str(result2 * 100) + chr(37) + " accuracy")
+        print("Difference: " + str((result1-result2) * 100) + chr(37))
+        os.remove(dict.getNativeAudioPath(id))
+        os.remove(dict.getModifiedAudioPath(id))
     output(batch_data)
-
-
     # Write our new algorithm data to file
     if not dict.FLAG_RESULTS:
-        with open(dict.ALGORITHM_JSON_PATH, 'w') as f:
-            f.write(dict)
+        json_object = json.dumps(dictionary, indent=3)
+        with open(dict.ALGORITHM_JSON_PATH, "w+") as outfile:
+            outfile.write(json_object)
 
 
 # Updates a dictionary with new key+values
 def createJson(dict, id: str, chords: str, beats: float):
     s = {}
-    s["chords"] = chords
+    s["chords"] = chords.tolist()
     s["beats"] = beats
     dict[id] = s
 
@@ -222,8 +243,6 @@ def createJson(dict, id: str, chords: str, beats: float):
 # Compares two chord arrays based on matching indexes with their timestamp arrays
 def compareChords(gt_timestamp, gt_chord, alg_timestamp, alg_chord):
     results = 0
-    # print(len(alg_timestamp))
-    # print(len(alg_chord))
     for idx, timestamp in enumerate(gt_timestamp):
         near = find_nearest(alg_timestamp, timestamp)
         algoChord = alg_chord[near]        # Preferrably better solution here
@@ -251,17 +270,24 @@ def output(data):
     aggregate = pd.cut(df['result'], bins = 10).value_counts()
     if not os.path.exists(dict.RESULTS_CSV_PATH):
         os.makedirs(dict.RESULTS_CSV_PATH)
-    df.to_csv(dict.RESULTS_CSV_PATH)
+    aggregate.to_csv(dict.RESULTS_CSV_PATH)
 
 
 def test(id):
     with open(dict.PROCESSED_JSON_PATH, 'r') as f:
         dataset = json.loads(f.read())
+    downloadAudio(id)
     beatRecognizer = beat_algorithm.BeatRecognizer(id)
     beatRecognizer.run()
-    splitAudio(id, mode=dict.STEMS2, output=dict.ACCOMPANIMENT)
-    resampleAudio(id, dict.SAMPLERATE_CHORDS)
     chordRecognizer = chord_algorithm.ChordRecognizer(id)
+    temp = np.array(dataset[id]["beats"])
+    print(temp.shape)
+    chordRecognizer.run(beats=temp, verbose=True)
+    result1 = compareChords(dataset[id]["beats"], dataset[id]["chords"], dataset[id]["beats"], chordRecognizer.chords)
+    print("The result is: " + str(result1 * 100) + chr(37) + " accuracy")
     chordRecognizer.run(beats=beatRecognizer.beats, verbose=True)
-    result = compareChords(dataset[id]["beats"], dataset[id]["chords"], beatRecognizer.beats, chordRecognizer.chords)
-    print("The result is: " + str(result * 100) + chr(37) + " accuracy")
+    result2 = compareChords(dataset[id]["beats"], dataset[id]["chords"], beatRecognizer.beats, chordRecognizer.chords)
+    print("The result is: " + str(result2 * 100) + chr(37) + " accuracy")
+    print("Difference: " + str((result1-result2) * 100) + chr(37))
+    os.remove(dict.getNativeAudioPath(id))
+    os.remove(dict.getModifiedAudioPath(id))

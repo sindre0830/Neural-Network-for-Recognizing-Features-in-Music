@@ -8,7 +8,7 @@ PLOTS_DIR = "Data/Plots/"
 NATIVE_DIR = "Data/Audio/Native/"
 MODIFIED_DIR = "Data/Audio/Modified/"
 JSON_PATH = "Data/songs.json"
-PROCESSED_JSON_PATH = "Data/processedSongs.json"
+PROCESSED_JSON_PATH = "Data/temp.json"        # for testing: "Data/temp.json"
 ALGORITHM_JSON_PATH = "Data/algoSongs.json"
 RESULTS_CSV_PATH = "Data/results.csv"
 # extensions for conversion to wav
@@ -38,7 +38,7 @@ ACCOMPANIMENT = "/accompaniment" + WAV_FORMAT
 FLAG_DATABASE = False
 FLAG_RESULTS = False
 # blacklisted songs from EC-Play dataset
-BLACKLIST = ["6d5ST3tbPIU", "ASywAfBAVrQ", "DGIgXP9SvB8"]
+BLACKLIST = ["6d5ST3tbPIU", "ASywAfBAVrQ", "DGIgXP9SvB8", "qf9Ipqubh9g", "0Yy9YzdmTJA"]
 
 
 def getNativeAudioPath(id):
@@ -81,3 +81,8 @@ def printMessage(message, verbose=True):
 def printDivider(verbose=True):
     if verbose:
         print("\n")
+
+    
+errorMessage = ""
+class YoutubeError(Exception):
+    errorMessage = "Audio file could not be extracted from Youtube link."

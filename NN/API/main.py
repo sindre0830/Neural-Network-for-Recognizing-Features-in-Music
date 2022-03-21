@@ -18,7 +18,7 @@ warnings.filterwarnings("ignore", category=Warning)
 # Main program.
 def main():
     # # define youtube id
-    id = "N8BXtM6onEY"
+    id = "dQw4w9WgXcQ"
     # # parse songs.json if it exists for comparison data
     # preprocessing.parseJson(dict.JSON_PATH)
     # dict.printDivider()
@@ -30,8 +30,8 @@ def main():
     # # run chord recognizer
     # chordRecognizer = chord_algorithm.ChordRecognizer(id)
     # chordRecognizer.run(beats=beatRecognizer.beats, verbose=True)
-    #preprocessing.batchHandler()
-    preprocessing.test(id)
+    preprocessing.batchHandler()
+    #preprocessing.test(id)
 
 
 
@@ -59,7 +59,7 @@ def analysis():
         error = {
             "Msg": "Requires a YouTube ID, example: '.../v1/analysis?id=dQw4w9WgXcQ'"
         }
-        return error
+        return error, 404
     dict.printDivider()
     # preprocess audio file
     preprocessing.downloadAudio(id)
