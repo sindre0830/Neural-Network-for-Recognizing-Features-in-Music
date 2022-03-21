@@ -9,6 +9,7 @@ import soundfile as sf
 import shutil
 import numpy as np
 import json
+import pandas as pd
 
 
 # Downloads an audio file from given URL.
@@ -184,7 +185,9 @@ def batchHandler(force:bool = False):
     if os.path.getsize(dict.ALGORITHM_JSON_PATH) != 0 and not force:
         if len(dataset) == len(results):
             dict.FLAG_RESULTS = True
-            
+
+    # store our results
+    batch_data = {}
     # # Go through dataset
     for key in dataset:
         # Get the data we need if not existing
@@ -192,12 +195,14 @@ def batchHandler(force:bool = False):
             downloadAudio(id)
             beatRecognizer = beat_algorithm.BeatRecognizer(id)
             beatRecognizer.run()
-            splitAudio(id, mode=dict.STEMS2, output=dict.ACCOMPANIMENT)
-            resampleAudio(id, dict.SAMPLERATE_CHORDS)
-            chords = chord_algorithm.chordHandler(id, beatRecognizer.beats)
+            chordRecognizer = chord_algorithm.ChordRecognizer(id)
+            chordRecognizer.run(beats=beatRecognizer.beats, verbose=True)
             # Add to dictionary
-            createJson(dict, id, chords, beatRecognizer.beats)
-        # This is where the comparison happens!
+            createJson(dict, id, chordRecognizer.chords, beatRecognizer.beats)
+        result = compareChords(dataset[id]["beats"], dataset[id]["chords"], beatRecognizer.beats, chordRecognizer.chords)
+        batch_data[key] = result
+    
+    output(batch_data)
 
 
     # Write our new algorithm data to file
@@ -217,17 +222,17 @@ def createJson(dict, id: str, chords: str, beats: float):
 # Compares two chord arrays based on matching indexes with their timestamp arrays
 def compareChords(gt_timestamp, gt_chord, alg_timestamp, alg_chord):
     results = 0
-    print(len(alg_timestamp))
-    print(len(alg_chord))
+    # print(len(alg_timestamp))
+    # print(len(alg_chord))
     for idx, timestamp in enumerate(gt_timestamp):
         near = find_nearest(alg_timestamp, timestamp)
         algoChord = alg_chord[near]        # Preferrably better solution here
-        print(timestamp)
-        print(algoChord + " " + gt_chord[idx])
+        # print(timestamp)
+        # print(algoChord + " " + gt_chord[idx])
         if algoChord == gt_chord[idx]:
             results += 1
     # Return number of correct guesses divided by total guesses - can improve
-    print(results)
+    #print(results)
     temp = results / len(gt_chord)
     return temp
 
@@ -237,6 +242,16 @@ def find_nearest(array, value):
     array = np.asarray(array)
     idx = (np.abs(array - value)).argmin()
     return idx
+
+
+# records the batch processing results into CSV
+def output(data):
+    stat_results = {}
+    df = pd.DataFrame(list(data.items()), columns = ['id', 'result'])   # get it in dataframe form
+    aggregate = pd.cut(df['result'], bins = 10).value_counts()
+    if not os.path.exists(dict.RESULTS_CSV_PATH):
+        os.makedirs(dict.RESULTS_CSV_PATH)
+    df.to_csv(dict.RESULTS_CSV_PATH)
 
 
 def test(id):

@@ -23,7 +23,7 @@ class ChordRecognizer:
         # preprocess
         dict.printOperation("Preprocess data...", verbose=verbose)
         preprocessing.splitAudio(self.id, mode=dict.STEMS2, output=dict.ACCOMPANIMENT)
-        preprocessing.resampleAudio(self.id, dict.SAMPLERATE_CHORDS)
+        #preprocessing.resampleAudio(self.id, dict.SAMPLERATE_CHORDS)
         dict.printMessage(dict.DONE, verbose=verbose)
         # get results
         dict.printOperation("Running chord tracker...", verbose=verbose)
@@ -51,7 +51,7 @@ class ChordRecognizer:
         if end is not None:
             duration = (end - start)
         y, sr = librosa.load(dict.getModifiedAudioPath(self.id), sr=None, offset=start, duration=duration)
-        (label, _, _, _) = pyACA.computeChords(y, sr)
+        (label, _, _, _) = pyACA.computeChords(y, sr) #dict.getModifiedAudioPath(self.id)
         chord = self.pickChord(label[0])
         return np.array(chord)
 
@@ -67,6 +67,7 @@ class ChordRecognizer:
             plt.xlim(right=end)
         plt.show()
 
+    # We choose the dominant chord - if multiples, weigh first chords higher
     def pickChord(self, labels):
         chords = {}
         counter = len(labels)       # Weighting

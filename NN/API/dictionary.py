@@ -10,6 +10,7 @@ MODIFIED_DIR = "Data/Audio/Modified/"
 JSON_PATH = "Data/songs.json"
 PROCESSED_JSON_PATH = "Data/processedSongs.json"
 ALGORITHM_JSON_PATH = "Data/algoSongs.json"
+RESULTS_CSV_PATH = "Data/results.csv"
 # extensions for conversion to wav
 EXTENSIONS = [".m4v", ".webm", ".mp3", ".mp4"]
 # formats
