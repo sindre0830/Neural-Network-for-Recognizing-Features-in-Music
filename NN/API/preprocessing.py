@@ -129,7 +129,6 @@ def flattenSongData(song):
                     for _ in range(int(length)):
                         chordsInRepetition.append("")
                 else:
-                    print(song["youtubeLink"])
                     for _ in range(length):
                         chordsInRepetition.append(chordToString(int(chord["chord"]), chord["minor"]))
 
