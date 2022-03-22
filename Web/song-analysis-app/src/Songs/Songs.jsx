@@ -16,10 +16,10 @@ const Songs = () => {
      *  Get results from the API.
      */
     const getSongs = () => {
-        const jsonData= require('../testData.json'); 
-        fetchSongs(jsonData);
+        /*const jsonData= require('../testData.json'); 
+        fetchSongs(jsonData);*/
 
-        /*try {
+        try {
             fetch('/results')
             .then((res) => res.json())
             .then((res) => {
@@ -28,7 +28,7 @@ const Songs = () => {
             })
         } catch (err) {
             console.log(err)
-        }*/
+        }
     }
 
     useEffect(() => {

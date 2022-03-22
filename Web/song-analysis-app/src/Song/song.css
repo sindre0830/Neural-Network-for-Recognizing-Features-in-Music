@@ -15,7 +15,7 @@
 
 .song__title hr {
     height: 20px;
-    width: 7px;
+    min-width: 5px;
 }
 
 .song__title-approved {
@@ -28,7 +28,8 @@
 
 .song__title h1 {
     margin-right: auto;
-    padding-left: 10px;
+    margin-left: 10px;
+    width: 90%;
     font-size: 22px;
 }
 

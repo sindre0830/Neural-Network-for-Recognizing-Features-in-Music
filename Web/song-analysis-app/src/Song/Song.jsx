@@ -7,10 +7,10 @@ import './song.css';
  */
 const Song = (props) => {
     const [toggleSong, setToggle] = useState(false);
-    const [title, setTitle] = useState(props.value.title);
-    const [bpm, setBpm] = useState(props.value.bpm);
-    const [beats, setBeats] = useState(props.value.beats);
-    const [chords, setChords] = useState(props.value.chords);
+    const [title, setTitle] = useState("")
+    const [bpm, setBpm] = useState(null)
+    const [beats, setBeats] = useState("")
+    const [chords, setChords] = useState("")
 
     /**
      *  Update result.
@@ -18,22 +18,30 @@ const Song = (props) => {
      *  @param {event} e 
      */
     const handleSubmit = async (e) => {
-        console.log(title);
+        // only send the values that has been changed
+        let items = {approved: true};
+
+        if (title !== "") {
+            items.title = title;
+        }
+
+        if (bpm !== null) {
+            items.bpm = parseInt(bpm);
+        }
+
+        if (beats !== "") {
+            items.beats = beats.replace(/\s+/g, '').split(",");
+        }
+
+        if (chords !== "") {
+            items.chords = chords.replace(/\s+/g, '').split(",");
+        }
 
         try {
             const options = {
                 method: 'PUT',
-                body: JSON.stringify({
-                    title: title,
-                    bpm: bpm,
-                    beats: beats,
-                    chords: chords,
-                    approved: true
-                })
+                body: JSON.stringify(items)
             }
-            //let url = "/results" + props.id
-
-            console.log(options.body);
 
             const res = await fetch('/results', options);
         } catch (err) {
@@ -49,13 +57,13 @@ const Song = (props) => {
 
                 {/* show approve button if the song is pending */}
                 {!props.value.approved &&
-                    <button>Approve</button>
+                    <button type='submit' form='update'>Approve</button>
                 }
 
                 {/* check if the arrow is going to point up or down*/}
                 {toggleSong
                     ? <FiChevronUp size={28} onClick={() => setToggle(false)} style={{cursor: 'pointer'}}/>
-                    : <FiChevronDown size={28} onClick={() => setToggle(true)} style={{ cursor: 'pointer' }}/>
+                    : <FiChevronDown size={28} onClick={() => setToggle(true)} style={{ cursor: 'pointer'}}/>
                 }
             </div>
             <div className='song__line'>
@@ -65,15 +73,11 @@ const Song = (props) => {
                 {/* display result */}
                 {toggleSong &&
                     <div>
-                        <form onSubmit={handleSubmit}>
+                        <form id='update' onSubmit={handleSubmit}>
                             <div className='song__result-group'>
                                 <label htmlFor='title'>Title</label>
                                 <input type='text' id='title' name='title' onChange={(e) => setTitle(e.target.value)} defaultValue={props.value.title} disabled={props.value.approved}/>
                             </div>
-                            {/*<div className='song__result-group'>
-                                <label for='link'>Link</label>
-                                <input type='text' id='link' name='link' defaultValue={props.value.link} disabled={props.value.approved}/>
-                            </div>*/}
                             <div className='song__result-group'>
                                 <label htmlFor='bpm'>Bpm</label>
                                 <input type='text' id='bpm' name='bpm' onChange={(e) => setBpm(e.target.value)} defaultValue={props.value.bpm} disabled={props.value.approved}/>
@@ -86,7 +90,6 @@ const Song = (props) => {
                                 <label htmlFor='chords'>Chords</label>
                                 <input type='text' id='chords' name='chords' onChange={(e) => setChords(e.target.value)} defaultValue={props.value.chords} disabled={props.value.approved}/>
                             </div>
-                            <button type='submit'>Submit</button>
                         </form>
                     </div>
                 }
