@@ -7,7 +7,7 @@ ANALYSIS_PATH = '/' + VERSION + '/analysis'
 PLOTS_DIR = "Data/Plots/"
 NATIVE_DIR = "Data/Audio/Native/"
 MODIFIED_DIR = "Data/Audio/Modified/"
-JSON_PATH = "Data/songs.json"
+JSON_PATH = "../Data/songs.json"
 PROCESSED_JSON_PATH = "Data/processedSongs.json"
 # extensions for conversion to wav
 EXTENSIONS = [".m4v", ".webm", ".mp3", ".mp4"]
