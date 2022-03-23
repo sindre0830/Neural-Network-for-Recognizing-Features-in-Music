@@ -184,7 +184,7 @@ def batchHandler(force:bool = False):
     algSize = os.path.getsize(dict.ALGORITHM_JSON_PATH)
 
     # Check if we have existing data for comparison and data does not need to be reprocessed
-    if (algSize == 0 or algSize != dataSize or force):
+    if (algSize == 0 or force):  # Add after debugging: or algSize != dataSize
         dict.FLAG_RESULTS = False
     else:
         dict.FLAG_RESULTS = True
@@ -194,6 +194,7 @@ def batchHandler(force:bool = False):
     dictionary = {}
     # store our results
     batch_data = {}
+    detailed_results = {}
     counter = 0
     # # Go through dataset
     for id in dataset:
@@ -210,23 +211,23 @@ def batchHandler(force:bool = False):
             beatRecognizer.run()
             chordRecognizer = chord_algorithm.ChordRecognizer(id)
             temp = np.array(dataset[id]["beats"])
-            chordRecognizer.run(beats=temp, verbose=True) #beatRecognizer.beats # We wamt the beats as numpy array...
+            chordRecognizer.run(beats=temp, verbose=True) #beatRecognizer.beats
             # Add to dictionary
-            createJson(dictionary, id, chordRecognizer.chords, dataset[id]["beats"]) # replace with beatrecognizer
-            result1 = compareChords(dataset[id]["beats"], dataset[id]["chords"], dataset[id]["beats"], chordRecognizer.chords)
+            createJson(dictionary, id, chordRecognizer.chords, dataset[id]["beats"])
+            result = compareChords(dataset[id]["beats"], dataset[id]["chords"], dataset[id]["beats"], chordRecognizer.chords)
         else:
-            result1 = compareChords(dataset[id]["beats"], dataset[id]["chords"], results[id]["beats"], results[id]["chords"])
-        chordRecognizer.run(beats=beatRecognizer.beats, verbose=True) #beatRecognizer.beats # We wamt the beats as numpy array...
-        result2 = compareChords(dataset[id]["beats"], dataset[id]["chords"], beatRecognizer.beats, chordRecognizer.chords)
-        batch_data[id] = result1
-        print("The result manual is: " + str(result1 * 100) + chr(37) + " accuracy")
-        print("The result algorithm is: " + str(result2 * 100) + chr(37) + " accuracy")
-        print("Difference: " + str((result1-result2) * 100) + chr(37))
-        os.remove(dict.getNativeAudioPath(id))
-        os.remove(dict.getModifiedAudioPath(id))
-    output(batch_data)
+            print("Entered else")
+            result = compareChords(dataset[id]["beats"], dataset[id]["chords"], results[id]["beats"], results[id]["chords"])
+        batch_data[id] = result*100
+        createResults(detailed_results, id, algorithm = result)
+        print("The result manual is: " + str(result * 100) + chr(37) + " accuracy")
+        if not dict.FLAG_RESULTS:
+            os.remove(dict.getNativeAudioPath(id))
+            os.remove(dict.getModifiedAudioPath(id))
+    output(batch_data, detailed_results)
     # Write our new algorithm data to file
     if not dict.FLAG_RESULTS:
+        print("Writing algorithm results...")
         json_object = json.dumps(dictionary, indent=3)
         with open(dict.ALGORITHM_JSON_PATH, "w+") as outfile:
             outfile.write(json_object)
@@ -237,6 +238,14 @@ def createJson(dict, id: str, chords: str, beats: float):
     s = {}
     s["chords"] = chords.tolist()
     s["beats"] = beats
+    dict[id] = s
+
+
+# Stores accuracy of Chord Algorithm and Neural Network for song
+def createResults(dict, id: str, algorithm: float = None, neural: float = None):
+    s = {}
+    s["algo-accuracy"] = algorithm
+    s["neural-accuracy"] = neural
     dict[id] = s
 
 
@@ -264,13 +273,17 @@ def find_nearest(array, value):
 
 
 # records the batch processing results into CSV
-def output(data):
-    stat_results = {}
+def output(data, detailed):
+    if not os.path.exists(dict.RESULTS_PATH):
+        os.makedirs(dict.RESULTS_PATH)
     df = pd.DataFrame(list(data.items()), columns = ['id', 'result'])   # get it in dataframe form
-    aggregate = pd.cut(df['result'], bins = 10).value_counts()
-    if not os.path.exists(dict.RESULTS_CSV_PATH):
-        os.makedirs(dict.RESULTS_CSV_PATH)
-    aggregate.to_csv(dict.RESULTS_CSV_PATH)
+    print(df.to_string())
+    aggregate = pd.cut(df['result'], bins = pd.interval_range(start=0, end=100, periods=10)).value_counts()
+    with open(dict.RESULTS_CSV_PATH, "w") as f:
+        aggregate.to_csv(f)
+    json_object = json.dumps(detailed, indent=3)
+    with open(dict.DETAILED_RESULTS_PATH, "w+") as outfile:
+        outfile.write(json_object)
 
 
 def test(id):
@@ -285,9 +298,5 @@ def test(id):
     chordRecognizer.run(beats=temp, verbose=True)
     result1 = compareChords(dataset[id]["beats"], dataset[id]["chords"], dataset[id]["beats"], chordRecognizer.chords)
     print("The result is: " + str(result1 * 100) + chr(37) + " accuracy")
-    chordRecognizer.run(beats=beatRecognizer.beats, verbose=True)
-    result2 = compareChords(dataset[id]["beats"], dataset[id]["chords"], beatRecognizer.beats, chordRecognizer.chords)
-    print("The result is: " + str(result2 * 100) + chr(37) + " accuracy")
-    print("Difference: " + str((result1-result2) * 100) + chr(37))
     os.remove(dict.getNativeAudioPath(id))
     os.remove(dict.getModifiedAudioPath(id))
