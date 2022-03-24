@@ -175,11 +175,15 @@ def chordToString(chordNum: int, minor: bool):
 
 # Handles batch process comparison of database
 def batchHandler(force:bool = False):
+    # prep for results
+    if not os.path.exists(dict.RESULTS_PATH):
+        os.makedirs(dict.RESULTS_PATH)
+    if not os.path.exists(dict.RESULTS_SONG_PATH):
+        os.makedirs(dict.RESULTS_SONG_PATH)
     # Make sure we have the dataset parsed
-    if not os.path.exists(dict.PROCESSED_JSON_PATH):
+    if not os.path.exists(dict.PROCESSED_JSON_PATH) or os.path.getsize(dict.PROCESSED_JSON_PATH) < 100:
         parseJson(dict.JSON_PATH)
 
-    dataSize = os.path.getsize(dict.PROCESSED_JSON_PATH)
     with open(dict.PROCESSED_JSON_PATH, 'r') as f:
         dataset = json.loads(f.read())
 
@@ -188,6 +192,7 @@ def batchHandler(force:bool = False):
     # Check if we have existing data for comparison and data does not need to be reprocessed
     if algSize == 0:  # Add after debugging: or algSize != dataSize
         dict.FLAG_RESULTS = False
+        results = aggregateResults()
     else:
         dict.FLAG_RESULTS = True
         with open(dict.ALGORITHM_JSON_PATH, 'r') as f:
@@ -199,6 +204,7 @@ def batchHandler(force:bool = False):
     # store updated songs
     newProcessed = {}
     counter = 0
+    print(dict.FLAG_RESULTS)
     # # Go through dataset
     for id in dataset:
         counter += 1
@@ -217,7 +223,7 @@ def batchHandler(force:bool = False):
             chordRecognizer.run(beats=newBeats, verbose=True)
             createJson(dictionary, id, chordRecognizer.chords.tolist(), newBeats.tolist(), "chords", "beats")
             result = compareChords(newBeats, dataset[id]["chords"], newBeats, chordRecognizer.chords)
-        elif force or id not in results:        # test this
+        elif force or not os.path.exists(dict.RESULTS_SONG_PATH + id + '.json'):        # test this
             try:
                 downloadAudio(id)
             except dict.YoutubeError:
@@ -229,16 +235,21 @@ def batchHandler(force:bool = False):
             createJson(dictionary, id, chordRecognizer.chords.tolist(), newBeats.tolist(), "chords", "beats")
             result = compareChords(newBeats, dataset[id]["chords"], newBeats, chordRecognizer.chords)
         else:
+            print("Using saved results")
             result = compareChords(dataset[id]["beats"], dataset[id]["chords"], dataset[id]["beats"], results[id]["chords"])
         batch_data[id] = result*100
         createResults(detailed_results, id, algorithm = result)
         print("The result manual is: " + str(result * 100) + chr(37) + " accuracy")
         if not dict.FLAG_RESULTS:
             createJson(newProcessed, id, dataset[id]["chords"], newBeats.tolist(), "chords", "beats")    # Update processed dataclear
+            json_object = json.dumps(newProcessed[id], indent=3)
+            with open(dict.RESULTS_SONG_PATH + id + '.json', "w+") as outfile:
+                outfile.write(json_object)
             os.remove(dict.getNativeAudioPath(id))
             os.remove(dict.getModifiedAudioPath(id))
     output(batch_data, detailed_results)
     # Update processed data with trimmed beats
+    print(len(newProcessed))
     json_object = json.dumps(newProcessed, indent=3)
     with open(dict.PROCESSED_JSON_PATH, "w+") as outfile:
         outfile.write(json_object)
@@ -291,10 +302,7 @@ def find_nearest(array, value):
 
 # records the batch processing results into CSV
 def output(data, detailed):
-    if not os.path.exists(dict.RESULTS_PATH):
-        os.makedirs(dict.RESULTS_PATH)
     df = pd.DataFrame(list(data.items()), columns = ['id', 'result'])   # get it in dataframe form
-    print(df.to_string())
     aggregate = pd.cut(df['result'], bins = pd.interval_range(start=0, end=100, periods=10)).value_counts()
     with open(dict.RESULTS_CSV_PATH, "w") as f:
         aggregate.to_csv(f)
@@ -331,3 +339,12 @@ def plotResults():
     plt.ylabel("# of songs")
     plt.xticks(rotation=25)
     plt.savefig(dict.PLOT_PATH)
+
+import glob
+# could change to write to file instead
+def aggregateResults():
+    result = []
+    for f in glob.glob(dict.RESULTS_SONG_PATH + "*.json"):
+        with open(f, "rb") as infile:
+            result.append(json.load(infile))
+    return result

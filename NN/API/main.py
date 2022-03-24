@@ -31,9 +31,9 @@ def main():
     # # run chord recognizer
     # chordRecognizer = chord_algorithm.ChordRecognizer(id)
     # chordRecognizer.run(beats=beatRecognizer.beats, verbose=True)
-    #preprocessing.batchHandler()
+    preprocessing.batchHandler()
     #preprocessing.test(id)
-    preprocessing.plotResults()
+    #preprocessing.plotResults()
 
 
 
