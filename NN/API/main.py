@@ -19,9 +19,9 @@ warnings.filterwarnings("ignore", category=Warning)
 # Main program.
 def main():
     # # define youtube id
-    id = "dQw4w9WgXcQ"
+    id = "qf9Ipqubh9g"
     # # parse songs.json if it exists for comparison data
-    # preprocessing.parseJson(dict.JSON_PATH)
+    #preprocessing.parseJson(dict.JSON_PATH)
     # dict.printDivider()
     # # download file
     # preprocessing.downloadAudio(id)
@@ -31,8 +31,9 @@ def main():
     # # run chord recognizer
     # chordRecognizer = chord_algorithm.ChordRecognizer(id)
     # chordRecognizer.run(beats=beatRecognizer.beats, verbose=True)
-    preprocessing.batchHandler()
+    #preprocessing.batchHandler()
     #preprocessing.test(id)
+    preprocessing.plotResults()
 
 
 

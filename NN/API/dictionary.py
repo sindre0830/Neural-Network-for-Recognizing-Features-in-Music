@@ -9,11 +9,13 @@ NATIVE_DIR = "Data/Audio/Native/"
 MODIFIED_DIR = "Data/Audio/Modified/"
 JSON_PATH = "Data/songs.json"
 RESULTS_PATH = "Data/Results/"
-# PROCESSED_JSON_PATH = "Data/processedSongs.json"
-PROCESSED_JSON_PATH = "Data/temp.json"        # for testing: "Data/temp.json"
+RESULTS_SONG_PATH = RESULTS_PATH + "Songs/"
+PROCESSED_JSON_PATH = "Data/processedSongs.json"
+#PROCESSED_JSON_PATH = "Data/temp.json"        # for testing: "Data/temp.json"
 ALGORITHM_JSON_PATH = "Data/algoSongs.json"
 RESULTS_CSV_PATH = "Data/Results/results.csv"
 DETAILED_RESULTS_PATH = "Data/Results/detailed_results.json"
+PLOT_PATH = "Data/Results/plot.png"
 # extensions for conversion to wav
 EXTENSIONS = [".m4v", ".webm", ".mp3", ".mp4"]
 # formats
@@ -41,7 +43,7 @@ ACCOMPANIMENT = "/accompaniment" + WAV_FORMAT
 FLAG_DATABASE = False
 FLAG_RESULTS = False
 # blacklisted songs from EC-Play dataset
-BLACKLIST = ["6d5ST3tbPIU", "ASywAfBAVrQ", "DGIgXP9SvB8", "qf9Ipqubh9g", "0Yy9YzdmTJA", "xz3F744K2v0"]
+BLACKLIST = ["6d5ST3tbPIU", "ASywAfBAVrQ", "DGIgXP9SvB8", "xz3F744K2v0"]
 
 
 def getNativeAudioPath(id):

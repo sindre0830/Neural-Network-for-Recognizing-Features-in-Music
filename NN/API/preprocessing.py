@@ -10,6 +10,8 @@ import shutil
 import numpy as np
 import json
 import pandas as pd
+import csv
+import matplotlib.pyplot as plt
 
 
 # Downloads an audio file from given URL.
@@ -184,17 +186,18 @@ def batchHandler(force:bool = False):
     algSize = os.path.getsize(dict.ALGORITHM_JSON_PATH)
 
     # Check if we have existing data for comparison and data does not need to be reprocessed
-    if (algSize == 0 or force):  # Add after debugging: or algSize != dataSize
+    if algSize == 0:  # Add after debugging: or algSize != dataSize
         dict.FLAG_RESULTS = False
     else:
         dict.FLAG_RESULTS = True
         with open(dict.ALGORITHM_JSON_PATH, 'r') as f:
             results = json.loads(f.read())
-
     dictionary = {}
     # store our results
     batch_data = {}
     detailed_results = {}
+    # store updated songs
+    newProcessed = {}
     counter = 0
     # # Go through dataset
     for id in dataset:
@@ -202,29 +205,43 @@ def batchHandler(force:bool = False):
         print(id)
         # Get the data we need if not existing
         if not dict.FLAG_RESULTS:
-            # try:
-            #     downloadAudio(id)
-            # except dict.YoutubeError:
-            #     continue
-            downloadAudio(id)
-            beatRecognizer = beat_algorithm.BeatRecognizer(id)
-            beatRecognizer.run()
+            # Catches for bad ID, unavailable video, not online, etc
+            try:
+                downloadAudio(id)
+            except dict.YoutubeError:
+                continue
+
             chordRecognizer = chord_algorithm.ChordRecognizer(id)
-            temp = np.array(dataset[id]["beats"])
-            chordRecognizer.run(beats=temp, verbose=True) #beatRecognizer.beats
-            # Add to dictionary
-            createJson(dictionary, id, chordRecognizer.chords, dataset[id]["beats"])
-            result = compareChords(dataset[id]["beats"], dataset[id]["chords"], dataset[id]["beats"], chordRecognizer.chords)
+            newBeats = np.array(dataset[id]["beats"])
+            newBeats = newBeats[newBeats <= librosa.get_duration(filename=dict.getNativeAudioPath(id))]   # trim timestamps
+            chordRecognizer.run(beats=newBeats, verbose=True)
+            createJson(dictionary, id, chordRecognizer.chords.tolist(), newBeats.tolist(), "chords", "beats")
+            result = compareChords(newBeats, dataset[id]["chords"], newBeats, chordRecognizer.chords)
+        elif force or id not in results:        # test this
+            try:
+                downloadAudio(id)
+            except dict.YoutubeError:
+                continue
+            chordRecognizer = chord_algorithm.ChordRecognizer(id)
+            newBeats = np.array(dataset[id]["beats"])
+            newBeats = newBeats[newBeats <= librosa.get_duration(filename=dict.getNativeAudioPath(id))]   # trim timestamps
+            chordRecognizer.run(beats=newBeats, verbose=True)
+            createJson(dictionary, id, chordRecognizer.chords.tolist(), newBeats.tolist(), "chords", "beats")
+            result = compareChords(newBeats, dataset[id]["chords"], newBeats, chordRecognizer.chords)
         else:
-            print("Entered else")
-            result = compareChords(dataset[id]["beats"], dataset[id]["chords"], results[id]["beats"], results[id]["chords"])
+            result = compareChords(dataset[id]["beats"], dataset[id]["chords"], dataset[id]["beats"], results[id]["chords"])
         batch_data[id] = result*100
         createResults(detailed_results, id, algorithm = result)
         print("The result manual is: " + str(result * 100) + chr(37) + " accuracy")
         if not dict.FLAG_RESULTS:
+            createJson(newProcessed, id, dataset[id]["chords"], newBeats.tolist(), "chords", "beats")    # Update processed dataclear
             os.remove(dict.getNativeAudioPath(id))
             os.remove(dict.getModifiedAudioPath(id))
     output(batch_data, detailed_results)
+    # Update processed data with trimmed beats
+    json_object = json.dumps(newProcessed, indent=3)
+    with open(dict.PROCESSED_JSON_PATH, "w+") as outfile:
+        outfile.write(json_object)
     # Write our new algorithm data to file
     if not dict.FLAG_RESULTS:
         print("Writing algorithm results...")
@@ -234,10 +251,10 @@ def batchHandler(force:bool = False):
 
 
 # Updates a dictionary with new key+values
-def createJson(dict, id: str, chords: str, beats: float):
+def createJson(dict, id: str, first: str, second: float, fName:str, sName:str):
     s = {}
-    s["chords"] = chords.tolist()
-    s["beats"] = beats
+    s[fName] = first
+    s[sName] = second
     dict[id] = s
 
 
@@ -254,8 +271,8 @@ def compareChords(gt_timestamp, gt_chord, alg_timestamp, alg_chord):
     results = 0
     for idx, timestamp in enumerate(gt_timestamp):
         near = find_nearest(alg_timestamp, timestamp)
-        algoChord = alg_chord[near]        # Preferrably better solution here
-        # print(timestamp)
+        algoChord = alg_chord[near]
+        # print(timestamp)              # Debug
         # print(algoChord + " " + gt_chord[idx])
         if algoChord == gt_chord[idx]:
             results += 1
@@ -290,13 +307,27 @@ def test(id):
     with open(dict.PROCESSED_JSON_PATH, 'r') as f:
         dataset = json.loads(f.read())
     downloadAudio(id)
-    beatRecognizer = beat_algorithm.BeatRecognizer(id)
-    beatRecognizer.run()
+    # beatRecognizer = beat_algorithm.BeatRecognizer(id)
+    # beatRecognizer.run()
     chordRecognizer = chord_algorithm.ChordRecognizer(id)
     temp = np.array(dataset[id]["beats"])
-    print(temp.shape)
+    hold = librosa.get_duration(filename=dict.getNativeAudioPath(id))
+    temp = temp[temp <= hold]   # trim timestamps
     chordRecognizer.run(beats=temp, verbose=True)
-    result1 = compareChords(dataset[id]["beats"], dataset[id]["chords"], dataset[id]["beats"], chordRecognizer.chords)
+    result1 = compareChords(temp, dataset[id]["chords"], temp, chordRecognizer.chords)
     print("The result is: " + str(result1 * 100) + chr(37) + " accuracy")
     os.remove(dict.getNativeAudioPath(id))
     os.remove(dict.getModifiedAudioPath(id))
+
+
+def plotResults():
+    with open(dict.RESULTS_CSV_PATH) as f:
+        next(f)
+        df = pd.read_csv(f, names=['range', 'number'])
+        df = df.sort_values('range')
+    plt.bar(df['range'], df['number'], color = 'b')
+    plt.title('Chord Algorithm Accuracy')
+    plt.xlabel("Accuracy %")
+    plt.ylabel("# of songs")
+    plt.xticks(rotation=25)
+    plt.savefig(dict.PLOT_PATH)
