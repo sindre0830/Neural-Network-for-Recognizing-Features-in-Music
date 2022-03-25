@@ -1,4 +1,4 @@
-package songanalysis
+package analysis
 
 import (
 	debug "main/Debug"
@@ -9,8 +9,7 @@ import (
 func MethodHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:
-		var song Song
-		song.post(w, r)
+		sendToAnalysis(w, r)
 	default:
 		var errorMsg debug.Debug
 		errorMsg.Update(
