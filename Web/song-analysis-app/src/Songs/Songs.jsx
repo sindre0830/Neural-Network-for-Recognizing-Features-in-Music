@@ -20,13 +20,14 @@ const Songs = () => {
         fetchSongs(jsonData);*/
 
         try {
-            fetch('/results')
+            fetch('/v1/results')
             .then((res) => res.json())
             .then((res) => {
             console.log(res)
             fetchSongs(res)
             })
         } catch (err) {
+            console.log("hei")
             console.log(err)
         }
     }
@@ -42,13 +43,13 @@ const Songs = () => {
      */
     const filterSongs = () => {
         // filter based on search query
-        let filteredSongs = songs.filter(song => song.title.toLowerCase().includes(search.toLowerCase()));
+        let filteredSongs = songs.filter(song => song.Title.toLowerCase().includes(search.toLowerCase()));
 
         // filter based on status
         if (filter === 'Approved') {
-            return filteredSongs.filter(song => song.approved);
+            return filteredSongs.filter(song => song.Approved);
         } else if (filter === 'Pending') {
-            return filteredSongs.filter(song => !song.approved);
+            return filteredSongs.filter(song => !song.Approved);
         }
 
         return filteredSongs;
@@ -76,9 +77,18 @@ const Songs = () => {
                 </div>
             </div>
             <div className='songs__list'>
-                {filterSongs().map((song, index) => (
-                    <Song value={song} key={index} />
-                ))}
+                {/* render the song components
+                    if there are no songs in the database, render a message for the user */}
+                {songs !== null
+                    ? 
+                    <>
+                        {filterSongs().map((song, index) => (
+                            <Song value={song} key={index} />
+                        ))}
+                    </>
+                    : <p>No songs have been added yet...</p>
+                }
+                
             </div>
         </div>
     )
