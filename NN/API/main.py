@@ -22,17 +22,8 @@ def main():
     id = "qf9Ipqubh9g"
     # # parse songs.json if it exists for comparison data
     #preprocessing.parseJson(dict.JSON_PATH)
-    # dict.printDivider()
-    # # download file
-    # preprocessing.downloadAudio(id)
-    # # run beat recognizer
-    # beatRecognizer = beat_algorithm.BeatRecognizer(id)
-    # beatRecognizer.run(verbose=True)
-    # # run chord recognizer
-    # chordRecognizer = chord_algorithm.ChordRecognizer(id)
-    # chordRecognizer.run(beats=beatRecognizer.beats, verbose=True)
     preprocessing.batchHandler()
-    #preprocessing.test(id)
+    #preprocessing.updateJson(dict.TRIMMED_JSON_PATH, dict.TRIMMED_SONGS_PATH)
     #preprocessing.plotResults()
 
 

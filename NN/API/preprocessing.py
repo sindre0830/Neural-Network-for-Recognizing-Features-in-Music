@@ -10,8 +10,8 @@ import shutil
 import numpy as np
 import json
 import pandas as pd
-import csv
 import matplotlib.pyplot as plt
+from pathlib import Path
 
 
 # Downloads an audio file from given URL.
@@ -190,59 +190,49 @@ def batchHandler(force:bool = False):
     algSize = os.path.getsize(dict.ALGORITHM_JSON_PATH)
 
     # Check if we have existing data for comparison and data does not need to be reprocessed
+    updateJson(dict.ALGORITHM_JSON_PATH, dict.RESULTS_SONG_PATH)
     if algSize == 0:  # Add after debugging: or algSize != dataSize
-        dict.FLAG_RESULTS = False
-        results = aggregateResults()
-    else:
-        dict.FLAG_RESULTS = True
         with open(dict.ALGORITHM_JSON_PATH, 'r') as f:
             results = json.loads(f.read())
+    else:
+        results = {}
     dictionary = {}
     # store our results
     batch_data = {}
     detailed_results = {}
     # store updated songs
     newProcessed = {}
-    counter = 0
-    print(dict.FLAG_RESULTS)
+    songResults = {}
     # # Go through dataset
     for id in dataset:
-        counter += 1
         print(id)
         # Get the data we need if not existing
-        if not dict.FLAG_RESULTS:
+        if id in results.keys():
+            print("Using saved result")
+            result = compareChords(dataset[id]["beats"], dataset[id]["chords"], dataset[id]["beats"], results[id]["chords"])       
+        else:
+            print("Generating from scratch...")
             # Catches for bad ID, unavailable video, not online, etc
             try:
                 downloadAudio(id)
             except dict.YoutubeError:
                 continue
-
             chordRecognizer = chord_algorithm.ChordRecognizer(id)
             newBeats = np.array(dataset[id]["beats"])
             newBeats = newBeats[newBeats <= librosa.get_duration(filename=dict.getNativeAudioPath(id))]   # trim timestamps
             chordRecognizer.run(beats=newBeats, verbose=True)
             createJson(dictionary, id, chordRecognizer.chords.tolist(), newBeats.tolist(), "chords", "beats")
             result = compareChords(newBeats, dataset[id]["chords"], newBeats, chordRecognizer.chords)
-        elif force or not os.path.exists(dict.RESULTS_SONG_PATH + id + '.json'):        # test this
-            try:
-                downloadAudio(id)
-            except dict.YoutubeError:
-                continue
-            chordRecognizer = chord_algorithm.ChordRecognizer(id)
-            newBeats = np.array(dataset[id]["beats"])
-            newBeats = newBeats[newBeats <= librosa.get_duration(filename=dict.getNativeAudioPath(id))]   # trim timestamps
-            chordRecognizer.run(beats=newBeats, verbose=True)
-            createJson(dictionary, id, chordRecognizer.chords.tolist(), newBeats.tolist(), "chords", "beats")
-            result = compareChords(newBeats, dataset[id]["chords"], newBeats, chordRecognizer.chords)
-        else:
-            print("Using saved results")
-            result = compareChords(dataset[id]["beats"], dataset[id]["chords"], dataset[id]["beats"], results[id]["chords"])
         batch_data[id] = result*100
         createResults(detailed_results, id, algorithm = result)
         print("The result manual is: " + str(result * 100) + chr(37) + " accuracy")
         if not dict.FLAG_RESULTS:
             createJson(newProcessed, id, dataset[id]["chords"], newBeats.tolist(), "chords", "beats")    # Update processed dataclear
             json_object = json.dumps(newProcessed[id], indent=3)
+            with open(dict.TRIMMED_SONGS_PATH + id + '.json', "w+") as outfile:
+                outfile.write(json_object)
+            createJson(songResults, id, chordRecognizer.chords.tolist(), newBeats.tolist(), "chords", "beats")
+            json_object = json.dumps(songResults[id], indent=3)
             with open(dict.RESULTS_SONG_PATH + id + '.json', "w+") as outfile:
                 outfile.write(json_object)
             os.remove(dict.getNativeAudioPath(id))
@@ -262,7 +252,7 @@ def batchHandler(force:bool = False):
 
 
 # Updates a dictionary with new key+values
-def createJson(dict, id: str, first: str, second: float, fName:str, sName:str):
+def createJson(dict, id: str, first, second, fName:str, sName:str):
     s = {}
     s[fName] = first
     s[sName] = second
@@ -311,23 +301,6 @@ def output(data, detailed):
         outfile.write(json_object)
 
 
-def test(id):
-    with open(dict.PROCESSED_JSON_PATH, 'r') as f:
-        dataset = json.loads(f.read())
-    downloadAudio(id)
-    # beatRecognizer = beat_algorithm.BeatRecognizer(id)
-    # beatRecognizer.run()
-    chordRecognizer = chord_algorithm.ChordRecognizer(id)
-    temp = np.array(dataset[id]["beats"])
-    hold = librosa.get_duration(filename=dict.getNativeAudioPath(id))
-    temp = temp[temp <= hold]   # trim timestamps
-    chordRecognizer.run(beats=temp, verbose=True)
-    result1 = compareChords(temp, dataset[id]["chords"], temp, chordRecognizer.chords)
-    print("The result is: " + str(result1 * 100) + chr(37) + " accuracy")
-    os.remove(dict.getNativeAudioPath(id))
-    os.remove(dict.getModifiedAudioPath(id))
-
-
 def plotResults():
     with open(dict.RESULTS_CSV_PATH) as f:
         next(f)
@@ -340,11 +313,23 @@ def plotResults():
     plt.xticks(rotation=25)
     plt.savefig(dict.PLOT_PATH)
 
-import glob
-# could change to write to file instead
-def aggregateResults():
-    result = []
-    for f in glob.glob(dict.RESULTS_SONG_PATH + "*.json"):
-        with open(f, "rb") as infile:
-            result.append(json.load(infile))
-    return result
+
+# updates json with new data
+# file - file to be updated
+# dir - directory with new data
+def updateJson(file:str, dir:str):
+    if os.path.getsize(file) == 0:
+        resultsFile = {}
+    else:
+        with open(file, 'r') as f:
+            resultsFile = json.loads(f.read())
+    if not os.path.exists(dir):
+        os.makedirs(dir)
+    for f in os.listdir(dir):
+        with open(dir + f, "rb") as infile:
+            if Path(f).stem not in resultsFile:
+                resultsFile[Path(f).stem] = json.load(infile)
+        os.remove(f)        # need testing
+    output = json.dumps(resultsFile, indent=3)
+    with open(file, "w+") as outfile:
+        outfile.write(output)

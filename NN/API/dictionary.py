@@ -10,8 +10,9 @@ MODIFIED_DIR = "Data/Audio/Modified/"
 JSON_PATH = "Data/songs.json"
 RESULTS_PATH = "Data/Results/"
 RESULTS_SONG_PATH = RESULTS_PATH + "Songs/"
+TRIMMED_SONGS_PATH = "Data/Processed/"
 PROCESSED_JSON_PATH = "Data/processedSongs.json"
-#PROCESSED_JSON_PATH = "Data/temp.json"        # for testing: "Data/temp.json"
+TRIMMED_JSON_PATH = "Data/trimmedSongs.json"
 ALGORITHM_JSON_PATH = "Data/algoSongs.json"
 RESULTS_CSV_PATH = "Data/Results/results.csv"
 DETAILED_RESULTS_PATH = "Data/Results/detailed_results.json"
@@ -21,6 +22,7 @@ EXTENSIONS = [".m4v", ".webm", ".mp3", ".mp4"]
 # formats
 WAV_FORMAT = ".wav"
 PNG_FORMAT = ".png"
+JSON_FORMAT = ".json"
 # parameters
 SAMPLERATE_BEATS = 10000
 SAMPLERATE_CHORDS = 22050
@@ -52,6 +54,10 @@ def getNativeAudioPath(id):
 
 def getModifiedAudioPath(id):
     return MODIFIED_DIR + id + WAV_FORMAT
+
+
+def getSongResultAudioPath(id):
+    return RESULTS_SONG_PATH + id + JSON_FORMAT
 
 
 def getPlotPath(id):
