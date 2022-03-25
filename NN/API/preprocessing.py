@@ -187,11 +187,10 @@ def batchHandler(force:bool = False):
     with open(dict.PROCESSED_JSON_PATH, 'r') as f:
         dataset = json.loads(f.read())
 
-    algSize = os.path.getsize(dict.ALGORITHM_JSON_PATH)
-
     # Check if we have existing data for comparison and data does not need to be reprocessed
     updateJson(dict.ALGORITHM_JSON_PATH, dict.RESULTS_SONG_PATH)
-    if algSize == 0:  # Add after debugging: or algSize != dataSize
+    algSize = os.path.getsize(dict.ALGORITHM_JSON_PATH)
+    if algSize != 0:  # Add after debugging: or algSize != dataSize
         with open(dict.ALGORITHM_JSON_PATH, 'r') as f:
             results = json.loads(f.read())
     else:
@@ -223,10 +222,7 @@ def batchHandler(force:bool = False):
             chordRecognizer.run(beats=newBeats, verbose=True)
             createJson(dictionary, id, chordRecognizer.chords.tolist(), newBeats.tolist(), "chords", "beats")
             result = compareChords(newBeats, dataset[id]["chords"], newBeats, chordRecognizer.chords)
-        batch_data[id] = result*100
-        createResults(detailed_results, id, algorithm = result)
-        print("The result manual is: " + str(result * 100) + chr(37) + " accuracy")
-        if not dict.FLAG_RESULTS:
+            # Save
             createJson(newProcessed, id, dataset[id]["chords"], newBeats.tolist(), "chords", "beats")    # Update processed dataclear
             json_object = json.dumps(newProcessed[id], indent=3)
             with open(dict.TRIMMED_SONGS_PATH + id + '.json', "w+") as outfile:
@@ -237,14 +233,17 @@ def batchHandler(force:bool = False):
                 outfile.write(json_object)
             os.remove(dict.getNativeAudioPath(id))
             os.remove(dict.getModifiedAudioPath(id))
+        batch_data[id] = result*100
+        createResults(detailed_results, id, algorithm = result)
+        print("The result manual is: " + str(result * 100) + chr(37) + " accuracy")
     output(batch_data, detailed_results)
     # Update processed data with trimmed beats
-    print(len(newProcessed))
-    json_object = json.dumps(newProcessed, indent=3)
-    with open(dict.PROCESSED_JSON_PATH, "w+") as outfile:
-        outfile.write(json_object)
+    if(len(newProcessed)) > len(dataset):
+        json_object = json.dumps(newProcessed, indent=3)
+        with open(dict.PROCESSED_JSON_PATH, "w+") as outfile:
+            outfile.write(json_object)
     # Write our new algorithm data to file
-    if not dict.FLAG_RESULTS:
+    if(len(songResults)) > len(results):
         print("Writing algorithm results...")
         json_object = json.dumps(dictionary, indent=3)
         with open(dict.ALGORITHM_JSON_PATH, "w+") as outfile:
@@ -313,7 +312,7 @@ def plotResults():
     plt.xticks(rotation=25)
     plt.savefig(dict.PLOT_PATH)
 
-
+import shutil
 # updates json with new data
 # file - file to be updated
 # dir - directory with new data
@@ -323,13 +322,11 @@ def updateJson(file:str, dir:str):
     else:
         with open(file, 'r') as f:
             resultsFile = json.loads(f.read())
-    if not os.path.exists(dir):
-        os.makedirs(dir)
     for f in os.listdir(dir):
         with open(dir + f, "rb") as infile:
             if Path(f).stem not in resultsFile:
                 resultsFile[Path(f).stem] = json.load(infile)
-        os.remove(f)        # need testing
     output = json.dumps(resultsFile, indent=3)
     with open(file, "w+") as outfile:
         outfile.write(output)
+    shutil.rmtree(dir)
