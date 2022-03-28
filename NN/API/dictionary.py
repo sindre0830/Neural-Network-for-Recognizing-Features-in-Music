@@ -7,6 +7,7 @@ ANALYSIS_PATH = '/' + VERSION + '/analysis'
 PLOTS_DIR = "Data/Plots/"
 NATIVE_DIR = "Data/Audio/Native/"
 MODIFIED_DIR = "Data/Audio/Modified/"
+TRIMMED_SONGS_PATH = "Data/Processed/"
 JSON_PATH = "Data/songs.json"
 RESULTS_PATH = "Data/Results/"
 RESULTS_SONG_PATH = RESULTS_PATH + "Songs/"

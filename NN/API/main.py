@@ -1,6 +1,7 @@
 # import local modules
 import dictionary as dict
 import preprocessing
+import evaluation
 import beat_algorithm
 import chord_algorithm
 # import foreign modules
@@ -22,9 +23,9 @@ def main():
     id = "qf9Ipqubh9g"
     # # parse songs.json if it exists for comparison data
     #preprocessing.parseJson(dict.JSON_PATH)
-    preprocessing.batchHandler()
-    #preprocessing.updateJson(dict.TRIMMED_JSON_PATH, dict.TRIMMED_SONGS_PATH)
-    #preprocessing.plotResults()
+    evaluation.batchHandler()
+    #evaluation.updateJson(dict.TRIMMED_JSON_PATH, dict.TRIMMED_SONGS_PATH)
+    #evaluation.plotResults()
 
 
 
