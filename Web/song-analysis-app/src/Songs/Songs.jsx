@@ -8,28 +8,32 @@ import '../testData.json';
  *  Displaying of all analyzed songs.
  */
 const Songs = () => {
-    const [songs, fetchSongs] = useState([])
+    const [songs, setSongs] = useState([])
+    const [isLoading, setLoading] = useState(false)
+    const [isError, setError] = useState(false)
     const [search, setSearch] = useState("")
     const [filter, setFilter] = useState("All")
 
     /**
      *  Get results from the API.
      */
-    const getSongs = () => {
+    const getSongs = async () => {
+        // getting songs from file (for testing purposes)
         /*const jsonData= require('../testData.json'); 
-        fetchSongs(jsonData);*/
+        setSongs(jsonData);*/
+
+        setLoading(true);
+        setError(false);
 
         try {
-            fetch('/v1/results')
-            .then((res) => res.json())
-            .then((res) => {
-            console.log(res)
-            fetchSongs(res)
-            })
+            const res = await fetch('/v1/results');
+            const json = await res.json();
+            setSongs(json);
         } catch (err) {
-            console.log("hei")
-            console.log(err)
+            setError(true);
         }
+        
+        setLoading(false);
     }
 
     useEffect(() => {
@@ -77,9 +81,11 @@ const Songs = () => {
                 </div>
             </div>
             <div className='songs__list'>
-                {/* render the song components
-                    if there are no songs in the database, render a message for the user */}
-                {songs !== null
+                {/* display messages for users if results are loading or something went wrong */}
+                {isLoading && <p>Results are loading...</p>}
+                {isError && <p>Something went wrong...</p>}
+                {/* render song components. if there are no songs in the database, display a message for users */}
+                {songs
                     ? 
                     <>
                         {filterSongs().map((song, index) => (
@@ -87,8 +93,7 @@ const Songs = () => {
                         ))}
                     </>
                     : <p>No songs have been added yet...</p>
-                }
-                
+                }          
             </div>
         </div>
     )
