@@ -54,11 +54,16 @@
 
 .song__result {
     margin-top: 20px;
+    background-color: #E8E8E8;
+}
+
+.song__result pre {
+    white-space: pre-wrap;
+    font-size: 18px;
 }
 
 .song__result form {
     padding: 10px;
-    background-color: #E8E8E8;
 }
 
 .song__result-group {

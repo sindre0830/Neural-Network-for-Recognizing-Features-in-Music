@@ -8,7 +8,7 @@ import './song.css';
 const Song = (props) => {
     const [toggleSong, setToggle] = useState(false);
     const [title, setTitle] = useState("")
-    const [bpm, setBpm] = useState(null)
+    const [bpm, setBpm] = useState(0)
     const [beats, setBeats] = useState("")
     const [chords, setChords] = useState("")
 
@@ -17,33 +17,30 @@ const Song = (props) => {
      * 
      *  @param {event} e 
      */
-    const handleSubmit = async (e) => {
-        // only send the values that has been changed
-        let items = {approved: true};
-
+    const handleSubmit = async (e) => {        
+        let items = {Approved: true};
+        // only send the values that have been changed
         if (title !== "") {
-            items.title = title;
+            items.Title = title;
         }
-
-        if (bpm !== null) {
-            items.bpm = parseInt(bpm);
+        if (bpm !== 0) {
+            items.Bpm = parseFloat(bpm);
         }
-
         if (beats !== "") {
-            items.beats = beats.replace(/\s+/g, '').split(",");
+            items.Beats = beats.replace(/\s+/g, '').split(",");
         }
-
         if (chords !== "") {
-            items.chords = chords.replace(/\s+/g, '').split(",");
+            items.Chords = chords.replace(/\s+/g, '').split(",");
         }
 
         try {
             const options = {
                 method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(items)
             }
 
-            const res = await fetch('/results', options);
+            const res = await fetch('/v/results?id=' + props.value.id, options);
         } catch (err) {
             console.log(err);
         }
@@ -52,15 +49,15 @@ const Song = (props) => {
     return (
         <div className='song'>
             <div className='song__title'>
-                <hr className={props.value.approved ? 'song__title-approved' : 'song__title-pending'} />
-                <h1>{props.value.title}</h1>
+                <hr className={props.value.Approved ? 'song__title-approved' : 'song__title-pending'} />
+                <h1>{props.value.Title}</h1>
 
                 {/* show approve button if the song is pending */}
-                {!props.value.approved &&
+                {!props.value.Approved &&
                     <button type='submit' form='update'>Approve</button>
                 }
 
-                {/* check if the arrow is going to point up or down*/}
+                {/* check if song is opened or not */}
                 {toggleSong
                     ? <FiChevronUp size={28} onClick={() => setToggle(false)} style={{cursor: 'pointer'}}/>
                     : <FiChevronDown size={28} onClick={() => setToggle(true)} style={{ cursor: 'pointer'}}/>
@@ -72,26 +69,26 @@ const Song = (props) => {
             <div className='song__result'>
                 {/* display result */}
                 {toggleSong &&
-                    <div>
+                    <>
                         <form id='update' onSubmit={handleSubmit}>
                             <div className='song__result-group'>
                                 <label htmlFor='title'>Title</label>
-                                <input type='text' id='title' name='title' onChange={(e) => setTitle(e.target.value)} defaultValue={props.value.title} disabled={props.value.approved}/>
+                                <input type='text' id='title' name='title' onChange={(e) => setTitle(e.target.value)} defaultValue={props.value.Title} disabled={props.value.Approved} />
                             </div>
                             <div className='song__result-group'>
                                 <label htmlFor='bpm'>Bpm</label>
-                                <input type='text' id='bpm' name='bpm' onChange={(e) => setBpm(e.target.value)} defaultValue={props.value.bpm} disabled={props.value.approved}/>
+                                <input type='text' id='bpm' name='bpm' onChange={(e) => setBpm(e.target.value)} defaultValue={props.value.Bpm} disabled={props.value.Approved} />
                             </div>
                             <div className='song__result-group'>
                                 <label htmlFor='beats'>Beats</label>
-                                <input type='text' id='beats' name='beats' onChange={(e) => setBeats(e.target.value)} defaultValue={props.value.beats} disabled={props.value.approved}/>    
+                                <input type='text' id='beats' name='beats' onChange={(e) => setBeats(e.target.value)} defaultValue={props.value.Beats} disabled={props.value.Approved} />
                             </div>
-                            <div className='song__result-group'>    
+                            <div className='song__result-group'>
                                 <label htmlFor='chords'>Chords</label>
-                                <input type='text' id='chords' name='chords' onChange={(e) => setChords(e.target.value)} defaultValue={props.value.chords} disabled={props.value.approved}/>
+                                <input type='text' id='chords' name='chords' onChange={(e) => setChords(e.target.value)} defaultValue={props.value.Chords} disabled={props.value.Approved} />
                             </div>
                         </form>
-                    </div>
+                    </>
                 }
             </div>
         </div>
