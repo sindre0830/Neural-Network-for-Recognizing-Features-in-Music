@@ -5,7 +5,6 @@ import (
 	database "main/Database"
 	debug "main/Debug"
 	"net/http"
-	"strings"
 )
 
 // get all song results from the database.
@@ -14,7 +13,7 @@ func get(w http.ResponseWriter, r *http.Request) {
 
 	data := make([]map[string]interface{}, 0)
 	// get all documents from the database
-	data, err := database.Firestore.GetAll("songs")
+	data, err := database.Firestore.GetAll("results")
 	if err != nil {
 		var errorMsg debug.Debug
 		errorMsg.Update(
@@ -35,29 +34,17 @@ func get(w http.ResponseWriter, r *http.Request) {
 func update(w http.ResponseWriter, r *http.Request) {
 	var errorMsg debug.Debug
 
-	// validate URL
-	path := strings.Split(r.URL.Path, "/")
-	if len(path) != 3 {
+	// validate URL by extracting the id
+	id, ok := r.URL.Query()["id"]
+	if !ok || len(id[0]) < 1 {
 		errorMsg.Update(
 			http.StatusBadRequest,
 			"update() -> Validating URL",
 			"url validation: incorrect format",
-			"URL format not valid",
+			"Missing 'id' param",
 		)
 		errorMsg.Print()
-		return
-	}
-
-	// make sure an ID is provided by the user
-	id := path[2]
-	if len(id) < 1 {
-		errorMsg.Update(
-			http.StatusBadRequest,
-			"update() -> Validating URL",
-			"url validation: incorrect format",
-			"URL format not valid",
-		)
-		errorMsg.Print()
+		http.Error(w, errorMsg.RawError, errorMsg.StatusCode)
 		return
 	}
 
@@ -72,11 +59,12 @@ func update(w http.ResponseWriter, r *http.Request) {
 			"Unknown",
 		)
 		errorMsg.Print()
+		http.Error(w, errorMsg.RawError, errorMsg.StatusCode)
 		return
 	}
 
 	// update data in database
-	err = database.Firestore.Update("songs", id, data)
+	err = database.Firestore.Update("results", id[0], data)
 	if err != nil {
 		errorMsg.Update(
 			http.StatusInternalServerError,
@@ -85,6 +73,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 			"Unknown",
 		)
 		errorMsg.Print()
+		http.Error(w, errorMsg.RawError, errorMsg.StatusCode)
 		return
 	}
 
