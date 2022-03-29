@@ -35,7 +35,7 @@ class BeatRecognizer:
         # plot
         if plot:
             dict.printOperation("Plotting results...", verbose=verbose)
-            self.plot(start=None, end=None)
+            self.plot(start=0, end=5)
             dict.printMessage(dict.DONE, verbose=verbose)
         dict.printDivider(verbose=verbose)
 
@@ -53,6 +53,8 @@ class BeatRecognizer:
         onset_env = librosa.onset.onset_strength(y=y, sr=sr, aggregate=np.median)
         times = librosa.times_like(onset_env, sr=sr, hop_length=512)
         plt.plot(times, librosa.util.normalize(onset_env), alpha=0.6)
+        plt.xlabel("Time")
+        plt.ylabel("Onset strength")
         # plot beat timestamps
         n = 1
         # branch if database has been loaded

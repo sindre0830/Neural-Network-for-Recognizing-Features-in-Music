@@ -158,3 +158,47 @@ def chordToString(chordNum: int, minor: bool):
         char += "m"
 
     return char
+
+
+def getTrainingData():
+    data = []
+    label = []
+    maxLength = 0
+    with open(dict.PROCESSED_JSON_PATH, 'r') as f:
+        ECPlayDataset = json.loads(f.read())
+    a = 0
+    for key in ECPlayDataset:
+        a += 1
+        downloadAudio(key)
+        for i in range(len(ECPlayDataset[key]["beats"])):
+            if i + 1 < len(ECPlayDataset[key]["beats"]):
+                chroma, maxLength = getChordChroma(key, maxLength, start=ECPlayDataset[key]["beats"][i], end=ECPlayDataset[key]["beats"][i + 1])
+                if chroma is not None:
+                    data.append(chroma)
+                    label.append(ECPlayDataset[key]["chords"][i])
+        print(str(a) + "\t" + key + "\tlength: " + str(len(data)))
+
+    for i in range(len(data)):
+        padding = np.zeros(shape=(12, maxLength - data[i].shape[1]), dtype=np.float32)
+        data[i] = np.append(data[i], padding, axis=1)
+
+    dataset = (data, label)
+    dataset = np.array(dataset)
+    # branch if audio directory doesn't exist
+    if not os.path.exists(dict.TRAINING_DATASET_PATH):
+        os.makedirs(dict.TRAINING_DATASET_PATH)
+    np.save(dict.TRAINING_DATASET_PATH + "dataset.npy", dataset)
+
+
+def getChordChroma(id: str, max_length: int, start: float, end: float = None):
+    duration = None
+    if end is not None:
+        duration = (end - start)
+    y, sr = librosa.load(dict.getNativeAudioPath(id), sr=None, offset=start, duration=duration)
+    if np.any(y):
+        chroma = librosa.feature.chroma_stft(y=y, sr=sr)
+        if chroma.shape[1] <= 50:
+            if chroma.shape[1] > max_length:
+                max_length = chroma.shape[1]
+            return chroma, max_length
+    return None, max_length
