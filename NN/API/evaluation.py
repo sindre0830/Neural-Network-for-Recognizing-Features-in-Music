@@ -12,6 +12,8 @@ import json
 import pandas as pd
 import matplotlib.pyplot as plt
 from pathlib import Path
+from itertools import tee, islice, chain
+from statistics import mean
 
 # Handles batch process comparison of database
 def batchHandler(force:bool = False, plot:bool = False):
@@ -179,3 +181,36 @@ def updateJson(file:str, dir:str):
     with open(file, "w+") as outfile:
         outfile.write(output)
     shutil.rmtree(dir)
+
+
+# Source: https://stackoverflow.com/a/1012089
+# Takes an iterable and returns list of 3-element tuples that lets us
+# access the previous and next element for each item
+# Used to compare distances between chords for the beat dataset
+def previous_and_next(some_iterable):
+    prevs, items, nexts = tee(some_iterable, 3)
+    prevs = chain([None], prevs)
+    nexts = chain(islice(nexts, 1, None), [None])
+    return zip(prevs, items, nexts)
+
+
+# need to fix
+def evaluateBeats(dataset:float, algorithm:float):
+    beatAccuracy = []
+    print(dataset)
+    for previous, item, nxt in previous_and_next(dataset):
+        near = find_nearest(algorithm, item)
+        distance = item - near
+        print(item, near)
+        if nxt == None:
+            nxt = previous
+        if previous == None:
+            previous = nxt
+        if distance >= 0:
+            control = abs(item - previous)
+        else:
+            control = abs(item - nxt)
+        beatAccuracy.append(100-(distance / control))
+    print(beatAccuracy)
+    average = mean(beatAccuracy)
+    print("The average accuracy is: ", average)
