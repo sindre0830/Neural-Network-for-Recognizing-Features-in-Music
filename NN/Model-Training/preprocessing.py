@@ -23,6 +23,8 @@ def prepareDataset(data: np.ndarray, labels: np.ndarray):
     # iterate through data and Convert each matrix to List
     for i in range(0, len(data)):
         data[i] = data[i].tolist()
+    # set shape
+    dict.SHAPE = (12, len(data[0][0]), 1)
     dict.printMessage(dict.DONE)
     return data.tolist(), labels
 

@@ -20,17 +20,18 @@ def main():
     # parse songs.json if it exists for comparison data
     preprocessing.parseJson(dict.JSON_PATH)
     dict.printDivider()
-    # define youtube id
-    id = "hPOYc4a2RPY"
-    # download file
-    preprocessing.downloadAudio(id)
-    # run beat recognizer
-    beatRecognizer = beat_algorithm.BeatRecognizer(id)
-    beatRecognizer.run(plot=True, verbose=True)
-    # run chord recognizer
-    #chordRecognizer = chord_algorithm.ChordRecognizer(id)
-    #chordRecognizer.run(beats=beatRecognizer.beats, verbose=True)
-    #print(chordRecognizer.chords)
+    preprocessing.getTrainingData()
+    # # define youtube id
+    # id = "hPOYc4a2RPY"
+    # # download file
+    # preprocessing.downloadAudio(id)
+    # # run beat recognizer
+    # beatRecognizer = beat_algorithm.BeatRecognizer(id)
+    # beatRecognizer.run(plot=True, verbose=True)
+    # # run chord recognizer
+    # chordRecognizer = chord_algorithm.ChordRecognizer(id)
+    # chordRecognizer.run(beats=beatRecognizer.beats, verbose=True)
+    # print(chordRecognizer.chords)
 
 
 # Calculate time since program started in seconds.

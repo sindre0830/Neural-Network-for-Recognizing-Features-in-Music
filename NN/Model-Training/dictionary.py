@@ -1,12 +1,12 @@
 # dataset names
-LABEL_NAMES = ['', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B',
+LABEL_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B',
                'Cm', 'C#m', 'Dm', 'D#m', 'Em', 'Fm', 'F#m', 'Gm', 'G#m', 'Am', 'A#m', 'Bm']
 # status messages
 DONE = 'DONE'
 SUCCESS = 'SUCCESS'
 FAILED = 'FAILED'
 # set parameters
-SHAPE = (12, 50, 1)
+SHAPE = None
 DATASET_AMOUNT = len(LABEL_NAMES) + 1
 LEARNING_RATE = 0.001
 TRAIN_SIZE = 0.80
