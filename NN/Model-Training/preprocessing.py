@@ -16,7 +16,7 @@ def loadDataset():
 
 # Prepare dataset by convert from ndarray to List and setting the label names to their respective index.
 def prepareDataset(data: np.ndarray, labels: np.ndarray):
-    dict.printOperation("Prepare dataset...")
+    dict.printOperation("Prepare dataset (size: " + str(len(labels)) + ")...")
     # iterate through labels and set value to index
     for i in range(0, len(labels)):
         labels[i] = dict.LABEL_NAMES.index(labels[i])
