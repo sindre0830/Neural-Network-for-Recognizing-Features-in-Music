@@ -1,6 +1,7 @@
 # import local modules
 from preprocessing import (
-    loadDataset
+    loadDataset,
+    prepareDataset
 )
 # import foreign modules
 import os
@@ -19,8 +20,9 @@ if gpu_devices:
 
 # Main program.
 def main():
-    # load dataset from file
+    # load dataset from file and process it to correct type
     data, labels = loadDataset()
+    data, labels = prepareDataset(data, labels)
 
 
 # branch if program is run through 'python main.py' and run main program
