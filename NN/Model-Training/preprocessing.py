@@ -1,6 +1,8 @@
 # import local modules
 import dictionary as dict
 # import foreign modules
+import sklearn.model_selection
+import keras.utils.np_utils
 import numpy as np
 
 
@@ -23,3 +25,13 @@ def prepareDataset(data: np.ndarray, labels: np.ndarray):
         data[i] = data[i].tolist()
     dict.printMessage(dict.DONE)
     return data.tolist(), labels
+
+
+# Perform tain-test-split.
+def splitData(data, labels):
+    dict.printOperation("Split dataset...")
+    xTrain, xTest, yTrain, yTest = sklearn.model_selection.train_test_split(data, labels, train_size=dict.TRAIN_SIZE, random_state=0)
+    yTrain = keras.utils.np_utils.to_categorical(yTrain, num_classes=dict.DATASET_AMOUNT)
+    yTest = keras.utils.np_utils.to_categorical(yTest, num_classes=dict.DATASET_AMOUNT)
+    dict.printMessage(dict.DONE)
+    return xTrain, xTest, yTrain.tolist(), yTest.tolist()

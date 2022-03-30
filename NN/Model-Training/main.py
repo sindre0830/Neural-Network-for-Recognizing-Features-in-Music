@@ -2,7 +2,8 @@
 import dictionary as dict
 from preprocessing import (
     loadDataset,
-    prepareDataset
+    prepareDataset,
+    splitData
 )
 from model import (
     generateModel
@@ -31,6 +32,9 @@ def main():
     # generate model
     model = generateModel()
     model.summary()
+    dict.printDivider()
+    # split dataset
+    xTrain, xTest, yTrain, yTest = splitData(data, labels)
 
 
 # branch if program is run through 'python main.py' and run main program
