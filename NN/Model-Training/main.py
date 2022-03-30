@@ -8,7 +8,8 @@ from preprocessing import (
 from model import (
     generateModel,
     trainModel,
-    predictModel
+    predictModel,
+    plotResults
 )
 # import foreign modules
 import os
@@ -41,6 +42,7 @@ def main():
     dict.printDivider()
     # predict on testing data and output results
     predictModel(model, xTest, yTest)
+    plotResults(results)
 
 # branch if program is run through 'python main.py' and run main program
 if __name__ == "__main__":
