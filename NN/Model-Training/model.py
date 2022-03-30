@@ -5,6 +5,9 @@ import keras.models
 import keras.layers.convolutional
 import keras.layers.core
 import keras.optimizer_v2.adam
+import sklearn.metrics
+import numpy as np
+import pandas as pd
 
 
 # Generate convolutional neural network model.
@@ -46,3 +49,15 @@ def trainModel(model: keras.models.Sequential, xTrain, xTest, yTrain, yTest, ver
     # evaluate model and output results
     model.evaluate(xTest, yTest)
     return model, results
+
+
+# Function for running model.predict.
+def predictModel(model: keras.models.Sequential, xTest, yTest):
+    # predict dataset on model
+    yPred = model.predict(xTest)
+    # flatten each array to get index of highest value
+    yPred = np.argmax(yPred, axis=1)
+    yTest = np.argmax(yTest, axis=1)
+    # print classification report and confusion matrix
+    print(sklearn.metrics.classification_report(yTest, yPred, target_names=dict.LABEL_NAMES, zero_division=1))
+    print(pd.DataFrame(sklearn.metrics.confusion_matrix(yTest, yPred), index=dict.LABEL_NAMES, columns=dict.LABEL_NAMES))
