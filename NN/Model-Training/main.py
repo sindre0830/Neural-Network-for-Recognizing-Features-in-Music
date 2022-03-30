@@ -1,3 +1,7 @@
+# import local modules
+from preprocessing import (
+    loadDataset
+)
 # import foreign modules
 import os
 import tensorflow as tf
@@ -15,7 +19,8 @@ if gpu_devices:
 
 # Main program.
 def main():
-    pass
+    # load dataset from file
+    data, labels = loadDataset()
 
 
 # branch if program is run through 'python main.py' and run main program
