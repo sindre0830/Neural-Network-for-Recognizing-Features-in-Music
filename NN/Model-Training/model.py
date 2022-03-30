@@ -30,3 +30,19 @@ def generateModel():
         metrics=['accuracy']
     )
     return model
+
+
+# Function to run model.fit.
+def trainModel(model: keras.models.Sequential, xTrain, xTest, yTrain, yTest, verbose_flag):
+    # fit model by parameters
+    results = model.fit(
+        xTrain, 
+        yTrain, 
+        validation_data=(xTest, yTest), 
+        batch_size=dict.BATCH_SIZE, 
+        epochs=dict.EPOCHS,
+        verbose=verbose_flag
+    )
+    # evaluate model and output results
+    model.evaluate(xTest, yTest)
+    return model, results

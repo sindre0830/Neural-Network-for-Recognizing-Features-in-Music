@@ -6,7 +6,8 @@ from preprocessing import (
     splitData
 )
 from model import (
-    generateModel
+    generateModel,
+    trainModel
 )
 # import foreign modules
 import os
@@ -33,9 +34,9 @@ def main():
     model = generateModel()
     model.summary()
     dict.printDivider()
-    # split dataset
+    # split dataset and train model
     xTrain, xTest, yTrain, yTest = splitData(data, labels)
-
+    model, results = trainModel(model, xTrain, xTest, yTrain, yTest, verbose_flag=True)
 
 # branch if program is run through 'python main.py' and run main program
 if __name__ == "__main__":
