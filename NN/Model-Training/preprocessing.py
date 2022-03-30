@@ -20,7 +20,7 @@ def prepareDataset(data: np.ndarray, labels: np.ndarray):
     # iterate through labels and set value to index
     for i in range(0, len(labels)):
         labels[i] = dict.LABEL_NAMES.index(labels[i])
-    # iterate through data and Convert each matrix to List 
+    # iterate through data and Convert each matrix to List
     for i in range(0, len(data)):
         data[i] = data[i].tolist()
     dict.printMessage(dict.DONE)

@@ -48,6 +48,7 @@ def main():
     # prompt user to save the model
     saveModel(model)
 
+
 # branch if program is run through 'python main.py' and run main program
 if __name__ == "__main__":
     main()
