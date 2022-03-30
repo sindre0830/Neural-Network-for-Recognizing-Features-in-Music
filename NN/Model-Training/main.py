@@ -9,7 +9,8 @@ from model import (
     generateModel,
     trainModel,
     predictModel,
-    plotResults
+    plotResults,
+    saveModel
 )
 # import foreign modules
 import os
@@ -43,6 +44,9 @@ def main():
     # predict on testing data and output results
     predictModel(model, xTest, yTest)
     plotResults(results)
+    dict.printDivider()
+    # prompt user to save the model
+    saveModel(model)
 
 # branch if program is run through 'python main.py' and run main program
 if __name__ == "__main__":

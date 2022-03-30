@@ -90,3 +90,12 @@ def plotResults(results):
     plt.ylim(0, 1)
     plt.legend()
     plt.show()
+
+
+# Save model to disk in HDF5 format.
+def saveModel(model: keras.models.Sequential):
+    inp = input("Do you want to save the model? Y/N: ")
+    if inp.lower() == "y":
+        dict.printOperation("Saving model...")
+        model.save(dict.MODEL_PATH)
+        dict.printMessage(dict.DONE)
