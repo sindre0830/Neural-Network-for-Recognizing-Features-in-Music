@@ -25,7 +25,7 @@ func (db *Database) Setup() error {
 	db.Ctx = context.Background()
 
 	// connect to Firebase with the service account key
-	opt := option.WithCredentialsFile("./serviceAccountKey.json")
+	opt := option.WithCredentialsFile("./test-aa354-firebase-adminsdk-iktfk-7cd7559143.json")
 	app, err := firebase.NewApp(context.Background(), nil, opt)
 	if err != nil {
 		return err
@@ -54,6 +54,7 @@ func (db *Database) Get(collection string, id string) (map[string]interface{}, e
 // Get all documents from a collection.
 func (db *Database) GetAll(collection string, processing bool) ([]map[string]interface{}, error) {
 	var data []map[string]interface{}
+	var doc map[string]interface{}
 	// iterate through collection
 	iter := db.Client.Collection(collection).Where("Processing", "==", processing).Documents(db.Ctx)
 	for {
@@ -64,8 +65,11 @@ func (db *Database) GetAll(collection string, processing bool) ([]map[string]int
 		if err != nil {
 			return nil, err
 		}
-		// add current document to the data slice
-		data = append(data, el.Data())
+		// get the current document's id
+		doc = el.Data()
+		doc["id"] = el.Ref.ID
+		// add document to data slice
+		data = append(data, doc)
 	}
 
 	return data, nil

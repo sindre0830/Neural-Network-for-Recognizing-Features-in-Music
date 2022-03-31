@@ -13,7 +13,7 @@ func get(w http.ResponseWriter, r *http.Request) {
 
 	data := make([]map[string]interface{}, 0)
 	// get all documents from the database
-	data, err := database.Firestore.GetAll("results")
+	data, err := database.Firestore.GetAll("results", false)
 	if err != nil {
 		var errorMsg debug.Debug
 		errorMsg.Update(
