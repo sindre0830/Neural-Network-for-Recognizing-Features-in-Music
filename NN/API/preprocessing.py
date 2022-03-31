@@ -160,50 +160,93 @@ def chordToString(chordNum: int, minor: bool):
     return char
 
 
+# generate training set for NN training through songs.json (provided by EC-Play).
 def getTrainingData():
     data = []
     label = []
     maxLength = 0
+    a = 0
+    # load parsed JSON file
     with open(dict.PROCESSED_JSON_PATH, 'r') as f:
         ECPlayDataset = json.loads(f.read())
-    a = 0
+    # iterate through each song
     for key in ECPlayDataset:
         a += 1
+        # preprocess audio file
         downloadAudio(key)
+        splitAudio(key, mode=dict.STEMS2, output=dict.ACCOMPANIMENT)
+        resampleAudio(key, dict.SAMPLERATE_CHORDS)
         beats = ECPlayDataset[key]["beats"]
         chords = ECPlayDataset[key]["chords"]
+        # iterate through each beat in song
         for i in range(len(beats)):
             # branch if beat is not last and its not a pause
             if i + 1 < len(beats) and chords[i] != '':
+                # try to convert audio sample to chromagram and add to list, otherwise skip to next song
                 chroma, maxLength = getChordChroma(key, maxLength, start=beats[i], end=beats[i + 1])
                 if chroma is not None:
                     data.append(chroma)
                     label.append(chords[i])
                 else:
                     break
-        print(str(a) + "\t" + key + "\tlength: " + str(len(data)))
-
+        print(str(a) + "\t" + key + "\tlength: " + str(len(data)) + "\tmax_lenght: " + str(maxLength))
+    # extend each chromagram to the largest length found
     for i in range(len(data)):
-        padding = np.zeros(shape=(12, maxLength - data[i].shape[1]), dtype=np.float32)
-        data[i] = np.append(data[i], padding, axis=1)
-
+        data[i] = extendMatrix(data[i], maxLength)
+        # print info if an error occurred
+        if maxLength != data[i].shape[1]:
+            print("index: " + str(i) + "\tlength: " + str(data[i].shape[1]) + "\tmax_length: " + str(maxLength))
+    # compact data and label to tuple and save to file
     dataset = (data, label)
     dataset = np.array(dataset)
-    print("Total elements: " + str(len(label)))
     # branch if audio directory doesn't exist
     if not os.path.exists(dict.TRAINING_DATASET_PATH):
         os.makedirs(dict.TRAINING_DATASET_PATH)
     np.save(dict.TRAINING_DATASET_PATH + "dataset.npy", dataset)
 
 
-def getChordChroma(id: str, max_length: int, start: float, end: float = None):
-    duration = None
-    if end is not None:
-        duration = (end - start)
-    y, sr = librosa.load(dict.getNativeAudioPath(id), sr=None, offset=start, duration=duration)
+# Generate chromagram from audio sample.
+def getChordChroma(id: str, max_length: int, start: float, end: float):
+    # load audio sample and branch if it was able to load the audio sample
+    y, sr = librosa.load(dict.getModifiedAudioPath(id), sr=None, offset=start, duration=(end - start))
     if np.any(y):
+        # generate chromagram and branch if there is enough data (threshold set to 10 data points)
         chroma = librosa.feature.chroma_stft(y=y, sr=sr)
-        if chroma.shape[1] > max_length:
-            max_length = chroma.shape[1]
-        return chroma, max_length
+        if np.any(chroma) and chroma.shape[1] > 10:
+            if chroma.shape[1] > max_length:
+                max_length = chroma.shape[1]
+            return chroma, max_length
     return None, max_length
+
+
+# Extend matrix on the X axis by n length evenly.
+def extendMatrix(mat: np.ndarray, max_length: int):
+    INIT_LENGTH = mat.shape[1]
+    if INIT_LENGTH == max_length:
+        return mat
+    length = INIT_LENGTH
+    max_length -= INIT_LENGTH
+    double = max_length // INIT_LENGTH
+    rest = max_length - (double * INIT_LENGTH)
+    # double the size of the matrix
+    for i in range(double):
+        length += INIT_LENGTH
+        for j in range(length):
+            if j % (i + 2) != 0:
+                continue
+            mat = np.insert(mat, j + i + 1, mat[:,j + i], axis=1)
+    if rest == 0:
+        return mat
+    # apply the rest evenly
+    skip = length / rest
+    total = 0
+    i = 0
+    j = 0
+    while j < length:
+        if j > total:
+            mat = np.insert(mat, i + 1, mat[:,i], axis=1)
+            total += skip
+            i += 1
+        i += 1
+        j += 1
+    return mat
