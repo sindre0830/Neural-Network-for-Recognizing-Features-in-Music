@@ -52,10 +52,10 @@ func (db *Database) Get(collection string, id string) (map[string]interface{}, e
 }
 
 // Get all documents from a collection.
-func (db *Database) GetAll(collection string) ([]map[string]interface{}, error) {
+func (db *Database) GetAll(collection string, processing bool) ([]map[string]interface{}, error) {
 	var data []map[string]interface{}
 	// iterate through collection
-	iter := db.Client.Collection(collection).Documents(db.Ctx)
+	iter := db.Client.Collection(collection).Where("Processing", "==", processing).Documents(db.Ctx)
 	for {
 		el, err := iter.Next()
 		if err == iterator.Done {
@@ -82,7 +82,7 @@ func (db *Database) Update(collection string, id string, data interface{}) error
 	// check if the ID is a valid document
 	_, err := db.Client.Collection(collection).Doc(id).Get(db.Ctx)
 	if err != nil {
-		// returning prevents the creation of a new document
+		// prevents the creation of a new document
 		return err
 	}
 
