@@ -2,8 +2,8 @@ package analysis
 
 import (
 	"encoding/json"
+	"fmt"
 	dataHandling "main/DataHandling"
-	database "main/Database"
 	debug "main/Debug"
 	dictionary "main/Dictionary"
 	"net/http"
@@ -11,7 +11,7 @@ import (
 )
 
 // sendToAnalysis handles retrieving and sending of a YouTube link.
-func sendToAnalysis(w http.ResponseWriter, r *http.Request) {
+func analyze(w http.ResponseWriter, r *http.Request) {
 	// decode body to song structure
 	var song Song
 	err := json.NewDecoder(r.Body).Decode(&song)
@@ -53,14 +53,15 @@ func sendToAnalysis(w http.ResponseWriter, r *http.Request) {
 		id = linkArr[1]
 	}
 
-	// get result of analysis
-	var analysis Analysis
-	err, status := analysis.getAnalysis(id)
+	fmt.Println(id)
+
+	// get title of video
+	title, err, status := getTitle(id)
 	if err != nil {
 		var errorMsg debug.Debug
 		errorMsg.Update(
 			status,
-			"analysis.post() -> Getting result of analysis",
+			"analysis.post() -> Getting title of YouTube video",
 			err.Error(),
 			"Unknown",
 		)
@@ -69,67 +70,27 @@ func sendToAnalysis(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// add result to database
-	err, status = analysis.addToDatabase(id)
-	if err != nil {
-		var errorMsg debug.Debug
-		errorMsg.Update(
-			status,
-			"analysis.post() -> Adding result to database",
-			err.Error(),
-			"Unknown",
-		)
-		errorMsg.Print()
-		http.Error(w, errorMsg.RawError, errorMsg.StatusCode)
-	}
+	fmt.Println(title)
 
 	http.Error(w, "song successfully analyzed", http.StatusOK)
 }
 
-// getAnalysis analysis result.
-func (analysis *Analysis) getAnalysis(id string) (error, int) {
-	// create request
-	body, status, err := dataHandling.Request("http://localhost:8081/get?id=" + id)
-	if err != nil {
-		return err, status
-	}
-
-	// unmarshal to struct
-	err = json.Unmarshal(body, &analysis)
-	if err != nil {
-		return err, http.StatusInternalServerError
-	}
-
-	return nil, http.StatusOK
-}
-
-// addToDatabase adds the analysis result to the database.
-func (analysis *Analysis) addToDatabase(id string) (error, int) {
+// getTitle gets the title of a YouTube video based on the id.
+func getTitle(id string) (string, error, int) {
 	// get title of youtube video
 	body, status, err := dataHandling.Request(dictionary.GetYouTubeURL(id))
 	if err != nil {
-		return err, status
+		return "", err, status
 	}
 
 	// unmarshal to map
 	var items map[string][]interface{}
 	err = json.Unmarshal(body, &items)
 	if err != nil {
-		return err, http.StatusInternalServerError
+		return "", err, http.StatusInternalServerError
 	}
 
-	// add information to database structure
-	var resultDB dictionary.ResultDB
-	resultDB.Bpm = analysis.Bpm
-	resultDB.Beats = analysis.Beats
-	resultDB.Chords = analysis.Chords
-	resultDB.Title = items["items"][0].(map[string]interface{})["snippet"].(map[string]interface{})["title"].(string)
-	resultDB.Approved = false
+	title := items["items"][0].(map[string]interface{})["snippet"].(map[string]interface{})["title"].(string)
 
-	err = database.Firestore.Add(dictionary.RESULTS_COLLECTION, id, resultDB)
-	if err != nil {
-		return err, http.StatusInternalServerError
-	}
-
-	return nil, http.StatusOK
+	return title, nil, http.StatusOK
 }
