@@ -9,7 +9,7 @@ import (
 func MethodHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:
-		sendToAnalysis(w, r)
+		analyze(w, r)
 	default:
 		var errorMsg debug.Debug
 		errorMsg.Update(

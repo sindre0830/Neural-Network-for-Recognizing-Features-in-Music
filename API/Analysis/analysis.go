@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	dataHandling "main/DataHandling"
+	database "main/Database"
 	debug "main/Debug"
 	dictionary "main/Dictionary"
 	"net/http"
@@ -24,7 +25,7 @@ func analyze(w http.ResponseWriter, r *http.Request) {
 			"JSON format not valid",
 		)
 		errorMsg.Print()
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, err.Error(), errorMsg.StatusCode)
 		return
 	}
 
@@ -38,21 +39,12 @@ func analyze(w http.ResponseWriter, r *http.Request) {
 			"JSON format not valid",
 		)
 		errorMsg.Print()
-		http.Error(w, errorMsg.RawError, http.StatusBadRequest)
+		http.Error(w, errorMsg.RawError, errorMsg.StatusCode)
 		return
 	}
 
-	// retrieve the id from the link
-	linkArr := strings.Split(song.Link, "=")
-	var id string
-
-	// there are two ways to send a youtube link, so we have to check which link format is sent to be able to retrieve the id
-	if len(linkArr) <= 1 {
-		id = strings.Split(song.Link, "/")[3]
-	} else {
-		id = linkArr[1]
-	}
-
+	// get id of song
+	id := getID(song.Link)
 	fmt.Println(id)
 
 	// get title of video
@@ -70,9 +62,73 @@ func analyze(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println(title)
+	// add to database, marked as pending
+	data := map[string]interface{}{
+		"Title":   title,
+		"Pending": true,
+	}
+	err = database.Firestore.Add(dictionary.RESULTS_COLLECTION, id, data)
+	if err != nil {
+		var errorMsg debug.Debug
+		errorMsg.Update(
+			http.StatusInternalServerError,
+			"analysis.post() -> Adding song to database",
+			err.Error(),
+			"Unknown",
+		)
+		errorMsg.Print()
+		http.Error(w, errorMsg.RawError, errorMsg.StatusCode)
+		return
+	}
+
+	// get result of analysis
+	var analysis Analysis
+	err, status = analysis.getAnalysis(id)
+	if err != nil {
+		var errorMsg debug.Debug
+		errorMsg.Update(
+			status,
+			"analysis.post() -> Getting result of analysis",
+			err.Error(),
+			"Unknown",
+		)
+		errorMsg.Print()
+		http.Error(w, errorMsg.RawError, errorMsg.StatusCode)
+		return
+	}
+
+	// update database with result
+	err, status = updateDatabase(analysis, id)
+	if err != nil {
+		var errorMsg debug.Debug
+		errorMsg.Update(
+			status,
+			"analysis.post() -> Updating result in database",
+			err.Error(),
+			"Unknown",
+		)
+		errorMsg.Print()
+		http.Error(w, errorMsg.RawError, errorMsg.StatusCode)
+		return
+	}
 
 	http.Error(w, "song successfully analyzed", http.StatusOK)
+}
+
+// getID retrieves the ID of a YouTube video from the link.
+func getID(link string) string {
+	// retrieve the id from the link
+	linkArr := strings.Split(link, "=")
+	var id string
+
+	// there are two ways to send a youtube link, so we have to check which link format is sent to be able to retrieve the id
+	if len(linkArr) <= 1 {
+		id = strings.Split(link, "/")[3]
+	} else {
+		id = linkArr[1]
+	}
+
+	return id
 }
 
 // getTitle gets the title of a YouTube video based on the id.
@@ -93,4 +149,40 @@ func getTitle(id string) (string, error, int) {
 	title := items["items"][0].(map[string]interface{})["snippet"].(map[string]interface{})["title"].(string)
 
 	return title, nil, http.StatusOK
+}
+
+// getAnalysis result.
+func (analysis *Analysis) getAnalysis(id string) (error, int) {
+	// create request
+	body, status, err := dataHandling.Request("http://localhost:8082/get?id=" + id)
+	if err != nil {
+		return err, status
+	}
+
+	// unmarshal to struct
+	err = json.Unmarshal(body, &analysis)
+	if err != nil {
+		return err, http.StatusInternalServerError
+	}
+
+	return nil, http.StatusOK
+}
+
+// updateDatabase updates the database with the analysis result.
+func updateDatabase(analysis Analysis, id string) (error, int) {
+	// add new data to map
+	data := map[string]interface{}{
+		"Bpm":      analysis.Bpm,
+		"Beats":    analysis.Beats,
+		"Chords":   analysis.Chords,
+		"Approved": false,
+		"Pending":  false,
+	}
+
+	err := database.Firestore.Update(dictionary.RESULTS_COLLECTION, id, data)
+	if err != nil {
+		return err, http.StatusInternalServerError
+	}
+
+	return nil, http.StatusOK
 }
