@@ -62,10 +62,10 @@ func analyze(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// add to database, marked as pending
+	// add to database, marked as processing
 	data := map[string]interface{}{
-		"Title":   title,
-		"Pending": true,
+		"Title":      title,
+		"Processing": true,
 	}
 	err = database.Firestore.Add(dictionary.RESULTS_COLLECTION, id, data)
 	if err != nil {
@@ -172,11 +172,11 @@ func (analysis *Analysis) getAnalysis(id string) (error, int) {
 func updateDatabase(analysis Analysis, id string) (error, int) {
 	// add new data to map
 	data := map[string]interface{}{
-		"Bpm":      analysis.Bpm,
-		"Beats":    analysis.Beats,
-		"Chords":   analysis.Chords,
-		"Approved": false,
-		"Pending":  false,
+		"Bpm":        analysis.Bpm,
+		"Beats":      analysis.Beats,
+		"Chords":     analysis.Chords,
+		"Approved":   false,
+		"Processing": false,
 	}
 
 	err := database.Firestore.Update(dictionary.RESULTS_COLLECTION, id, data)
