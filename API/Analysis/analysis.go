@@ -2,7 +2,6 @@ package analysis
 
 import (
 	"encoding/json"
-	"fmt"
 	dataHandling "main/DataHandling"
 	database "main/Database"
 	debug "main/Debug"
@@ -43,7 +42,6 @@ func analyze(w http.ResponseWriter, r *http.Request) {
 
 	// get id of song
 	id := getID(song.Link)
-	fmt.Println(id)
 
 	// get title of video
 	title, err, status := getTitle(id)
