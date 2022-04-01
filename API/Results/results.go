@@ -13,7 +13,7 @@ func get(w http.ResponseWriter, r *http.Request) {
 
 	data := make([]map[string]interface{}, 0)
 	// get all documents from the database
-	data, err := database.Firestore.GetAll("results")
+	data, err := database.Firestore.GetAll("results", "")
 	if err != nil {
 		var errorMsg debug.Debug
 		errorMsg.Update(
@@ -44,7 +44,6 @@ func update(w http.ResponseWriter, r *http.Request) {
 			"Missing 'id' param",
 		)
 		errorMsg.Print()
-		http.Error(w, errorMsg.RawError, errorMsg.StatusCode)
 		return
 	}
 
@@ -59,7 +58,6 @@ func update(w http.ResponseWriter, r *http.Request) {
 			"Unknown",
 		)
 		errorMsg.Print()
-		http.Error(w, errorMsg.RawError, errorMsg.StatusCode)
 		return
 	}
 
@@ -73,7 +71,6 @@ func update(w http.ResponseWriter, r *http.Request) {
 			"Unknown",
 		)
 		errorMsg.Print()
-		http.Error(w, errorMsg.RawError, errorMsg.StatusCode)
 		return
 	}
 

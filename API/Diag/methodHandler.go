@@ -1,23 +1,22 @@
-package analysis
+package diag
 
 import (
 	debug "main/Debug"
 	"net/http"
 )
 
-// MethodHandler handles the http request based on method
 func MethodHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
-	case http.MethodPost:
-		analyze(w, r)
+	case http.MethodGet:
+		var diag Diag
+		diag.get(w, r)
 	default:
 		var errorMsg debug.Debug
 		errorMsg.Update(
 			http.StatusMethodNotAllowed,
-			"MethodHandler() -> Method validating",
+			"StatusHandler() -> Method validating",
 			"method validation: validating method",
 			"Method not implemented",
 		)
-		errorMsg.Print()
 	}
 }
