@@ -13,11 +13,12 @@ import (
 
 // sendToAnalysis handles retrieving and sending of a YouTube link.
 func analyze(w http.ResponseWriter, r *http.Request) {
+	var errorMsg debug.Debug
+
 	// decode body to song structure
 	var song Song
 	err := json.NewDecoder(r.Body).Decode(&song)
 	if err != nil {
-		var errorMsg debug.Debug
 		errorMsg.Update(
 			http.StatusBadRequest,
 			"analysis.post() -> Decoding body",
@@ -25,13 +26,11 @@ func analyze(w http.ResponseWriter, r *http.Request) {
 			"JSON format not valid",
 		)
 		errorMsg.Print()
-		http.Error(w, err.Error(), errorMsg.StatusCode)
 		return
 	}
 
 	// check if a link is sent
 	if song.Link == "" {
-		var errorMsg debug.Debug
 		errorMsg.Update(
 			http.StatusBadRequest,
 			"analysis.post() -> Parsing body",
@@ -39,7 +38,6 @@ func analyze(w http.ResponseWriter, r *http.Request) {
 			"JSON format not valid",
 		)
 		errorMsg.Print()
-		http.Error(w, errorMsg.RawError, errorMsg.StatusCode)
 		return
 	}
 
@@ -50,7 +48,6 @@ func analyze(w http.ResponseWriter, r *http.Request) {
 	// get title of video
 	title, err, status := getTitle(id)
 	if err != nil {
-		var errorMsg debug.Debug
 		errorMsg.Update(
 			status,
 			"analysis.post() -> Getting title of YouTube video",
@@ -58,18 +55,16 @@ func analyze(w http.ResponseWriter, r *http.Request) {
 			"Unknown",
 		)
 		errorMsg.Print()
-		http.Error(w, errorMsg.RawError, errorMsg.StatusCode)
 		return
 	}
 
-	// add to database, marked as processing
+	// add title to database, marked as processing
 	data := map[string]interface{}{
 		"Title":      title,
 		"Processing": true,
 	}
 	err = database.Firestore.Add(dictionary.RESULTS_COLLECTION, id, data)
 	if err != nil {
-		var errorMsg debug.Debug
 		errorMsg.Update(
 			http.StatusInternalServerError,
 			"analysis.post() -> Adding song to database",
@@ -77,15 +72,20 @@ func analyze(w http.ResponseWriter, r *http.Request) {
 			"Unknown",
 		)
 		errorMsg.Print()
-		http.Error(w, errorMsg.RawError, errorMsg.StatusCode)
 		return
 	}
+
+	// used for updating the result in the database
+	result := make(map[string]interface{})
 
 	// get result of analysis
 	var analysis Analysis
 	err, status = analysis.getAnalysis(id)
 	if err != nil {
-		var errorMsg debug.Debug
+		// mark song as failed
+		result["Failed"] = true
+		result["Processing"] = false
+
 		errorMsg.Update(
 			status,
 			"analysis.post() -> Getting result of analysis",
@@ -93,14 +93,19 @@ func analyze(w http.ResponseWriter, r *http.Request) {
 			"Unknown",
 		)
 		errorMsg.Print()
-		http.Error(w, errorMsg.RawError, errorMsg.StatusCode)
-		return
+	} else {
+		// initialize result map with result
+		result["Failed"] = false
+		result["Processing"] = false
+		result["Approved"] = false
+		result["Bpm"] = analysis.Bpm
+		result["Beats"] = analysis.Beats
+		result["Chords"] = analysis.Chords
 	}
 
-	// update database with result
-	err, status = updateDatabase(analysis, id)
+	// update database with the result
+	err = database.Firestore.Update(dictionary.RESULTS_COLLECTION, id, result)
 	if err != nil {
-		var errorMsg debug.Debug
 		errorMsg.Update(
 			status,
 			"analysis.post() -> Updating result in database",
@@ -108,11 +113,15 @@ func analyze(w http.ResponseWriter, r *http.Request) {
 			"Unknown",
 		)
 		errorMsg.Print()
-		http.Error(w, errorMsg.RawError, errorMsg.StatusCode)
 		return
 	}
 
-	http.Error(w, "song successfully analyzed", http.StatusOK)
+	// return status based on if the song failed or not
+	if result["Failed"].(bool) {
+		http.Error(w, "Song failed", status)
+	} else {
+		http.Error(w, "Song successfully analyzed", http.StatusOK)
+	}
 }
 
 // getID retrieves the ID of a YouTube video from the link.
@@ -154,32 +163,13 @@ func getTitle(id string) (string, error, int) {
 // getAnalysis result.
 func (analysis *Analysis) getAnalysis(id string) (error, int) {
 	// create request
-	body, status, err := dataHandling.Request("http://localhost:8082/get?id=" + id)
+	body, status, err := dataHandling.Request("http://localhost:8082/analysis?id=" + id)
 	if err != nil {
 		return err, status
 	}
 
 	// unmarshal to struct
 	err = json.Unmarshal(body, &analysis)
-	if err != nil {
-		return err, http.StatusInternalServerError
-	}
-
-	return nil, http.StatusOK
-}
-
-// updateDatabase updates the database with the analysis result.
-func updateDatabase(analysis Analysis, id string) (error, int) {
-	// add new data to map
-	data := map[string]interface{}{
-		"Bpm":        analysis.Bpm,
-		"Beats":      analysis.Beats,
-		"Chords":     analysis.Chords,
-		"Approved":   false,
-		"Processing": false,
-	}
-
-	err := database.Firestore.Update(dictionary.RESULTS_COLLECTION, id, data)
 	if err != nil {
 		return err, http.StatusInternalServerError
 	}

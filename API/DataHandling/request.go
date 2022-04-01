@@ -18,7 +18,7 @@ func Request(url string) ([]byte, int, error) {
 	// do request
 	res, err := client.Do(req)
 	if err != nil {
-		return nil, res.StatusCode, err
+		return nil, http.StatusRequestTimeout, err
 	}
 
 	// read body of request

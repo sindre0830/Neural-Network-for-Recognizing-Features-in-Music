@@ -25,7 +25,7 @@ func (db *Database) Setup() error {
 	db.Ctx = context.Background()
 
 	// connect to Firebase with the service account key
-	opt := option.WithCredentialsFile("./test-aa354-firebase-adminsdk-iktfk-7cd7559143.json")
+	opt := option.WithCredentialsFile("./serviceAccountKey.json")
 	app, err := firebase.NewApp(context.Background(), nil, opt)
 	if err != nil {
 		return err
@@ -39,24 +39,21 @@ func (db *Database) Setup() error {
 	return nil
 }
 
-// Get a document from a collection.
-func (db *Database) Get(collection string, id string) (map[string]interface{}, error) {
-	// find the document with the specific ID
-	dsnap, err := db.Client.Collection(collection).Doc(id).Get(db.Ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	data := dsnap.Data()
-	return data, nil
-}
-
 // Get all documents from a collection.
-func (db *Database) GetAll(collection string, processing bool) ([]map[string]interface{}, error) {
+func (db *Database) GetAll(collection string, query string) ([]map[string]interface{}, error) {
 	var data []map[string]interface{}
 	var doc map[string]interface{}
+
+	var iter *firestore.DocumentIterator
+
+	// check if a query is sent with
+	if query != "" {
+		iter = db.Client.Collection(collection).Where(query, "==", true).Documents(db.Ctx)
+	} else {
+		iter = db.Client.Collection(collection).Documents(db.Ctx)
+	}
+
 	// iterate through collection
-	iter := db.Client.Collection(collection).Where("Processing", "==", processing).Documents(db.Ctx)
 	for {
 		el, err := iter.Next()
 		if err == iterator.Done {
