@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
 import { FiChevronDown, FiChevronUp } from 'react-icons/fi';
-import './songStatus.css';
+import './statusList.css';
 import SongTitle from '../SongTitle/SongTitle';
 
-const SongStatus = (props) => {
+/**
+ *  List of status.
+ */
+const StatusList = (props) => {
     const [toggle, setToggle] = useState(true);
 
     return (
-        <div className='song-status'>
-            <div className='song-status__bar'>
+        <div className='status-list'>
+            <div className='status-list__bar'>
                 <h1>{props.title}</h1>
                 {/* check if list is going to be displayed or not */}
                 {toggle
@@ -21,9 +24,12 @@ const SongStatus = (props) => {
             {toggle &&
                 <>
                     {props.value.map((song, index) => (
-                    <div className='song-status__title'>
-                        <SongTitle title={song} status={props.status} />
-                        <hr id='line'/>
+                    <div className='status-list__title'>
+                        <SongTitle title={song} status={props.status} key={index} />
+                        {/* create a line between each title */}
+                        {index+1 !== props.value.length &&
+                            <hr id='line'/>
+                        }
                     </div>
                 ))}
                 </> 
@@ -33,4 +39,4 @@ const SongStatus = (props) => {
     )
 }
 
-export default SongStatus;
+export default StatusList;

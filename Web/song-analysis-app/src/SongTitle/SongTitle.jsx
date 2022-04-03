@@ -7,7 +7,9 @@ import './songTitle.css';
 const SongTitle = (props) => {
     return (
         <div className='song-title'>
-            <hr className={`song-title__${props.status}`}/>
+            {props.status &&
+                <hr className={`song-title__${props.status}`}/>
+            }
             <p>{props.title}</p>
         </div>
     )
