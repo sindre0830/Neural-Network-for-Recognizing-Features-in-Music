@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FiChevronDown, FiChevronUp } from 'react-icons/fi';
 import './song.css';
+import SongTitle from '../SongTitle/SongTitle';
 
 /**
  *  Displaying of one song.
@@ -48,9 +49,10 @@ const Song = (props) => {
  
     return (
         <div className='song'>
-            <div className='song__title'>
-                <hr className={props.value.Approved ? 'song__title-approved' : 'song__title-pending'} />
-                <h1>{props.value.Title}</h1>
+            <div className='song__bar'>
+                <div className='song__bar-title'>
+                    <SongTitle title={props.value.Title} status={props.value.Approved ? 'approved' : 'pending'}/>
+                </div>
 
                 {/* show approve button if the song is pending */}
                 {!props.value.Approved &&
@@ -59,8 +61,8 @@ const Song = (props) => {
 
                 {/* check if song is opened or not */}
                 {toggleSong
-                    ? <FiChevronUp size={28} onClick={() => setToggle(false)} style={{cursor: 'pointer'}}/>
-                    : <FiChevronDown size={28} onClick={() => setToggle(true)} style={{ cursor: 'pointer'}}/>
+                    ? <FiChevronUp size={28} onClick={() => setToggle(prev => !prev)} style={{cursor: 'pointer'}}/>
+                    : <FiChevronDown size={28} onClick={() => setToggle(prev => !prev)} style={{ cursor: 'pointer'}}/>
                 }
             </div>
             <div className='song__line'>
