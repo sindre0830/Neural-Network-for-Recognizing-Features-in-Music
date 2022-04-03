@@ -40,7 +40,8 @@ def batchHandler(force:bool = False, plot:bool = False):
 
     dictionary = {}
     # store our results
-    batch_data = {}
+    chord_data = {}
+    beat_data = {}
     detailed_results = {}
     # store updated songs
     newProcessed = {}
@@ -50,15 +51,18 @@ def batchHandler(force:bool = False, plot:bool = False):
         print(id)
         if id in results.keys():
             print("Using saved result")
-            result = compareChords(dataset[id]["beats"], dataset[id]["chords"], dataset[id]["beats"], results[id]["chords"])       
+            chordresult = compareChords(dataset[id]["beats"], dataset[id]["chords"], dataset[id]["beats"], results[id]["chords"])
+            beatresult = processBeats(dataset[id]["beats"], id)
         # Get the data we need if not existing
         else:
             print("Generating from scratch...")
-            result = process(newProcessed, songResults)
-        batch_data[id] = result*100
-        createResults(detailed_results, id, algorithm = result)
-        print("The result manual is: " + str(result * 100) + chr(37) + " accuracy")
-    output(batch_data, detailed_results)
+            chordresult = processChords(newProcessed, songResults, dataset, dictionary)
+            beatresult = processBeats(dataset[id]["beats"], id)
+        chord_data[id] = chordresult*100
+        beat_data[id] = beatresult
+        createResults(detailed_results, id, algorithm = chordresult)
+        print("The result manual is: " + str(chordresult * 100) + chr(37) + " accuracy")
+    output(chord_data, beat_data, detailed_results)
     # Update processed data with trimmed beats
     if(len(newProcessed)) > len(dataset):
         json_object = json.dumps(newProcessed, indent=3)
@@ -114,7 +118,7 @@ def find_nearest(array, value):
 
 
 # Processes a song and stores the results
-def process(newProcessed, songResults, dataset, dictionary):
+def processChords(newProcessed, songResults, dataset, dictionary):
     try:
         preprocessing.downloadAudio(id)
     except dict.YoutubeError:
@@ -142,14 +146,21 @@ def process(newProcessed, songResults, dataset, dictionary):
 
 
 # records the batch processing results into CSV
-def output(data, detailed):
-    df = pd.DataFrame(list(data.items()), columns = ['id', 'result'])   # get it in dataframe form
-    aggregate = pd.cut(df['result'], bins = pd.interval_range(start=0, end=100, periods=10)).value_counts()
-    with open(dict.RESULTS_CSV_PATH, "w") as f:
-        aggregate.to_csv(f)
-    json_object = json.dumps(detailed, indent=3)
-    with open(dict.DETAILED_RESULTS_PATH, "w+") as outfile:
-        outfile.write(json_object)
+def output(chorddata = None, beatdata = None, detailed = None):
+    if chorddata:
+        df = pd.DataFrame(list(chorddata.items()), columns = ['id', 'result'])   # get it in dataframe form
+        aggregate = pd.cut(df['result'], bins = pd.interval_range(start=0, end=100, periods=10)).value_counts()
+        with open(dict.CHORDRESULTS_CSV_PATH, "w") as f:
+            aggregate.to_csv(f)
+    if detailed:
+        json_object = json.dumps(detailed, indent=3)
+        with open(dict.DETAILED_RESULTS_PATH, "w+") as outfile:
+            outfile.write(json_object)
+    if beatdata:
+        df = pd.DataFrame(list(beatdata.items()), columns = ['id', 'result'])
+        aggregate = pd.cut(df['result'], bins = pd.interval_range(start=0, end=100, periods=10)).value_counts()
+        with open(dict.BEATRESULTS_CSV_PATH, "w") as f:
+            aggregate.to_csv(f)
 
 
 # Plot the results into bins based on %accuracy
@@ -194,14 +205,17 @@ def previous_and_next(some_iterable):
     return zip(prevs, items, nexts)
 
 
-# need to fix
-def evaluateBeats(dataset:float, algorithm:float):
+def processBeats(dataset, id):
+    beatRecognizer = beat_algorithm.BeatRecognizer(id)
+    beatRecognizer.run()
+    return evaluateBeats(dataset, beatRecognizer.beats)
+
+
+def evaluateBeats(dataset:float, algorithm:float, verbose = False):
     beatAccuracy = []
-    print(dataset)
     for previous, item, nxt in previous_and_next(dataset):
-        near = find_nearest(algorithm, item)
-        distance = item - near
-        print(item, near)
+        nearIdx = find_nearest(algorithm, item)
+        distance = item - algorithm[nearIdx]
         if nxt == None:
             nxt = previous
         if previous == None:
@@ -210,7 +224,27 @@ def evaluateBeats(dataset:float, algorithm:float):
             control = abs(item - previous)
         else:
             control = abs(item - nxt)
-        beatAccuracy.append(100-(distance / control))
-    print(beatAccuracy)
-    average = mean(beatAccuracy)
-    print("The average accuracy is: ", average)
+        # We halve control - at normal, it finds a value matching the control point
+        # to be 0% accurate, even though it's 100% accurate to the control.
+        beatAccuracy.append(100-abs((distance / (control/2))*100))
+    meanAccuracy = mean(beatAccuracy)
+    if verbose:
+        print("The average accuracy is: ", meanAccuracy)
+    return meanAccuracy
+
+
+def test():
+    with open(dict.PROCESSED_JSON_PATH, 'r') as f:
+        dataset = json.loads(f.read())
+    beat_data = {}
+    for id in dataset:
+        print("Evaluating beats for id: " + id)
+        try:
+            preprocessing.downloadAudio(id)
+        except dict.YoutubeError:
+            return    
+        beatresult = processBeats(dataset[id]["beats"], id)
+        beat_data[id] = beatresult
+        os.remove(dict.getNativeAudioPath(id))
+        os.remove(dict.getModifiedAudioPath(id))
+    output(chorddata=None, beatdata=beat_data, detailed=None)

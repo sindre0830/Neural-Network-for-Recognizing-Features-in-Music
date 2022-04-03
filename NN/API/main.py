@@ -24,12 +24,9 @@ def main():
     # # parse songs.json if it exists for comparison data
     #preprocessing.parseJson(dict.JSON_PATH)
     #evaluation.batchHandler()
-    test = [1.0,2.0,3.0,4.0,5.0]
-    dummy = [0.9, 2.1, 3.1, 3.9, 4.9]
-    
-    evaluation.evaluateBeats(test, dummy)
     #evaluation.updateJson(dict.TRIMMED_JSON_PATH, dict.TRIMMED_SONGS_PATH)
     #evaluation.plotResults()
+    evaluation.test()
 
 
 
