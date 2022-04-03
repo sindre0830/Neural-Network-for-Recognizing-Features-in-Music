@@ -1,0 +1,48 @@
+.song-status {
+    width: 60%;
+    padding: 10px;
+}
+
+.song-status h1 {
+    font-family: var(--font-family);
+    font-size: 22px;
+}
+
+.song-status__bar {
+    display: flex;
+    justify-content: space-between;
+}
+
+.song-status__title {
+    margin: 10px 0 15px 0;
+}
+
+.song-status__title #line {
+    margin-top: 5px;
+    border: none;
+    background-color: black;
+    height: 1px;
+}
+
+/* small devices */
+@media (min-width: 768px) {
+    .song-status {
+        width: 50%;
+        border: 1px solid;
+        border-radius: 10px;
+    }
+}
+
+/* medium devices */
+@media (min-width: 992px) {
+    .song-status {
+        width: 40%;
+    }
+}
+
+/* large devices */
+@media (min-width: 1200px) {
+    .song-status {
+        width: 30%;
+    }
+}

@@ -19,10 +19,10 @@ const Songs = () => {
      */
     const getSongs = async () => {
         // getting songs from file (for testing purposes)
-        /*const jsonData= require('../testData.json'); 
-        setSongs(jsonData);*/
+        const jsonData= require('../testData.json'); 
+        setSongs(jsonData);
 
-        setLoading(true);
+        /*setLoading(true);
         setError(false);
 
         try {
@@ -33,7 +33,7 @@ const Songs = () => {
             setError(true);
         }
         
-        setLoading(false);
+        setLoading(false);*/
     }
 
     useEffect(() => {
@@ -92,7 +92,7 @@ const Songs = () => {
                             <Song value={song} key={index} />
                         ))}
                     </>
-                    : <p>No songs have been added yet...</p>
+                    : <p id='error'>No songs have been added yet...</p>
                 }          
             </div>
         </div>

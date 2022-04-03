@@ -10,9 +10,10 @@
     border: none;
 }
 
-.song-title h1 {
+.song-title p {
     margin-left: 10px;
     font-family: var(--font-family);
+    font-size: 18px;
 }
 
 .song-title__approved {
