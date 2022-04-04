@@ -15,8 +15,8 @@ const StatusList = (props) => {
                 <h1>{props.title}</h1>
                 {/* check if list is going to be displayed or not */}
                 {toggle
-                    ? <FiChevronUp size={28} onClick={() => setToggle(prev => !prev)} style={{cursor: 'pointer'}}/>
-                    : <FiChevronDown size={28} onClick={() => setToggle(prev => !prev)} style={{ cursor: 'pointer'}}/>
+                    ? <FiChevronUp title='arrow-down' size={28} onClick={() => setToggle(prev => !prev)} style={{cursor: 'pointer'}}/>
+                    : <FiChevronDown title='arrow-up' size={28} onClick={() => setToggle(prev => !prev)} style={{ cursor: 'pointer'}}/>
                 }
             </div>
 
@@ -24,13 +24,13 @@ const StatusList = (props) => {
             {toggle &&
                 <>
                     {props.value.map((song, index) => (
-                    <div className='status-list__title'>
-                        <SongTitle title={song} status={props.status} key={index} />
-                        {/* create a line between each title */}
-                        {index+1 !== props.value.length &&
-                            <hr id='line'/>
-                        }
-                    </div>
+                        <div className='status-list__title'>
+                            <SongTitle title={song} status={props.status} key={index} />
+                            {/* create a line between each title */}
+                            {index+1 !== props.value.length &&
+                                <hr id='line'/>
+                            }
+                        </div>
                 ))}
                 </> 
             }
