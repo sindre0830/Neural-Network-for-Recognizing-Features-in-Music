@@ -11,11 +11,13 @@ TRIMMED_SONGS_PATH = "Data/Processed/"
 JSON_PATH = "Data/songs.json"
 RESULTS_PATH = "Data/Results/"
 RESULTS_SONG_PATH = RESULTS_PATH + "Songs/"
+RESULTS_BEATS_PATH = RESULTS_PATH + "Beats/"
 PROCESSED_JSON_PATH = "Data/processedSongs.json"
 ALGORITHM_JSON_PATH = "Data/algoSongs.json"
 CHORDRESULTS_CSV_PATH = "Data/Results/chordresults.csv"
 BEATRESULTS_CSV_PATH = "Data/Results/beatresults.csv"
 DETAILED_RESULTS_PATH = "Data/Results/detailed_results.json"
+BEAT_RESULTS_PATH = "Data/Results/beatresults.json"
 PLOT_PATH = "Data/Results/plot.png"
 # extensions for conversion to wav
 EXTENSIONS = [".m4v", ".webm", ".mp3", ".mp4"]

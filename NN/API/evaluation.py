@@ -192,6 +192,7 @@ def updateJson(file:str, dir:str):
     with open(file, "w+") as outfile:
         outfile.write(output)
     shutil.rmtree(dir)
+    os.makedirs(dir)
 
 
 # Source: https://stackoverflow.com/a/1012089
@@ -227,24 +228,46 @@ def evaluateBeats(dataset:float, algorithm:float, verbose = False):
         # We halve control - at normal, it finds a value matching the control point
         # to be 0% accurate, even though it's 100% accurate to the control.
         beatAccuracy.append(100-abs((distance / (control/2))*100))
+        if algorithm[nearIdx] == algorithm[-1]:  # Indicates dataset is longer
+            break
     meanAccuracy = mean(beatAccuracy)
     if verbose:
         print("The average accuracy is: ", meanAccuracy)
-    return meanAccuracy
+    return meanAccuracy, beatAccuracy
 
 
-def test():
+def beatProcess(force:bool = False, verbose:bool = False):
     with open(dict.PROCESSED_JSON_PATH, 'r') as f:
         dataset = json.loads(f.read())
+    print(os.path.exists(dict.RESULTS_BEATS_PATH))
+    if not os.path.exists(dict.RESULTS_BEATS_PATH):
+        os.makedirs(dict.RESULTS_BEATS_PATH)
     beat_data = {}
+    updateJson(dict.BEAT_RESULTS_PATH, dict.RESULTS_BEATS_PATH) # avoid error on nonexistent file here
+    beatSize = os.path.getsize(dict.BEAT_RESULTS_PATH)
+    if beatSize != 0:
+        with open(dict.BEAT_RESULTS_PATH, 'r') as f:
+            results = json.loads(f.read())
+    else:
+        results = {}
+
+    print(results.keys())
     for id in dataset:
-        print("Evaluating beats for id: " + id)
-        try:
-            preprocessing.downloadAudio(id)
-        except dict.YoutubeError:
-            return    
-        beatresult = processBeats(dataset[id]["beats"], id)
-        beat_data[id] = beatresult
-        os.remove(dict.getNativeAudioPath(id))
-        os.remove(dict.getModifiedAudioPath(id))
+        if id not in results.keys() or force:
+            print("Evaluating beats for id: " + id)
+            try:
+                preprocessing.downloadAudio(id)
+            except dict.YoutubeError:
+                return    
+            beatRecognizer = beat_algorithm.BeatRecognizer(id)
+            beatRecognizer.run()
+            accuracy, beatresults = evaluateBeats(dataset[id]["beats"], beatRecognizer.beats)
+            createJson(beat_data, id, accuracy, beatresults, "accuracy", "beat_results")
+            json_object = json.dumps(beat_data[id], indent=3)
+            with open(dict.RESULTS_BEATS_PATH + id + '.json', "w+") as outfile:
+                outfile.write(json_object)
+            os.remove(dict.getNativeAudioPath(id))
+            os.remove(dict.getModifiedAudioPath(id))
+        else:
+            print("Data already exists for " + id + ", skipping to next...")
     output(chorddata=None, beatdata=beat_data, detailed=None)
