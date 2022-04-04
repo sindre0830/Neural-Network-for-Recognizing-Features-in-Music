@@ -3,37 +3,18 @@
     padding-top: 25px;
 }
 
-.song hr {
-    border: none;
-}
-
-.song__title {
+.song__bar {
     display: flex;
     align-items: center;
     margin-bottom: 10px;
 }
 
-.song__title hr {
-    height: 20px;
-    min-width: 5px;
-}
-
-.song__title-approved {
-    background-color: var(--color-approved);
-}
-
-.song__title-pending {
-    background-color: var(--color-pending);
-}
-
-.song__title h1 {
+.song__bar-title {
     margin-right: auto;
-    margin-left: 10px;
-    width: 90%;
-    font-size: 22px;
+    padding-right: 15px;
 }
 
-.song__title button {
+.song__bar button {
     margin-right: 10px;
     height: 30px;
     padding: 5px;
@@ -48,6 +29,7 @@
 }
 
 .song__line hr {
+    border: none;
     background-color: black;
     height: 1px;
 }
@@ -55,11 +37,6 @@
 .song__result {
     margin-top: 20px;
     background-color: #E8E8E8;
-}
-
-.song__result pre {
-    white-space: pre-wrap;
-    font-size: 18px;
 }
 
 .song__result form {
