@@ -5,6 +5,7 @@ import keras.models
 import keras.layers.convolutional
 import keras.layers.core
 import keras.optimizer_v2.adam
+import keras.callbacks
 import sklearn.metrics
 import numpy as np
 import pandas as pd
@@ -38,6 +39,7 @@ def generateModel():
 
 # Function to run model.fit.
 def trainModel(model: keras.models.Sequential, xTrain, xTest, yTrain, yTest, verbose_flag):
+    callback = keras.callbacks.EarlyStopping(min_delta=0.01, patience=3)
     # fit model by parameters
     results = model.fit(
         xTrain,
@@ -45,7 +47,8 @@ def trainModel(model: keras.models.Sequential, xTrain, xTest, yTrain, yTest, ver
         validation_data=(xTest, yTest),
         batch_size=dict.BATCH_SIZE,
         epochs=dict.EPOCHS,
-        verbose=verbose_flag
+        verbose=verbose_flag,
+        callbacks=[callback]
     )
     # evaluate model and output results
     model.evaluate(xTest, yTest)

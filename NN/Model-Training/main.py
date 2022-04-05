@@ -38,11 +38,11 @@ def main():
     model.summary()
     dict.printDivider()
     # split dataset and train model
-    xTrain, xTest, yTrain, yTest = splitData(data, labels)
+    xTrain, xTest, xVal, yTrain, yTest, yVal = splitData(data, labels)
     model, results = trainModel(model, xTrain, xTest, yTrain, yTest, verbose_flag=True)
     dict.printDivider()
     # predict on testing data and output results
-    predictModel(model, xTest, yTest)
+    predictModel(model, xVal, yVal)
     plotResults(results)
     dict.printDivider()
     # prompt user to save the model
