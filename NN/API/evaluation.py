@@ -276,7 +276,7 @@ def beatProcess(force:bool = False, verbose:bool = False):
             printing = json.loads(f.read())
         df = pd.DataFrame.from_dict(printing)
         df['average'] = df[:1].mean(axis=1)
-        print("Average accuracy: " + str(df['average']))
+        print("Average accuracy: " + str(df['average']['accuracy']))
 
 
 def plotBeatResults():
