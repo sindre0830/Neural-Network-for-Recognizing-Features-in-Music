@@ -8,6 +8,7 @@ PLOTS_DIR = "Data/Plots/"
 NATIVE_DIR = "Data/Audio/Native/"
 MODIFIED_DIR = "Data/Audio/Modified/"
 TRIMMED_SONGS_PATH = "Data/Processed/"
+TRIMMED_JSON_PATH = "Data/trimmedSongs.json"
 JSON_PATH = "Data/songs.json"
 RESULTS_PATH = "Data/Results/"
 RESULTS_SONG_PATH = RESULTS_PATH + "Songs/"
@@ -18,7 +19,8 @@ CHORDRESULTS_CSV_PATH = "Data/Results/chordresults.csv"
 BEATRESULTS_CSV_PATH = "Data/Results/beatresults.csv"
 DETAILED_RESULTS_PATH = "Data/Results/detailed_results.json"
 BEAT_RESULTS_PATH = "Data/Results/beatresults.json"
-PLOT_PATH = "Data/Results/plot.png"
+CHORDPLOT_PATH = "Data/Results/chordplot.png"
+BEATPLOT_PATH = "Data/Results/beatplot.png"
 # extensions for conversion to wav
 EXTENSIONS = [".m4v", ".webm", ".mp3", ".mp4"]
 # formats

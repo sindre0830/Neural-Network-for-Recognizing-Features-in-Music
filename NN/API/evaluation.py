@@ -75,7 +75,7 @@ def batchHandler(force:bool = False, plot:bool = False):
         with open(dict.ALGORITHM_JSON_PATH, "w+") as outfile:
             outfile.write(json_object)
     if plot:
-        plotResults()
+        plotChordResults()
 
 
 # Updates a dictionary with new key+values
@@ -158,23 +158,24 @@ def output(chorddata = None, beatdata = None, detailed = None):
             outfile.write(json_object)
     if beatdata:
         df = pd.DataFrame(list(beatdata.items()), columns = ['id', 'result'])
-        aggregate = pd.cut(df['result'], bins = pd.interval_range(start=0, end=100, periods=10)).value_counts()
+        #print(df)
+        aggregate = pd.cut(df['result'].str['accuracy'], bins = pd.interval_range(start=0, end=100, periods=10)).value_counts()
         with open(dict.BEATRESULTS_CSV_PATH, "w") as f:
             aggregate.to_csv(f)
 
 
 # Plot the results into bins based on %accuracy
-def plotResults():
-    with open(dict.RESULTS_CSV_PATH) as f:
+def plotChordResults():
+    with open(dict.CHORDRESULTS_CSV_PATH) as f:
         next(f)
         df = pd.read_csv(f, names=['range', 'number'])
         df = df.sort_values('range')
     plt.bar(df['range'], df['number'], color = 'b')
-    plt.title('Chord Algorithm Accuracy')
+    plt.title('Algorithm Accuracy')
     plt.xlabel("Accuracy %")
     plt.ylabel("# of songs")
     plt.xticks(rotation=25)
-    plt.savefig(dict.PLOT_PATH)
+    plt.savefig(dict.CHORDPLOT_PATH)
 
 
 # updates json with new data from directory
@@ -239,7 +240,6 @@ def evaluateBeats(dataset:float, algorithm:float, verbose = False):
 def beatProcess(force:bool = False, verbose:bool = False):
     with open(dict.PROCESSED_JSON_PATH, 'r') as f:
         dataset = json.loads(f.read())
-    print(os.path.exists(dict.RESULTS_BEATS_PATH))
     if not os.path.exists(dict.RESULTS_BEATS_PATH):
         os.makedirs(dict.RESULTS_BEATS_PATH)
     beat_data = {}
@@ -251,7 +251,6 @@ def beatProcess(force:bool = False, verbose:bool = False):
     else:
         results = {}
 
-    print(results.keys())
     for id in dataset:
         if id not in results.keys() or force:
             print("Evaluating beats for id: " + id)
@@ -270,4 +269,24 @@ def beatProcess(force:bool = False, verbose:bool = False):
             os.remove(dict.getModifiedAudioPath(id))
         else:
             print("Data already exists for " + id + ", skipping to next...")
-    output(chorddata=None, beatdata=beat_data, detailed=None)
+    output(chorddata=None, beatdata=results, detailed=None)
+    if verbose:
+        plotBeatResults()
+        with open(dict.BEAT_RESULTS_PATH, 'r') as f:
+            printing = json.loads(f.read())
+        df = pd.DataFrame.from_dict(printing)
+        df['average'] = df[:1].mean(axis=1)
+        print("Average accuracy: " + str(df['average']))
+
+
+def plotBeatResults():
+    with open(dict.BEATRESULTS_CSV_PATH) as f:
+        next(f)
+        df = pd.read_csv(f, names=['range', 'number'])
+        df = df.sort_values('range')
+    plt.bar(df['range'], df['number'], color = 'b')
+    plt.title('Algorithm Accuracy')
+    plt.xlabel("Accuracy %")
+    plt.ylabel("# of songs")
+    plt.xticks(rotation=25)
+    plt.savefig(dict.BEATPLOT_PATH)
