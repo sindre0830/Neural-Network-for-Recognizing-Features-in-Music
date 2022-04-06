@@ -41,7 +41,7 @@ const Song = (props) => {
                 body: JSON.stringify(items)
             }
 
-            const res = await fetch('/v/results?id=' + props.value.id, options);
+            const res = await fetch('/v1/results?id=' + props.value.id, options);
         } catch (err) {
             console.log(err);
         }
@@ -59,11 +59,13 @@ const Song = (props) => {
                     <button type='submit' form='update'>Approve</button>
                 }
 
-                {/* check if song is opened or not */}
-                {toggleSong
-                    ? <FiChevronUp size={28} onClick={() => setToggle(prev => !prev)} style={{cursor: 'pointer'}}/>
-                    : <FiChevronDown size={28} onClick={() => setToggle(prev => !prev)} style={{ cursor: 'pointer'}}/>
-                }
+                <div className='song__bar-button'>
+                    {/* check if song is opened or not */}
+                    {toggleSong
+                        ? <FiChevronUp size={28} onClick={() => setToggle(prev => !prev)} style={{cursor: 'pointer'}}/>
+                        : <FiChevronDown size={28} onClick={() => setToggle(prev => !prev)} style={{ cursor: 'pointer'}}/>
+                    }
+                </div>
             </div>
             <div className='song__line'>
                 <hr />
