@@ -21,12 +21,12 @@ def main():
     preprocessing.parseJson(dict.JSON_PATH)
     dict.printDivider()
     # define youtube id
-    id = "N8BXtM6onEY"
+    id = "hPOYc4a2RPY"
     # download file
     preprocessing.downloadAudio(id)
     # run beat recognizer
     beatRecognizer = beat_algorithm.BeatRecognizer(id)
-    beatRecognizer.run(verbose=True)
+    beatRecognizer.run(plot=True, plot_start=5, plot_end=15, verbose=True)
     # run chord recognizer
     chordRecognizer = chord_algorithm.ChordRecognizer(id)
     chordRecognizer.run(beats=beatRecognizer.beats, verbose=True)
