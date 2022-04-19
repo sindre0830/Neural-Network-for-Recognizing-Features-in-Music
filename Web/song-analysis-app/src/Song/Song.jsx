@@ -41,7 +41,7 @@ const Song = (props) => {
                 body: JSON.stringify(items)
             }
 
-            const res = await fetch('/v1/results?id=' + props.value.id, options);
+            await fetch('/v1/results?id=' + props.value.id, options);
         } catch (err) {
             console.log(err);
         }

@@ -2,31 +2,25 @@ import React, { useState, useEffect } from 'react';
 import './status.css';
 import StatusList from '../StatusList/StatusList';
 
-const titles = ["How To Be a Heartbreaker - MARINA", "När vi två blir en - Gyllene Tider", "This is the day - The the"];
-
 /**
  *  Displaying of application status.
  */
 const Status = () => {
     const [status, setStatus] = useState([])
     const [isLoading, setLoading] = useState(false)
-    const [isError, setError] = useState(false)
 
     /**
      *  Get application status.
      */
     const getStatus = async () => {
         setLoading(true);
-        setError(false);
-
-        console.log("hei");
 
         try {
             const res = await fetch('/v1/diag');
             const json = await res.json();
             setStatus(json);
         } catch (err) {
-            setError(true);
+            console.log(err);
         }
         
         setLoading(false);
