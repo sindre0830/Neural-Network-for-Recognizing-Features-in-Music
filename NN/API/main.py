@@ -26,7 +26,9 @@ def main():
     #evaluation.batchHandler()
     #evaluation.updateJson(dict.TRIMMED_JSON_PATH, dict.TRIMMED_SONGS_PATH)
     #evaluation.plotResults()
-    evaluation.beatProcess(verbose=True)
+    #evaluation.beatProcess(verbose=True)
+    evaluator = evaluation.Evaluators()
+    evaluator.batchHandler()
 
 
 

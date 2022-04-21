@@ -15,6 +15,113 @@ from pathlib import Path
 from itertools import tee, islice, chain
 from statistics import mean
 
+
+# Object to perform chord tracking.
+class Evaluators:
+    # Store algorithm data - make one variable
+    processed_beats:dict # Don't need?
+    beat_chord_aggregate:dict # Don't need?
+    song_buffer:dict # Don't need?
+    # Analysis results  
+    results:dict
+    detailed_results:dict
+    
+    class Evaluator:
+        id: str
+        chords: dict
+        beats: dict
+        
+        def __init__(self, id: str):
+            self.id = id
+    
+    def __init__(self):
+        self.processed_beats = {} # Don't need?
+        self.beat_chord_aggregate = {} # Don't need?
+        self.song_buffer = {} # Don't need?
+        self.results = {}
+        self.detailed_results = {}
+
+
+    # Handles batch process comparison of database
+    def batchHandler(self, force:bool = False, plot:bool = False):
+        # Make sure we have the dataset parsed
+        if not os.path.exists(dict.PROCESSED_JSON_PATH) or os.path.getsize(dict.PROCESSED_JSON_PATH) < 100:
+            preprocessing.parseJson(dict.JSON_PATH)
+        with open(dict.PROCESSED_JSON_PATH, 'r') as f:
+            dataset = json.loads(f.read())
+
+        # prep for results
+        if not os.path.exists(dict.RESULTS_PATH):
+            os.makedirs(dict.RESULTS_PATH)
+        if not os.path.exists(dict.RESULTS_SONG_PATH):
+            os.makedirs(dict.RESULTS_SONG_PATH)
+
+        # Check if we have existing data for comparison and data does not need to be reprocessed
+        updateJson(dict.ALGORITHM_JSON_PATH, dict.RESULTS_SONG_PATH)
+        algSize = os.path.getsize(dict.ALGORITHM_JSON_PATH)
+        if algSize != 0:  # Add after debugging: or algSize != dataSize
+            with open(dict.ALGORITHM_JSON_PATH, 'r') as f:
+                results = json.loads(f.read())
+
+        # # Go through dataset
+        for id in dataset:
+            print(id)
+            song = self.Evaluator(id)
+            if id in results.keys():
+                print("Using saved result")
+                song.chords = compareChords(dataset[id]["beats"], dataset[id]["chords"], dataset[id]["beats"], results[id]["chords"])
+                song.beats = results[id]["beats"]
+            # Get the data we need if not existing
+            else:
+                print("Generating from scratch...")
+                song.chords = processChords(self.processed_beats, self.song_buffer, dataset, self.beat_chord_aggregate)
+                meanbeat, song.beats = processBeats(dataset[id]["beats"], id)
+# Above is ok now!
+            createResults(self.detailed_results, id, algorithm = song.chords)
+            print("The result manual is: " + str(song.chords * 100) + chr(37) + " accuracy")
+        output(self.chord_data, self.beat_data, self.detailed_results)
+        # Update processed data with trimmed beats
+        if(len(self.processed_beats)) > len(dataset):
+            json_object = json.dumps(self.processed_beats, indent=3)
+            with open(dict.PROCESSED_JSON_PATH, "w+") as outfile:
+                outfile.write(json_object)
+        # Write our new algorithm data to file
+        if(len(self.song_buffer)) > len(results):
+            print("Writing algorithm results...")
+            json_object = json.dumps(self.beat_chord_aggregate, indent=3)
+            with open(dict.ALGORITHM_JSON_PATH, "w+") as outfile:
+                outfile.write(json_object)
+        if plot:
+            plotChordResults()
+            
+            # TEST THIS ONE
+    # Processes a song and stores the results
+    def processChords(self, song:Evaluator, dataset):
+        try:
+            preprocessing.downloadAudio(id)
+        except dict.YoutubeError:
+            return
+        chordRecognizer = chord_algorithm.ChordRecognizer(id)
+        song.beats = np.array(dataset[id]["beats"])
+        song.beats = song.beats[song.beats <= librosa.get_duration(filename=dict.getNativeAudioPath(id))]   # trim timestamps
+        chordRecognizer.run(beats=song.beats, verbose=True)
+        createJson(self.beat_chord_aggregate, id, chordRecognizer.chords.tolist(), newBeats.tolist(), "chords", "beats")
+        result = compareChords(song.beats, dataset[id]["chords"], song.beats, chordRecognizer.chords)
+        # Save
+        createJson(self.processed_beats, id, dataset[id]["chords"], song.beats.tolist(), "chords", "beats")    # Update processed dataclear
+        json_object = json.dumps(self.processed_beats[id], indent=3)
+        with open(dict.TRIMMED_SONGS_PATH + id + '.json', "w+") as outfile:
+            outfile.write(json_object)
+
+        createJson(self.song_buffer, id, chordRecognizer.chords.tolist(), song.beats.tolist(), "chords", "beats")
+        json_object = json.dumps(self.song_buffer[id], indent=3)
+        with open(dict.RESULTS_SONG_PATH + id + '.json', "w+") as outfile:
+            outfile.write(json_object)
+
+        os.remove(dict.getNativeAudioPath(id))
+        os.remove(dict.getModifiedAudioPath(id))
+        return result
+
 # Handles batch process comparison of database
 def batchHandler(force:bool = False, plot:bool = False):
     # Make sure we have the dataset parsed
@@ -38,14 +145,14 @@ def batchHandler(force:bool = False, plot:bool = False):
     else:
         results = {}
 
-    dictionary = {}
     # store our results
     chord_data = {}
     beat_data = {}
+    song_buffer = {}
+    beat_chord_aggregate = {}
     detailed_results = {}
     # store updated songs
-    newProcessed = {}
-    songResults = {}
+    processed_beats = {}
     # # Go through dataset
     for id in dataset:
         print(id)
@@ -56,7 +163,7 @@ def batchHandler(force:bool = False, plot:bool = False):
         # Get the data we need if not existing
         else:
             print("Generating from scratch...")
-            chordresult = processChords(newProcessed, songResults, dataset, dictionary)
+            chordresult = processChords(processed_beats, song_buffer, dataset, beat_chord_aggregate)
             beatresult = processBeats(dataset[id]["beats"], id)
         chord_data[id] = chordresult*100
         beat_data[id] = beatresult
@@ -64,14 +171,14 @@ def batchHandler(force:bool = False, plot:bool = False):
         print("The result manual is: " + str(chordresult * 100) + chr(37) + " accuracy")
     output(chord_data, beat_data, detailed_results)
     # Update processed data with trimmed beats
-    if(len(newProcessed)) > len(dataset):
-        json_object = json.dumps(newProcessed, indent=3)
+    if(len(processed_beats)) > len(dataset):
+        json_object = json.dumps(processed_beats, indent=3)
         with open(dict.PROCESSED_JSON_PATH, "w+") as outfile:
             outfile.write(json_object)
     # Write our new algorithm data to file
-    if(len(songResults)) > len(results):
+    if(len(song_buffer)) > len(results):
         print("Writing algorithm results...")
-        json_object = json.dumps(dictionary, indent=3)
+        json_object = json.dumps(beat_chord_aggregate, indent=3)
         with open(dict.ALGORITHM_JSON_PATH, "w+") as outfile:
             outfile.write(json_object)
     if plot:
@@ -105,7 +212,6 @@ def compareChords(gt_timestamp, gt_chord, alg_timestamp, alg_chord):
         if algoChord == gt_chord[idx]:
             results += 1
     # Return number of correct guesses divided by total guesses - can improve
-    #print(results)
     temp = results / len(gt_chord)
     return temp
 
@@ -118,7 +224,7 @@ def find_nearest(array, value):
 
 
 # Processes a song and stores the results
-def processChords(newProcessed, songResults, dataset, dictionary):
+def processChords(processed_beats, song_buffer, dataset, beat_chord_aggregate):
     try:
         preprocessing.downloadAudio(id)
     except dict.YoutubeError:
@@ -127,16 +233,16 @@ def processChords(newProcessed, songResults, dataset, dictionary):
     newBeats = np.array(dataset[id]["beats"])
     newBeats = newBeats[newBeats <= librosa.get_duration(filename=dict.getNativeAudioPath(id))]   # trim timestamps
     chordRecognizer.run(beats=newBeats, verbose=True)
-    createJson(dictionary, id, chordRecognizer.chords.tolist(), newBeats.tolist(), "chords", "beats")
+    createJson(beat_chord_aggregate, id, chordRecognizer.chords.tolist(), newBeats.tolist(), "chords", "beats")
     result = compareChords(newBeats, dataset[id]["chords"], newBeats, chordRecognizer.chords)
     # Save
-    createJson(newProcessed, id, dataset[id]["chords"], newBeats.tolist(), "chords", "beats")    # Update processed dataclear
-    json_object = json.dumps(newProcessed[id], indent=3)
+    createJson(processed_beats, id, dataset[id]["chords"], newBeats.tolist(), "chords", "beats")    # Update processed dataclear
+    json_object = json.dumps(processed_beats[id], indent=3)
     with open(dict.TRIMMED_SONGS_PATH + id + '.json', "w+") as outfile:
         outfile.write(json_object)
 
-    createJson(songResults, id, chordRecognizer.chords.tolist(), newBeats.tolist(), "chords", "beats")
-    json_object = json.dumps(songResults[id], indent=3)
+    createJson(song_buffer, id, chordRecognizer.chords.tolist(), newBeats.tolist(), "chords", "beats")
+    json_object = json.dumps(song_buffer[id], indent=3)
     with open(dict.RESULTS_SONG_PATH + id + '.json', "w+") as outfile:
         outfile.write(json_object)
 
