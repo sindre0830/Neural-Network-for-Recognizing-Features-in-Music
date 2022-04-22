@@ -32,13 +32,13 @@ def main():
     # load dataset from file and process it to correct type
     data, labels = loadDataset()
     data, labels = prepareDataset(data, labels)
+    xTrain, xTest, xVal, yTrain, yTest, yVal = splitData(data, labels)
     dict.printDivider()
     # generate model
     model = generateModel()
     model.summary()
     dict.printDivider()
     # split dataset and train model
-    xTrain, xTest, xVal, yTrain, yTest, yVal = splitData(data, labels)
     model, results = trainModel(model, xTrain, xTest, yTrain, yTest, verbose_flag=True)
     dict.printDivider()
     # predict on testing data and output results
