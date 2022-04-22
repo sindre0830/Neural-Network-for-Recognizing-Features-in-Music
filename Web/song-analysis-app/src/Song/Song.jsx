@@ -62,8 +62,8 @@ const Song = (props) => {
                 <div className='song__bar-button'>
                     {/* check if song is opened or not */}
                     {toggleSong
-                        ? <FiChevronUp size={28} onClick={() => setToggle(prev => !prev)} style={{cursor: 'pointer'}}/>
-                        : <FiChevronDown size={28} onClick={() => setToggle(prev => !prev)} style={{ cursor: 'pointer'}}/>
+                        ? <FiChevronUp data-testid='arrow-up' size={28} onClick={() => setToggle(prev => !prev)} style={{cursor: 'pointer'}}/>
+                        : <FiChevronDown data-testid='arrow-down' size={28} onClick={() => setToggle(prev => !prev)} style={{ cursor: 'pointer'}}/>
                     }
                 </div>
             </div>

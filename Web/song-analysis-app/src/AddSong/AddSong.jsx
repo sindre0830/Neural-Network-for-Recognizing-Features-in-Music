@@ -34,20 +34,22 @@ const AddSong = () => {
             return;
         }
 
+        const item = { link: link }
+
         try {
             const options = {
                 method: 'POST',
-                body: JSON.stringify(link)
+                body: JSON.stringify(item)
             }
 
-            const res = await fetch('/post', options);
+            const res = await fetch('/v1/analysis', options);
 
             if (res.status === 200) {
                 setLink("");
-                setMessage("Link successfully parsed, result will be uploaded to the result page.");
+                setMessage("Song successfully analyzed, the result is uploaded to the results page");
             } else {
                 setLink("");
-                setMessage("Error when parsing link");
+                setMessage("Error when analyzing song");
             }
         } catch (err) {
             console.log(err);
