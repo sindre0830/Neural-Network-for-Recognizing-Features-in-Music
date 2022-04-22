@@ -39,7 +39,7 @@ def main():
     model.summary()
     dict.printDivider()
     # split dataset and train model
-    model, results = trainModel(model, xTrain, xTest, yTrain, yTest, verbose_flag=True)
+    model, results = trainModel(model, xTrain, xTest, xVal, yTrain, yTest, yVal, verbose_flag=True)
     dict.printDivider()
     # predict on testing data and output results
     predictModel(model, xVal, yVal)

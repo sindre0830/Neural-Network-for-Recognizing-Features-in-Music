@@ -38,7 +38,7 @@ def generateModel():
 
 
 # Function to run model.fit.
-def trainModel(model: keras.models.Sequential, xTrain, xTest, yTrain, yTest, verbose_flag):
+def trainModel(model: keras.models.Sequential, xTrain, xTest, xVal, yTrain, yTest, yVal, verbose_flag):
     callback = keras.callbacks.EarlyStopping(min_delta=0.01, patience=3)
     # fit model by parameters
     results = model.fit(
@@ -51,7 +51,7 @@ def trainModel(model: keras.models.Sequential, xTrain, xTest, yTrain, yTest, ver
         callbacks=[callback]
     )
     # evaluate model and output results
-    model.evaluate(xTest, yTest)
+    model.evaluate(xVal, yVal)
     return model, results
 
 
