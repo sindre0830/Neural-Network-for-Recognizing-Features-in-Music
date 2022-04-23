@@ -35,7 +35,7 @@ def randomSearch(xTrain, xTest, xVal, yTrain, yTest, yVal):
         i += 1
         dict.printOperation("Starting work on model " + str(i) + "...")
         # create and train model based on parameters
-        val_accuracy, val_loss = generateRandomSearchModel(
+        val_loss, val_accuracy= generateRandomSearchModel(
             initial_filters=initial_filter,
             conv_layer_1=conv_layer_1,
             conv_filters_1=conv_filter_1,
