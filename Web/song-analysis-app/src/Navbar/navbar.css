@@ -35,7 +35,6 @@
     margin-top: 1rem;
 
     background: var(--color-accent);
-    color: white;    
 }
 
 .navbar__menu-links ul {
@@ -47,7 +46,19 @@
 .navbar__menu-links li {
     font-size: 22px;
     padding: 40px;
-    cursor: pointer;
+}
+
+.menu {
+    padding: 10px;
+    color: white;
+    text-decoration: none;
+}
+
+.menu-active {
+    padding: 10px;
+    background-color: white;
+    color: var(--color-accent);
+    text-decoration: none;
 }
 
 /* small devices (tablets etc.) */
@@ -73,11 +84,19 @@
         font-size: 22px;
         display: inline-block;
         padding-left: 50px;
-        cursor: pointer;
     }
 
     .navbar__menu {
         display: none;
+    }
+
+    .menu {
+        color: black;
+    }
+
+    .menu-active {
+        background-color: var(--color-accent);
+        color: white;
     }
 }
 

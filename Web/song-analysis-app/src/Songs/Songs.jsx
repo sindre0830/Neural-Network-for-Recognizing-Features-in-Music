@@ -18,11 +18,11 @@ const Songs = () => {
      *  Get results from the API.
      */
     const getSongs = async () => {
-        // getting songs from file (for testing purposes)
+        /*/ getting songs from file (for testing purposes)
         const jsonData= require('../testData.json'); 
-        setSongs(jsonData);
+        setSongs(jsonData);*/
 
-        /*setLoading(true);
+        setLoading(true);
         setError(false);
 
         try {
@@ -33,7 +33,7 @@ const Songs = () => {
             setError(true);
         }
         
-        setLoading(false);*/
+        setLoading(false);
     }
 
     useEffect(() => {
@@ -82,8 +82,8 @@ const Songs = () => {
             </div>
             <div className='songs__list'>
                 {/* display messages for users if results are loading or something went wrong */}
-                {isLoading && <p>Results are loading...</p>}
-                {isError && <p>Something went wrong...</p>}
+                {isLoading && <p className='error'>Results are loading...</p>}
+                {isError && <p className='error'>Something went wrong...</p>}
                 {/* render song components. if there are no songs in the database, display a message for users */}
                 {songs
                     ? 
