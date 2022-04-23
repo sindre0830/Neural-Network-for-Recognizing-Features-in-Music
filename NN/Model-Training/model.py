@@ -30,7 +30,7 @@ def randomSearch(xTrain, xTest, xVal, yTrain, yTest, yVal):
     random.shuffle(combinations)
     combinations = combinations[:N]
     # iterate through each combination and train each model while saving the results
-    for (initial_filter, conv_layer_1, conv_filter_1, conv_layer_2, conv_filter_2, conv_layer_3, conv_filter_3, 
+    for (initial_filter, conv_layer_1, conv_filter_1, conv_layer_2, conv_filter_2, conv_layer_3, conv_filter_3,
          dense_layer_1, dense_units_1, dense_layer_2, dense_units_2, dense_layer_3, dense_units_3) in combinations:
         i += 1
         dict.printOperation("Starting work on model " + str(i) + "...")
@@ -50,7 +50,7 @@ def randomSearch(xTrain, xTest, xVal, yTrain, yTest, yVal):
             dense_layer_3=dense_layer_3,
             dense_units_3=dense_units_3,
             xTrain=xTrain,
-            xTest=xTest, 
+            xTest=xTest,
             xVal=xVal,
             yTrain=yTrain,
             yTest=yTest,
@@ -91,7 +91,7 @@ def randomSearch(xTrain, xTest, xVal, yTrain, yTest, yVal):
     if not os.path.exists("Data/RandomSearch/"):
         os.makedirs("Data/RandomSearch/")
     with open("Data/RandomSearch/" + datetime.datetime.now().strftime("%H:%M:%S") + ".txt", "w+") as outfile:
-            outfile.write(strResults)
+        outfile.write(strResults)
     dict.printDivider()
 
 
@@ -107,11 +107,11 @@ def generateRandomSearchModel(
         dense_layer_1: int,
         dense_units_1: int,
         dense_layer_2: int,
-        dense_units_2: int, 
+        dense_units_2: int,
         dense_layer_3: int,
         dense_units_3: int,
         xTrain, xTest, xVal, yTrain, yTest, yVal
-    ):
+        ):
     model = keras.models.Sequential()
     # initial layer and conv layers
     model.add(keras.layers.convolutional.Conv2D(filters=initial_filters, kernel_size=3, input_shape=dict.SHAPE, activation='relu'))

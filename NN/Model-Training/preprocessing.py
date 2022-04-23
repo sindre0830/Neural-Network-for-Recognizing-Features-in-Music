@@ -39,8 +39,9 @@ def splitData(data, labels):
         (xTrain, xTest, xVal, yTrain, yTest, yVal) = np.load("Data/split.npy", allow_pickle=True)
     else:
         # perform train-test-val-split
-        xTrain, xRem, yTrain, yRem = sklearn.model_selection.train_test_split(data, labels, train_size=dict.TRAIN_SIZE, random_state=0, stratify=labels)
-        xVal, xTest, yVal, yTest = sklearn.model_selection.train_test_split(xRem, yRem, test_size=0.33, random_state=0, stratify=yRem)  
+        xTrain, xRem, yTrain, yRem = sklearn.model_selection.train_test_split(data, labels, train_size=dict.TRAIN_SIZE,
+                                                                              random_state=0, stratify=labels)
+        xVal, xTest, yVal, yTest = sklearn.model_selection.train_test_split(xRem, yRem, test_size=0.33, random_state=0, stratify=yRem)
         # convert to categorical
         yTrain = keras.utils.np_utils.to_categorical(yTrain, num_classes=dict.DATASET_AMOUNT).tolist()
         yTest = keras.utils.np_utils.to_categorical(yTest, num_classes=dict.DATASET_AMOUNT).tolist()
