@@ -4,6 +4,8 @@ import dictionary as dict
 import keras.models
 import keras.layers.convolutional
 import keras.layers.core
+import keras.layers
+import keras.regularizers
 import keras.optimizer_v2.adam
 import keras.callbacks
 import sklearn.metrics
@@ -20,23 +22,29 @@ import os
 # Perform random search to find the best model.
 def randomSearch(xTrain, xTest, xVal, yTrain, yTest, yVal):
     layers = [0, 1, 2]
-    filters = [16, 32, 64, 128]
-    units = [32, 64, 128]
+    filters = [16, 32, 64, 128, 256]
+    units = [32, 64, 128, 256]
+    regularizers = [0.0001, 0.0005, 0.001, 0.005]
+    batch_normalization = [True]
+    dropout = [True]
+    activation = ["sigmoid"]
     results = []
     i = 0
     N = 20
     # generate each possible combination, randomize, and choose 20 combinations to test
-    combinations = list(itertools.product(filters, layers, filters, layers, filters, layers, filters, layers, units, layers, units, layers, units))
+    combinations = list(itertools.product(filters, regularizers, layers, filters, layers, filters, layers, filters, layers, units, layers, units, layers, units, batch_normalization, dropout, activation))
     random.shuffle(combinations)
     combinations = combinations[:N]
     # iterate through each combination and train each model while saving the results
-    for (initial_filter, conv_layer_1, conv_filter_1, conv_layer_2, conv_filter_2, conv_layer_3, conv_filter_3,
-         dense_layer_1, dense_units_1, dense_layer_2, dense_units_2, dense_layer_3, dense_units_3) in combinations:
+    for (initial_filter, regularizer, conv_layer_1, conv_filter_1, conv_layer_2, conv_filter_2, conv_layer_3, conv_filter_3,
+         dense_layer_1, dense_units_1, dense_layer_2, dense_units_2, dense_layer_3, dense_units_3, batch_normalization, dropout,
+         activation) in combinations:
         i += 1
-        dict.printOperation("Starting work on model " + str(i) + "...")
+        dict.printOperation("Training model " + str(i) + "...")
         # create and train model based on parameters
         val_loss, val_accuracy= generateRandomSearchModel(
             initial_filters=initial_filter,
+            regularizer=regularizer,
             conv_layer_1=conv_layer_1,
             conv_filters_1=conv_filter_1,
             conv_layer_2=conv_layer_2,
@@ -49,12 +57,10 @@ def randomSearch(xTrain, xTest, xVal, yTrain, yTest, yVal):
             dense_units_2=dense_units_2,
             dense_layer_3=dense_layer_3,
             dense_units_3=dense_units_3,
-            xTrain=xTrain,
-            xTest=xTest,
-            xVal=xVal,
-            yTrain=yTrain,
-            yTest=yTest,
-            yVal=yVal
+            batch_normalization=batch_normalization,
+            dropout=dropout,
+            final_activation=activation,
+            xTrain=xTrain, xTest=xTest, xVal=xVal, yTrain=yTrain, yTest=yTest, yVal=yVal
         )
         # create object and store result and parameters
         result = {}
@@ -73,6 +79,10 @@ def randomSearch(xTrain, xTest, xVal, yTrain, yTest, yVal):
         result["dense_units_2"] = dense_units_2
         result["dense_layer_3"] = dense_layer_3
         result["dense_units_3"] = dense_units_3
+        result["regularizer"] = regularizer
+        result["batch_normalization"] = batch_normalization
+        result["dropout"] = dropout
+        result["final_activation"] = activation
         results.append(result)
         dict.printMessage(dict.DONE)
     # sort results by accuracy and convert to string
@@ -86,7 +96,9 @@ def randomSearch(xTrain, xTest, xVal, yTrain, yTest, yVal):
         strResults += "conv_filter_3: {} \t| dense_layer_1: {} \t| ".format(val["conv_filter_3"], val["dense_layer_1"])
         strResults += "dense_units_1: {} \t| dense_layer_2: {} \t| ".format(val["dense_units_1"], val["dense_layer_2"])
         strResults += "dense_units_2: {} \t| dense_layer_3: {} \t| ".format(val["dense_units_2"], val["dense_layer_3"])
-        strResults += "dense_units_3: {}\n".format(val["dense_units_3"])
+        strResults += "dense_units_3: {} \t| regularizer: {} \t| ".format(val["dense_units_3"], val["regularizer"])
+        strResults += "batch_normalization: {} \t| dropout: {} \t| ".format(val["batch_normalization"], val["dropout"])
+        strResults += "final_activation: {}\n".format(val["final_activation"])
     # Create a folder if it doesn't exist and save the results to a txt file
     if not os.path.exists("Data/RandomSearch/"):
         os.makedirs("Data/RandomSearch/")
@@ -98,6 +110,7 @@ def randomSearch(xTrain, xTest, xVal, yTrain, yTest, yVal):
 # Generate convolutional neural network model and return results. Used for random search.
 def generateRandomSearchModel(
         initial_filters: int,
+        regularizer: float,
         conv_layer_1: int,
         conv_filters_1: int,
         conv_layer_2: int,
@@ -110,34 +123,70 @@ def generateRandomSearchModel(
         dense_units_2: int,
         dense_layer_3: int,
         dense_units_3: int,
+        batch_normalization: bool,
+        dropout: bool,
+        final_activation: str,
         xTrain, xTest, xVal, yTrain, yTest, yVal
         ):
     model = keras.models.Sequential()
     # initial layer and conv layers
-    model.add(keras.layers.convolutional.Conv2D(filters=initial_filters, kernel_size=3, input_shape=dict.SHAPE, activation='relu'))
+    model.add(keras.layers.convolutional.Conv2D(filters=initial_filters, kernel_size=3, input_shape=dict.SHAPE, kernel_regularizer=keras.regularizers.l2(regularizer)))
+    if batch_normalization:
+        model.add(keras.layers.BatchNormalization())
+    model.add(keras.layers.Activation('relu'))
     for _ in range(conv_layer_1):
-        model.add(keras.layers.convolutional.Conv2D(filters=conv_filters_1, kernel_size=1, activation='relu'))
+        model.add(keras.layers.convolutional.Conv2D(filters=conv_filters_1, kernel_size=1))
+        if batch_normalization:
+            model.add(keras.layers.BatchNormalization())
+        model.add(keras.layers.Activation('relu'))
+        if dropout:
+            model.add(keras.layers.Dropout(rate=0.1))
     for _ in range(conv_layer_2):
-        model.add(keras.layers.convolutional.Conv2D(filters=conv_filters_2, kernel_size=1, activation='relu'))
+        model.add(keras.layers.convolutional.Conv2D(filters=conv_filters_2, kernel_size=1))
+        if batch_normalization:
+            model.add(keras.layers.BatchNormalization())
+        model.add(keras.layers.Activation('relu'))
+        if dropout:
+            model.add(keras.layers.Dropout(rate=0.1))
     for _ in range(conv_layer_3):
-        model.add(keras.layers.convolutional.Conv2D(filters=conv_filters_3, kernel_size=1, activation='relu'))
+        model.add(keras.layers.convolutional.Conv2D(filters=conv_filters_3, kernel_size=1))
+        if batch_normalization:
+            model.add(keras.layers.BatchNormalization())
+        model.add(keras.layers.Activation('relu'))
+        if dropout:
+            model.add(keras.layers.Dropout(rate=0.1))
     # flatten layer and dense layers
     model.add(keras.layers.core.Flatten())
     for _ in range(dense_layer_1):
-        model.add(keras.layers.core.Dense(units=dense_units_1, activation='relu'))
+        model.add(keras.layers.core.Dense(units=dense_units_1))
+        if batch_normalization:
+            model.add(keras.layers.BatchNormalization())
+        model.add(keras.layers.Activation('relu'))
+        if dropout:
+            model.add(keras.layers.Dropout(rate=0.25))
     for _ in range(dense_layer_2):
-        model.add(keras.layers.core.Dense(units=dense_units_2, activation='relu'))
+        model.add(keras.layers.core.Dense(units=dense_units_2))
+        if batch_normalization:
+            model.add(keras.layers.BatchNormalization())
+        model.add(keras.layers.Activation('relu'))
+        if dropout:
+            model.add(keras.layers.Dropout(rate=0.25))
     for _ in range(dense_layer_3):
-        model.add(keras.layers.core.Dense(units=dense_units_3, activation='relu'))
+        model.add(keras.layers.core.Dense(units=dense_units_3))
+        if batch_normalization:
+            model.add(keras.layers.BatchNormalization())
+        model.add(keras.layers.Activation('relu'))
+        if dropout:
+            model.add(keras.layers.Dropout(rate=0.25))
     # last layer
-    model.add(keras.layers.core.Dense(units=dict.DATASET_AMOUNT, activation='sigmoid'))
+    model.add(keras.layers.core.Dense(units=dict.DATASET_AMOUNT, activation=final_activation))
     model.compile(
         optimizer=keras.optimizer_v2.adam.Adam(learning_rate=dict.LEARNING_RATE),
         loss='categorical_crossentropy',
         metrics=['accuracy']
     )
     # fit model by parameters
-    callback = keras.callbacks.EarlyStopping(min_delta=0.01, patience=3)
+    callback = keras.callbacks.EarlyStopping(min_delta=0.01, patience=5)
     model.fit(
         xTrain,
         yTrain,
