@@ -181,16 +181,47 @@ def generateRandomSearchModel(
 def generateModel():
     model = keras.models.Sequential([
         # layer 1
-        keras.layers.convolutional.Conv2D(filters=32, kernel_size=3, input_shape=dict.SHAPE, activation='relu'),
+        keras.layers.convolutional.Conv2D(filters=64, kernel_size=3, input_shape=dict.SHAPE, kernel_regularizer=keras.regularizers.l2(0.0005)),
+        keras.layers.BatchNormalization(),
+        keras.layers.Activation('relu'),
+        keras.layers.Dropout(rate=0.1),
         # layer 2
-        keras.layers.convolutional.Conv2D(filters=32, kernel_size=3, activation='relu'),
+        keras.layers.convolutional.Conv2D(filters=32, kernel_size=1),
+        keras.layers.BatchNormalization(),
+        keras.layers.Activation('relu'),
+        keras.layers.Dropout(rate=0.1),
         # layer 3
-        keras.layers.convolutional.Conv2D(filters=64, kernel_size=3, activation='relu'),
+        keras.layers.convolutional.Conv2D(filters=64, kernel_size=1),
+        keras.layers.BatchNormalization(),
+        keras.layers.Activation('relu'),
+        keras.layers.Dropout(rate=0.1),
+        # layer 3
+        keras.layers.convolutional.Conv2D(filters=64, kernel_size=1),
+        keras.layers.BatchNormalization(),
+        keras.layers.Activation('relu'),
+        keras.layers.Dropout(rate=0.1),
+        # layer 3
+        keras.layers.convolutional.Conv2D(filters=16, kernel_size=1),
+        keras.layers.BatchNormalization(),
+        keras.layers.Activation('relu'),
+        keras.layers.Dropout(rate=0.1),
+        # layer 3
+        keras.layers.convolutional.Conv2D(filters=16, kernel_size=1),
+        keras.layers.BatchNormalization(),
+        keras.layers.Activation('relu'),
+        keras.layers.Dropout(rate=0.1),
         # flatten
         keras.layers.core.Flatten(),
         # layer 4
-        keras.layers.core.Dense(units=64, activation='relu'),
-        keras.layers.core.Dropout(rate=0.5),
+        keras.layers.core.Dense(units=256),
+        keras.layers.BatchNormalization(),
+        keras.layers.Activation('relu'),
+        keras.layers.Dropout(rate=0.25),
+        # layer 4
+        keras.layers.core.Dense(units=256),
+        keras.layers.BatchNormalization(),
+        keras.layers.Activation('relu'),
+        keras.layers.Dropout(rate=0.25),
         # layer 5
         keras.layers.core.Dense(units=dict.DATASET_AMOUNT, activation='sigmoid')
     ])
@@ -205,7 +236,7 @@ def generateModel():
 # Function to run model.fit.
 def trainModel(model: keras.models.Sequential, xTrain, xTest, xVal, yTrain, yTest, yVal, verbose_flag):
     # fit model by parameters
-    callback = keras.callbacks.EarlyStopping(min_delta=0.01, patience=3)
+    callback = keras.callbacks.EarlyStopping(min_delta=0.01, patience=5)
     results = model.fit(
         xTrain,
         yTrain,
