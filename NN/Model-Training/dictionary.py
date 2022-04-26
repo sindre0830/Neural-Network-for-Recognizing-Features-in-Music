@@ -14,7 +14,7 @@ BATCH_SIZE = 512
 EPOCHS = 50
 # paths
 DATASET_PATH = "Data/dataset.npy"
-MODEL_PATH = "Data/model"
+MODEL_PATH = "Model"
 
 
 # Print operation that allows status message on the same line.
