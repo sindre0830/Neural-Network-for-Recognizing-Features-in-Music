@@ -26,7 +26,7 @@ def main():
     preprocessing.downloadAudio(id)
     # run beat recognizer
     beatRecognizer = beat_algorithm.BeatRecognizer(id)
-    beatRecognizer.run(plot=True, plot_start=5, plot_end=15, verbose=True)
+    beatRecognizer.run(plot=True, verbose=True)
     # run chord recognizer
     chordRecognizer = chord_algorithm.ChordRecognizer(id)
     chordRecognizer.run(beats=beatRecognizer.beats, verbose=True)

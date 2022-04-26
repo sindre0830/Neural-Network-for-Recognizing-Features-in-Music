@@ -41,7 +41,7 @@ class ChordRecognizer:
         for i in range(beats.shape[0]):
             end = None
             if i + 1 < len(beats):
-                end = beats[i+1]
+                end = beats[i + 1]
             chords.append(self.getChord(start=beats[i], end=end))
         self.chords = np.array(chords)
 
