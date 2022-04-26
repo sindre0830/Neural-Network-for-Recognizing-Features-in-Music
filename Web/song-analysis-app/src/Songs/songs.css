@@ -1,0 +1,88 @@
+.songs {
+    margin: auto;
+    margin-top: 70px;
+    margin-bottom: 50px;
+    width: 75%;
+    font-family: var(--font-family);
+}
+
+.songs__sort-search {
+    text-align: center;
+}
+
+.songs__sort-search input[type='search'] {
+    margin-right: auto;
+    border: none;
+    border-bottom: 1px solid black;
+    font-size: 18px;
+}
+
+.songs__sort-search input:focus {
+    outline: none;
+}
+
+.songs__sort-filter {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-around;
+}
+
+.songs__sort-filter input[type='radio'] {
+    border: 4px;
+    cursor: pointer;
+}
+
+.songs__list {
+    margin-top: 30px;
+}
+
+.error {
+    text-align: center;
+    color: red;
+}
+
+/* small devices */
+@media (min-width: 768px) {
+    .songs {
+        width: 70%;
+    }
+
+    .songs__list {
+        padding: 10px 20px 10px 20px;
+        border: 1px solid;
+        border-radius: 10px;
+    }
+}
+
+/* medium devices */
+@media (min-width: 992px) {
+    .songs {
+        width: 65%;
+    }
+
+    .songs__sort {
+        display: flex;
+        align-items: flex-end;
+        margin-left: 10px;
+    }
+
+    .songs__sort-filter {
+        width: 40%;
+        margin-left: auto;
+    }
+
+    .songs__list {
+        padding: 10px 30px 10px 30px;
+    }
+}
+
+/* large devices */
+@media (min-width: 1200px) {
+    .songs {
+        width: 60%;
+    }
+
+    .songs__list {
+        padding: 20px 50px 20px 50px;
+    }
+}

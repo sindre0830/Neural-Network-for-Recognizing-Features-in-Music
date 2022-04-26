@@ -8,7 +8,7 @@ import './addSong.css';
  *  @param {text} link
  */
 const validateInput = (link) => {
-    var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
+    var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/
     return regexp.test(link);
 }
 
@@ -34,20 +34,22 @@ const AddSong = () => {
             return;
         }
 
+        const item = { link: link }
+
         try {
             const options = {
                 method: 'POST',
-                body: JSON.stringify(link)
+                body: JSON.stringify(item)
             }
 
-            const res = await fetch('/post', options);
+            const res = await fetch('/v1/analysis', options);
 
             if (res.status === 200) {
                 setLink("");
-                setMessage("Link successfully parsed, result will be uploaded to the result page.");
+                setMessage("Song successfully analyzed, the result is uploaded to the results page");
             } else {
                 setLink("");
-                setMessage("Error when parsing link");
+                setMessage("Error when analyzing song");
             }
         } catch (err) {
             console.log(err);

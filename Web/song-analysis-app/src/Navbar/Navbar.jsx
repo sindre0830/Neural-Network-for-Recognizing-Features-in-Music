@@ -1,16 +1,23 @@
 import React, { useState } from 'react';
-import { FiMenu, FiX } from 'react-icons/fi'; 
+import { FiMenu, FiX } from 'react-icons/fi';
+import { NavLink } from 'react-router-dom';
 import './navbar.css';
 
 /** 
  *   Displaying of the menu links.
  */
-const Menu = () => (
+const Menu = (props) => (
     <>
         <ul>
-            <li>Add song</li>
-            <li>Results</li>
-            <li>Status</li>
+            <li onClick={props.click}>
+                <NavLink className={({isActive}) => (isActive ? 'menu-active' : 'menu')} to='/'>Add song</NavLink>
+            </li>
+            <li onClick={props.click}>
+                <NavLink className={({isActive}) => (isActive ? 'menu-active' : 'menu')} to='results'>Results</NavLink>
+            </li>
+            <li onClick={props.click}>
+                <NavLink className={({isActive}) => (isActive ? 'menu-active' : 'menu')} to='status'>Status</NavLink>
+            </li>
         </ul>
     </>
 )
@@ -20,6 +27,14 @@ const Menu = () => (
  */
 const Navbar = () => {
     const [toggleMenu, setToggle] = useState(false);
+
+    /**
+     *  Close the dropdown menu when an item is clicked.
+     */
+    const handleClick = () => {
+        setToggle(prev => !prev);
+    }
+
     return (
         <div className='navbar'>
             <div className='navbar__title'>
@@ -31,11 +46,11 @@ const Navbar = () => {
             {/* div for dropdown menu, only showed on small screens */}
             <div className='navbar__menu'>
                 {toggleMenu
-                    ? <FiX size={32} onClick={() => setToggle(false)}/>
-                    : <FiMenu size={32} onClick={() => setToggle(true)}/> }
+                    ? <FiX size={32} onClick={() => setToggle(prev => !prev)} style={{cursor: 'pointer'}} />
+                    : <FiMenu size={32} onClick={() => setToggle(prev => !prev)} style={{cursor: 'pointer'}} /> }
                 {toggleMenu && (
                     <div className='navbar__menu-links'>
-                        <Menu />
+                        <Menu click={handleClick} />
                     </div>
                 )}
             </div>
