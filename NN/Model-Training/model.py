@@ -28,7 +28,7 @@ def randomSearch(xTrain, xTest, xVal, yTrain, yTest, yVal):
     results = []
     i = 0
     N = 20
-    # generate each possible combination, randomize, and choose 20 combinations to test
+    # generate each possible combination, randomize, and choose N combinations to test
     combinations = list(itertools.product(filters, regularizers, layers, filters, layers, filters, layers,
                                           filters, layers, units, layers, units, layers, units))
     random.shuffle(combinations)
@@ -39,7 +39,7 @@ def randomSearch(xTrain, xTest, xVal, yTrain, yTest, yVal):
         i += 1
         dict.printOperation("Training model " + str(i) + "...")
         # create and train model based on parameters
-        val_loss, val_accuracy= generateRandomSearchModel(
+        val_loss, val_accuracy = generateRandomSearchModel(
             initial_filters=initial_filter,
             regularizer=regularizer,
             conv_layer_1=conv_layer_1,
@@ -89,9 +89,9 @@ def randomSearch(xTrain, xTest, xVal, yTrain, yTest, yVal):
         strResults += "dense_units_2: {} \t| dense_layer_3: {} \t| ".format(val["dense_units_2"], val["dense_layer_3"])
         strResults += "dense_units_3: {} \t| regularizer: {}\n".format(val["dense_units_3"], val["regularizer"])
     # Create a folder if it doesn't exist and save the results to a txt file
-    if not os.path.exists("Data/RandomSearch/"):
-        os.makedirs("Data/RandomSearch/")
-    with open("Data/RandomSearch/" + datetime.datetime.now().strftime("%H:%M:%S") + ".txt", "w+") as outfile:
+    if not os.path.exists(dict.RANDOM_SEARCH_PATH):
+        os.makedirs(dict.RANDOM_SEARCH_PATH)
+    with open(dict.RANDOM_SEARCH_PATH + datetime.datetime.now().strftime("%H:%M:%S") + ".txt", "w+") as outfile:
         outfile.write(strResults)
     dict.printDivider()
 
@@ -116,7 +116,12 @@ def generateRandomSearchModel(
         ):
     model = keras.models.Sequential()
     # initial layer and conv layers
-    model.add(keras.layers.convolutional.Conv2D(filters=initial_filters, kernel_size=3, input_shape=dict.SHAPE, kernel_regularizer=keras.regularizers.l2(regularizer)))
+    model.add(keras.layers.convolutional.Conv2D(
+        filters=initial_filters,
+        kernel_size=3,
+        input_shape=dict.SHAPE,
+        kernel_regularizer=keras.regularizers.l2(regularizer)
+    ))
     model.add(keras.layers.BatchNormalization())
     model.add(keras.layers.Activation('relu'))
     for _ in range(conv_layer_1):
@@ -154,7 +159,7 @@ def generateRandomSearchModel(
     # last layer
     model.add(keras.layers.core.Dense(units=dict.DATASET_AMOUNT, activation='sigmoid'))
     model.compile(
-        optimizer=keras.optimizer_v2.adam.Adam(learning_rate=dict.LEARNING_RATE),
+        optimizer=keras.optimizer_v2.adam.Adam(),
         loss='categorical_crossentropy',
         metrics=['accuracy']
     )
@@ -181,7 +186,12 @@ def generateRandomSearchModel(
 def generateModel():
     model = keras.models.Sequential([
         # layer 1
-        keras.layers.convolutional.Conv2D(filters=64, kernel_size=3, input_shape=dict.SHAPE, kernel_regularizer=keras.regularizers.l2(0.0005)),
+        keras.layers.convolutional.Conv2D(
+            filters=64,
+            kernel_size=3,
+            input_shape=dict.SHAPE,
+            kernel_regularizer=keras.regularizers.l2(0.0005)
+        ),
         keras.layers.BatchNormalization(),
         keras.layers.Activation('relu'),
         keras.layers.Dropout(rate=0.1),
@@ -226,7 +236,7 @@ def generateModel():
         keras.layers.core.Dense(units=dict.DATASET_AMOUNT, activation='sigmoid')
     ])
     model.compile(
-        optimizer=keras.optimizer_v2.adam.Adam(learning_rate=dict.LEARNING_RATE),
+        optimizer=keras.optimizer_v2.adam.Adam(),
         loss='categorical_crossentropy',
         metrics=['accuracy']
     )

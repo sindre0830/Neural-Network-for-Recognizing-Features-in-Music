@@ -8,12 +8,13 @@ FAILED = 'FAILED'
 # set parameters
 SHAPE = None
 DATASET_AMOUNT = len(LABEL_NAMES) + 1
-LEARNING_RATE = 0.001
 TRAIN_SIZE = 0.70
 BATCH_SIZE = 512
 EPOCHS = 50
 # paths
 DATASET_PATH = "Data/dataset.npy"
+SPLIT_PATH = "Data/split.npy"
+RANDOM_SEARCH_PATH = "Data/RandomSearch/"
 MODEL_PATH = "Model"
 
 

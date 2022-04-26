@@ -34,9 +34,9 @@ def prepareDataset(data: np.ndarray, labels: np.ndarray):
 def splitData(data, labels):
     dict.printOperation("Split dataset...")
     # branch if file exists
-    if os.path.exists("Data/split.npy"):
+    if os.path.exists(dict.SPLIT_PATH):
         # load cached data
-        (xTrain, xTest, xVal, yTrain, yTest, yVal) = np.load("Data/split.npy", allow_pickle=True)
+        (xTrain, xTest, xVal, yTrain, yTest, yVal) = np.load(dict.SPLIT_PATH, allow_pickle=True)
     else:
         # perform train-test-val-split
         xTrain, xRem, yTrain, yRem = sklearn.model_selection.train_test_split(data, labels, train_size=dict.TRAIN_SIZE,
@@ -48,6 +48,6 @@ def splitData(data, labels):
         yVal = keras.utils.np_utils.to_categorical(yVal, num_classes=dict.DATASET_AMOUNT).tolist()
         # cache results
         splitDataset = np.array((xTrain, xTest, xVal, yTrain, yTest, yVal), dtype=object)
-        np.save("Data/split.npy", splitDataset, allow_pickle=True)
+        np.save(dict.SPLIT_PATH, splitDataset, allow_pickle=True)
     dict.printMessage(dict.DONE)
     return xTrain, xTest, xVal, yTrain, yTest, yVal
