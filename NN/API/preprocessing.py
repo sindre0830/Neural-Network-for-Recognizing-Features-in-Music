@@ -234,7 +234,7 @@ def extendMatrix(mat: np.ndarray, max_length: int):
         for j in range(length):
             if j % (i + 2) != 0:
                 continue
-            mat = np.insert(mat, j + i + 1, mat[:,j + i], axis=1)
+            mat = np.insert(mat, j + i + 1, mat[:, j + i], axis=1)
     if rest == 0:
         return mat
     # apply the rest evenly
@@ -244,7 +244,7 @@ def extendMatrix(mat: np.ndarray, max_length: int):
     j = 0
     while j < length:
         if j > total:
-            mat = np.insert(mat, i + 1, mat[:,i], axis=1)
+            mat = np.insert(mat, i + 1, mat[:, i], axis=1)
             total += skip
             i += 1
         i += 1
