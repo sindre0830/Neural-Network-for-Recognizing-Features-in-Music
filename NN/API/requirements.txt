@@ -1,7 +1,7 @@
 flask
 librosa
 pyaca==0.3.0
-matplotlib
+matplotlib==3.5.1
 yt-dlp
 spleeter
 numpy==1.19.5
