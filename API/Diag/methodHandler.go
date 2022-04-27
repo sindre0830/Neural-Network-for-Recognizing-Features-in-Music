@@ -18,5 +18,6 @@ func MethodHandler(w http.ResponseWriter, r *http.Request) {
 			"method validation: validating method",
 			"Method not implemented",
 		)
+		http.Error(w, http.StatusText(errorMsg.StatusCode), errorMsg.StatusCode)
 	}
 }

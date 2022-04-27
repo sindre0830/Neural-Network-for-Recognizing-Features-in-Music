@@ -25,6 +25,7 @@ func analyze(w http.ResponseWriter, r *http.Request) {
 			"JSON format not valid",
 		)
 		errorMsg.Print()
+		http.Error(w, http.StatusText(errorMsg.StatusCode), errorMsg.StatusCode)
 		return
 	}
 
@@ -37,6 +38,7 @@ func analyze(w http.ResponseWriter, r *http.Request) {
 			"JSON format not valid",
 		)
 		errorMsg.Print()
+		http.Error(w, http.StatusText(errorMsg.StatusCode), errorMsg.StatusCode)
 		return
 	}
 
@@ -53,6 +55,7 @@ func analyze(w http.ResponseWriter, r *http.Request) {
 			"Unknown",
 		)
 		errorMsg.Print()
+		http.Error(w, http.StatusText(errorMsg.StatusCode), errorMsg.StatusCode)
 		return
 	}
 
@@ -70,6 +73,7 @@ func analyze(w http.ResponseWriter, r *http.Request) {
 			"Unknown",
 		)
 		errorMsg.Print()
+		http.Error(w, http.StatusText(errorMsg.StatusCode), errorMsg.StatusCode)
 		return
 	}
 
@@ -111,6 +115,7 @@ func analyze(w http.ResponseWriter, r *http.Request) {
 			"Unknown",
 		)
 		errorMsg.Print()
+		http.Error(w, http.StatusText(errorMsg.StatusCode), errorMsg.StatusCode)
 		return
 	}
 
