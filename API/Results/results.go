@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	database "main/Database"
 	debug "main/Debug"
+	dictionary "main/Dictionary"
 	"net/http"
 )
 
@@ -13,7 +14,7 @@ func get(w http.ResponseWriter, r *http.Request) {
 
 	data := make([]map[string]interface{}, 0)
 	// get all documents from the database
-	data, err := database.Firestore.GetAll("results", "")
+	data, err := database.Firestore.GetAll(dictionary.RESULTS_COLLECTION, "")
 	if err != nil {
 		var errorMsg debug.Debug
 		errorMsg.Update(
@@ -23,6 +24,7 @@ func get(w http.ResponseWriter, r *http.Request) {
 			"Unknown",
 		)
 		errorMsg.Print()
+		http.Error(w, http.StatusText(errorMsg.StatusCode), errorMsg.StatusCode)
 		return
 	}
 
@@ -44,6 +46,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 			"Missing 'id' param",
 		)
 		errorMsg.Print()
+		http.Error(w, http.StatusText(errorMsg.StatusCode), errorMsg.StatusCode)
 		return
 	}
 
@@ -58,11 +61,12 @@ func update(w http.ResponseWriter, r *http.Request) {
 			"Unknown",
 		)
 		errorMsg.Print()
+		http.Error(w, http.StatusText(errorMsg.StatusCode), errorMsg.StatusCode)
 		return
 	}
 
 	// update data in database
-	err = database.Firestore.Update("results", id[0], data)
+	err = database.Firestore.Update(dictionary.RESULTS_COLLECTION, id[0], data)
 	if err != nil {
 		errorMsg.Update(
 			http.StatusInternalServerError,
@@ -71,6 +75,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 			"Unknown",
 		)
 		errorMsg.Print()
+		http.Error(w, http.StatusText(errorMsg.StatusCode), errorMsg.StatusCode)
 		return
 	}
 
