@@ -1,6 +1,6 @@
 package diag
 
-// Status stores the applications' status
+// Diag stores the applications' status
 type Diag struct {
 	ModelConnection int
 	ProcessingSongs []string

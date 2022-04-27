@@ -2,7 +2,7 @@ package analysis
 
 import (
 	"encoding/json"
-	dataHandling "main/DataHandling"
+	datahandling "main/DataHandling"
 	database "main/Database"
 	debug "main/Debug"
 	dictionary "main/Dictionary"
@@ -46,7 +46,7 @@ func analyze(w http.ResponseWriter, r *http.Request) {
 	id := getID(song.Link)
 
 	// get title of video
-	title, err, status := getTitle(id)
+	title, status, err := getTitle(id)
 	if err != nil {
 		errorMsg.Update(
 			status,
@@ -82,7 +82,7 @@ func analyze(w http.ResponseWriter, r *http.Request) {
 
 	// get result of analysis
 	var analysis Analysis
-	err, status = analysis.getAnalysis(id)
+	status, err = analysis.getAnalysis(id)
 	if err != nil {
 		// mark song as failed
 		result["Failed"] = true
@@ -144,38 +144,38 @@ func getID(link string) string {
 }
 
 // getTitle gets the title of a YouTube video based on the id.
-func getTitle(id string) (string, error, int) {
+func getTitle(id string) (string, int, error) {
 	// get title of youtube video
-	body, status, err := dataHandling.Request(dictionary.GetYouTubeURL(id))
+	body, status, err := datahandling.Request(dictionary.GetYouTubeURL(id))
 	if err != nil {
-		return "", err, status
+		return "", status, err
 	}
 
 	// unmarshal to map
 	var items map[string][]interface{}
 	err = json.Unmarshal(body, &items)
 	if err != nil {
-		return "", err, http.StatusInternalServerError
+		return "", http.StatusInternalServerError, err
 	}
 
 	title := items["items"][0].(map[string]interface{})["snippet"].(map[string]interface{})["title"].(string)
 
-	return title, nil, http.StatusOK
+	return title, http.StatusOK, nil
 }
 
 // getAnalysis result.
-func (analysis *Analysis) getAnalysis(id string) (error, int) {
+func (analysis *Analysis) getAnalysis(id string) (int, error) {
 	// create request
-	body, status, err := dataHandling.Request("http://localhost:8082/analysis?id=" + id)
+	body, status, err := datahandling.Request("http://localhost:8082/analysis?id=" + id)
 	if err != nil {
-		return err, status
+		return status, err
 	}
 
 	// unmarshal to struct
 	err = json.Unmarshal(body, &analysis)
 	if err != nil {
-		return err, http.StatusInternalServerError
+		return http.StatusInternalServerError, err
 	}
 
-	return nil, http.StatusOK
+	return http.StatusOK, nil
 }

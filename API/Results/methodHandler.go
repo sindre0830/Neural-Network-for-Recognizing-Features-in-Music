@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-// MethodHandler handles the http request based on method
+// MethodHandler handles the http request based on method.
 func MethodHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
