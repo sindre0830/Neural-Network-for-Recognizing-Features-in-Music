@@ -21,7 +21,7 @@ def downloadAudio(id: str):
 
 
 # Seperates instruments and vocals from audio file.
-def splitAudio(id: str, mode: str, output:str = None):
+def splitAudio(id: str, mode: str, output: str = None):
     # branch if audio directory doesn't exist
     if not os.path.exists(dict.MODIFIED_DIR):
         os.makedirs(dict.MODIFIED_DIR)
