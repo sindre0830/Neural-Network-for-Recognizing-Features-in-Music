@@ -40,7 +40,6 @@ class ChordRecognizer:
             dict.printMessage(dict.DONE, verbose=verbose)
         dict.printDivider(verbose=verbose)
 
-
     # Runs the neural network model.
     def runModel(self, beats: np.ndarray, model: keras.models.Sequential):
         chords = []
@@ -65,7 +64,6 @@ class ChordRecognizer:
             index = np.argmax(predictions)
             chords.append(dict.chords[index])
         self.chords = np.array(chords)
-
 
     # Gets chords from audio file.
     def getChords(self, beats: np.ndarray):
