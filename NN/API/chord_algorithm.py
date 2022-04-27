@@ -7,6 +7,7 @@ import librosa
 import librosa.display
 import numpy as np
 import preprocessing
+import keras
 
 
 # Object to perform chord tracking.
@@ -19,7 +20,7 @@ class ChordRecognizer:
         self.id = id
 
     # Compute chord recognizer.
-    def run(self, beats: np.ndarray, plot: bool = False, verbose: bool = False):
+    def run(self, beats: np.ndarray, model: keras.models.Sequential, plot: bool = False, verbose: bool = False):
         # preprocess
         dict.printOperation("Preprocess data...", verbose=verbose)
         preprocessing.splitAudio(self.id, mode=dict.STEMS2, output=dict.ACCOMPANIMENT)
@@ -27,7 +28,7 @@ class ChordRecognizer:
         dict.printMessage(dict.DONE, verbose=verbose)
         # get results
         dict.printOperation("Running chord tracker...", verbose=verbose)
-        self.getChords(beats)
+        self.runModel(beats, model)
         dict.printMessage(dict.DONE, verbose=verbose)
         # plot
         if plot:
@@ -36,6 +37,14 @@ class ChordRecognizer:
             dict.printMessage(dict.DONE, verbose=verbose)
         dict.printDivider(verbose=verbose)
 
+
+    # Runs the neural network model.
+    def runModel(self, beats: np.ndarray, model: keras.models.Sequential):
+        model.summary()
+        self.chords = np.array([])
+
+
+    # Gets chords from audio file.
     def getChords(self, beats: np.ndarray):
         chords = []
         for i in range(beats.shape[0]):
@@ -45,7 +54,7 @@ class ChordRecognizer:
             chords.append(self.getChord(start=beats[i], end=end))
         self.chords = np.array(chords)
 
-    # Gets chord between beat
+    # Gets chord between beat.
     def getChord(self, start: float, end: float = None):
         duration = None
         if end is not None:
@@ -56,7 +65,7 @@ class ChordRecognizer:
         chord = dict.chords[chordIndex]
         return np.array(chord)
 
-    # Plots the chromagram
+    # Plots the chromagram.
     def plot(self, start: float = None, end: float = None):
         y, sr = librosa.load(dict.getModifiedAudioPath(self.id), sr=None)
         chroma = librosa.feature.chroma_stft(y=y, sr=sr)

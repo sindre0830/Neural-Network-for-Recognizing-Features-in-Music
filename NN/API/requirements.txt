@@ -4,4 +4,6 @@ pyaca==0.3.0
 matplotlib==3.5.1
 yt-dlp
 spleeter
+tensorflow==2.8.0
+keras==2.8.0
 numpy==1.19.5
