@@ -45,21 +45,21 @@ class ChordRecognizer:
         chords = []
         lastDuration = 0.
         for i in range(beats.shape[0]):
-            end = None
-            start = beats[i]
+            # get audio sample between two beats and generate chromagram
             if i + 1 < len(beats):
                 end = beats[i + 1]
-            if end is not None:
+                start = beats[i]
                 duration = (end - start)
                 lastDuration = duration
             else:
                 duration = lastDuration
             y, sr = librosa.load(dict.getModifiedAudioPath(self.id), sr=None, offset=start, duration=duration)
             chroma = librosa.feature.chroma_stft(y=y, sr=sr)
+            # resize matrix to uniform length
             # max_length is decided by the data gathering in preprocessing.getTrainingData() in will have to be updated for each time it is run
             mat = preprocessing.extendMatrix(mat=chroma, max_length=47)
             mat = np.expand_dims(mat, axis=0)
-            # get predictions and get the one with highest score
+            # get predictions and append the label with highest score
             predictions = model.predict(mat)
             index = np.argmax(predictions)
             chords.append(dict.chords[index])
