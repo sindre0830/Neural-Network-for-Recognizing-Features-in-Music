@@ -20,7 +20,7 @@ class ChordRecognizer:
         self.id = id
 
     # Compute chord recognizer.
-    def run(self, beats: np.ndarray, model: keras.models.Sequential, plot: bool = False, verbose: bool = False):
+    def run(self, beats: np.ndarray, model: keras.models.Sequential, solution: str = "CNN", plot: bool = False, verbose: bool = False):
         # preprocess
         dict.printOperation("Preprocess data...", verbose=verbose)
         preprocessing.splitAudio(self.id, mode=dict.STEMS2, output=dict.ACCOMPANIMENT)
@@ -28,7 +28,10 @@ class ChordRecognizer:
         dict.printMessage(dict.DONE, verbose=verbose)
         # get results
         dict.printOperation("Running chord tracker...", verbose=verbose)
-        self.runModel(beats, model)
+        if solution == "CNN":
+            self.runModel(beats, model)
+        elif solution == "ALG":
+            self.getChords(beats)
         dict.printMessage(dict.DONE, verbose=verbose)
         # plot
         if plot:
@@ -40,8 +43,28 @@ class ChordRecognizer:
 
     # Runs the neural network model.
     def runModel(self, beats: np.ndarray, model: keras.models.Sequential):
-        model.summary()
-        self.chords = np.array([])
+        chords = []
+        lastDuration = 0.
+        for i in range(beats.shape[0]):
+            end = None
+            start = beats[i]
+            if i + 1 < len(beats):
+                end = beats[i + 1]
+            if end is not None:
+                duration = (end - start)
+                lastDuration = duration
+            else:
+                duration = lastDuration
+            y, sr = librosa.load(dict.getModifiedAudioPath(self.id), sr=None, offset=start, duration=duration)
+            chroma = librosa.feature.chroma_stft(y=y, sr=sr)
+            # max_length is decided by the data gathering in preprocessing.getTrainingData() in will have to be updated for each time it is run
+            mat = preprocessing.extendMatrix(mat=chroma, max_length=47)
+            mat = np.expand_dims(mat, axis=0)
+            # get predictions and get the one with highest score
+            predictions = model.predict(mat)
+            index = np.argmax(predictions)
+            chords.append(dict.chords[index])
+        self.chords = np.array(chords)
 
 
     # Gets chords from audio file.
