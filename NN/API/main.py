@@ -8,11 +8,25 @@ import flask
 import time
 import math
 import warnings
+import os
+import tensorflow as tf
+import keras
 
 start_time = time.time()
 app = flask.Flask(__name__)
 # suppress warnings from Librosa
 warnings.filterwarnings("ignore", category=Warning)
+# suppress info and warnings outputted by tensorflow
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
+# enable memory growth for gpu devices
+# source: https://stackoverflow.com/a/55541385/8849692
+gpu_devices = tf.config.experimental.list_physical_devices('GPU')
+if gpu_devices:
+    for device in gpu_devices:
+        tf.config.experimental.set_memory_growth(device, True)
+# load model once
+modelChord = keras.models.load_model(dict.MODEL_PATH)
 
 
 # Main program.
@@ -21,7 +35,7 @@ def main():
     preprocessing.parseJson(dict.JSON_PATH)
     dict.printDivider()
     # define youtube id
-    id = "hPOYc4a2RPY"
+    id = "GudvNP9AwNM"
     # download file
     preprocessing.downloadAudio(id)
     # run beat recognizer
@@ -29,7 +43,7 @@ def main():
     beatRecognizer.run(plot=True, verbose=True)
     # run chord recognizer
     chordRecognizer = chord_algorithm.ChordRecognizer(id)
-    chordRecognizer.run(beats=beatRecognizer.beats, verbose=True)
+    chordRecognizer.run(beats=beatRecognizer.beats, model=modelChord, verbose=True)
     print(chordRecognizer.chords)
 
 
@@ -68,7 +82,7 @@ def analysis():
     dict.printMessage(dict.DONE)
     dict.printOperation("Run chord tracker...")
     chordRecognizer = chord_algorithm.ChordRecognizer(id)
-    chordRecognizer.run(beats=beatRecognizer.beats)
+    chordRecognizer.run(beats=beatRecognizer.beats, model=modelChord)
     dict.printMessage(dict.DONE)
     # return output
     output = {
