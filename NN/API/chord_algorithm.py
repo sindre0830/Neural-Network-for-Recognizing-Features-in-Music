@@ -38,6 +38,10 @@ class ChordRecognizer:
             dict.printOperation("Plotting results...", verbose=verbose)
             self.plot(start=beats[2], end=beats[3])
             dict.printMessage(dict.DONE, verbose=verbose)
+        # clean-up
+        dict.printOperation("Cleaning up...", verbose=verbose)
+        preprocessing.deleteModifiedAudio(self.id)
+        dict.printMessage(dict.DONE, verbose=verbose)
         dict.printDivider(verbose=verbose)
 
     # Runs the neural network model.

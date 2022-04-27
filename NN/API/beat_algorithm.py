@@ -37,6 +37,10 @@ class BeatRecognizer:
             dict.printOperation("Plotting results...", verbose=verbose)
             self.plot(start=plot_start, end=plot_end)
             dict.printMessage(dict.DONE, verbose=verbose)
+        # clean-up
+        dict.printOperation("Cleaning up...", verbose=verbose)
+        preprocessing.deleteModifiedAudio(self.id)
+        dict.printMessage(dict.DONE, verbose=verbose)
         dict.printDivider(verbose=verbose)
 
     # Get beats and BPM from Librosa's beat tracker.

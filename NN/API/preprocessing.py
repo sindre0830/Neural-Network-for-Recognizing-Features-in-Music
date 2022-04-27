@@ -10,7 +10,7 @@ import json
 
 
 # Downloads an audio file from given URL.
-def downloadAudio(id):
+def downloadAudio(id: str):
     # branch if audio directory doesn't exist
     if not os.path.exists(dict.NATIVE_DIR):
         os.makedirs(dict.NATIVE_DIR)
@@ -21,7 +21,7 @@ def downloadAudio(id):
 
 
 # Seperates instruments and vocals from audio file.
-def splitAudio(id, mode, output=None):
+def splitAudio(id: str, mode: str, output:str = None):
     # branch if audio directory doesn't exist
     if not os.path.exists(dict.MODIFIED_DIR):
         os.makedirs(dict.MODIFIED_DIR)
@@ -39,7 +39,7 @@ def splitAudio(id, mode, output=None):
 
 
 # Resamples audio file and saves the modified version to disk.
-def resampleAudio(id, samplerate):
+def resampleAudio(id: str, samplerate: int):
     # branch if audio directory doesn't exist
     if not os.path.exists(dict.MODIFIED_DIR):
         os.makedirs(dict.MODIFIED_DIR)
@@ -63,15 +63,21 @@ def resampleAudio(id, samplerate):
 
 
 # Filter audio by threshold.
-def filterAudio(id):
+def filterAudio(id: str):
     y, sr = librosa.load(path=dict.getModifiedAudioPath(id), sr=None)
     applyFilter = np.vectorize(lambda t: 0. if t < 0.15 else t)
     y = applyFilter(y)
     sf.write(dict.getModifiedAudioPath(id), data=y, samplerate=sr)
 
 
+# Delete modified audio file.
+def deleteModifiedAudio(id: str):
+    if os.path.exists(dict.getModifiedAudioPath(id)):
+        os.remove(dict.getModifiedAudioPath(id))
+
+
 # Parses songs.json to a simplified JSON object.
-def parseJson(path):
+def parseJson(path: str):
     dict.printOperation("Parse songs.json for comparison data...")
     if os.path.exists(dict.JSON_PATH):
         dict.FLAG_DATABASE = True
