@@ -83,8 +83,8 @@ class BeatRecognizer:
         if end is not None:
             plt.xlim(right=end)
         # branch if plot directory doesn't exist
-        if not os.path.exists(dict.PLOTS_DIR):
-            os.makedirs(dict.PLOTS_DIR)
+        if not os.path.exists(dict.PLOTS_PATH):
+            os.makedirs(dict.PLOTS_PATH)
         # save plot as PNG and show results
         plt.subplots_adjust(top=0.8)
         plt.savefig(dict.getPlotPath(self.id), dpi=300, transparent=True, bbox_inches="tight")

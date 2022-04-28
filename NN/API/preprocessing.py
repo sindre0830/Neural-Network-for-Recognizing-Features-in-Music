@@ -12,26 +12,26 @@ import json
 # Downloads an audio file from given URL.
 def downloadAudio(id: str):
     # branch if audio directory doesn't exist
-    if not os.path.exists(dict.NATIVE_DIR):
-        os.makedirs(dict.NATIVE_DIR)
+    if not os.path.exists(dict.NATIVE_PATH):
+        os.makedirs(dict.NATIVE_PATH)
     # branch if audio file doesn't exist
     if not os.path.isfile(dict.getNativeAudioPath(id)):
         # download audio file with best quality then convert to wav
-        os.system("yt-dlp -q -f 'ba' -x --audio-format wav https://www.youtube.com/watch?v=" + id + " -o '" + dict.NATIVE_DIR + "%(id)s.%(ext)s'")
+        os.system("yt-dlp -q -f 'ba' -x --audio-format wav https://www.youtube.com/watch?v=" + id + " -o '" + dict.NATIVE_PATH + "%(id)s.%(ext)s'")
 
 
 # Seperates instruments and vocals from audio file.
 def splitAudio(id: str, mode: str, output: str = None):
     # branch if audio directory doesn't exist
-    if not os.path.exists(dict.MODIFIED_DIR):
-        os.makedirs(dict.MODIFIED_DIR)
+    if not os.path.exists(dict.MODIFIED_PATH):
+        os.makedirs(dict.MODIFIED_PATH)
     if mode is not dict.NO_STEMS:
         # split audio file according to the mode then move splitted file according to output
-        os.system("spleeter separate -p spleeter:" + mode + " -o " + dict.MODIFIED_DIR + " " + dict.getNativeAudioPath(id) + " &> /dev/null")
-        y, sr = librosa.load(path=dict.MODIFIED_DIR + id + output, sr=None)
+        os.system("spleeter separate -p spleeter:" + mode + " -o " + dict.MODIFIED_PATH + " " + dict.getNativeAudioPath(id) + " &> /dev/null")
+        y, sr = librosa.load(path=dict.MODIFIED_PATH + id + output, sr=None)
         sf.write(dict.getModifiedAudioPath(id), data=y, samplerate=sr)
         # remove temporary directory
-        shutil.rmtree(dict.MODIFIED_DIR + id)
+        shutil.rmtree(dict.MODIFIED_PATH + id)
     else:
         # copy native audio file to modified
         y, sr = librosa.load(path=dict.getNativeAudioPath(id), sr=None)
@@ -41,8 +41,8 @@ def splitAudio(id: str, mode: str, output: str = None):
 # Resamples audio file and saves the modified version to disk.
 def resampleAudio(id: str, samplerate: int):
     # branch if audio directory doesn't exist
-    if not os.path.exists(dict.MODIFIED_DIR):
-        os.makedirs(dict.MODIFIED_DIR)
+    if not os.path.exists(dict.MODIFIED_PATH):
+        os.makedirs(dict.MODIFIED_PATH)
     # check if modified audio exists and if it has correct samplerate
     flagResample = False
     if not os.path.isfile(dict.getModifiedAudioPath(id)):
