@@ -11,6 +11,7 @@ import warnings
 import os
 import tensorflow as tf
 import keras
+import http
 
 start_time = time.time()
 app = flask.Flask(__name__)
@@ -91,6 +92,26 @@ def analysis():
         "chords": chordRecognizer.chords.tolist()
     }
     return output
+
+
+# Clean-up endpoint.
+@app.route(dict.REMOVE_PATH)
+def remove():
+    # get youtube id
+    id = flask.request.args.get('id', None)
+    if id is None:
+        error = {
+            "Msg": "Requires a YouTube ID, example: '.../v1/remove?id=dQw4w9WgXcQ'"
+        }
+        return error, http.HTTPStatus.BAD_REQUEST
+    dict.printDivider()
+    # remove audio file
+    dict.printOperation("Removing " + id + " audio file...")
+    preprocessing.deleteAudioFile(dict.getNativeAudioPath(id))
+    dict.printMessage(dict.DONE)
+    # return output
+    output = ''
+    return output, http.HTTPStatus.OK
 
 
 # branch if program is run through 'python main.py'

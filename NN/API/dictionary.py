@@ -3,6 +3,7 @@ VERSION = 'v1'
 # endpoint paths
 DIAGNOSIS_PATH = '/' + VERSION + '/diag'
 ANALYSIS_PATH = '/' + VERSION + '/analysis'
+REMOVE_PATH = '/' + VERSION + '/remove'
 # directory paths
 PLOTS_DIR = "Data/Plots/"
 NATIVE_DIR = "Data/Audio/Native/"
