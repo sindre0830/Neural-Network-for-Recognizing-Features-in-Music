@@ -11,7 +11,7 @@ MODIFIED_PATH = "Data/Audio/Modified/"
 JSON_PATH = "Data/songs.json"
 PROCESSED_JSON_PATH = "Data/processedSongs.json"
 TRAINING_DATASET_PATH = "../Model-Training/Data/"
-MODEL_PATH = "../Model"
+MODEL_PATH = "Model/"
 # extensions for conversion to wav
 EXTENSIONS = [".m4v", ".webm", ".mp3", ".mp4"]
 # formats
