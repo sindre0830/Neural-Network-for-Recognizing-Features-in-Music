@@ -40,7 +40,7 @@ class ChordRecognizer:
             dict.printMessage(dict.DONE, verbose=verbose)
         # clean-up
         dict.printOperation("Cleaning up...", verbose=verbose)
-        preprocessing.deleteModifiedAudio(self.id)
+        preprocessing.deleteAudioFile(dict.getModifiedAudioPath(self.id))
         dict.printMessage(dict.DONE, verbose=verbose)
         dict.printDivider(verbose=verbose)
 

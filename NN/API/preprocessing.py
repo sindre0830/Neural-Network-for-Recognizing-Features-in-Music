@@ -70,10 +70,10 @@ def filterAudio(id: str):
     sf.write(dict.getModifiedAudioPath(id), data=y, samplerate=sr)
 
 
-# Delete modified audio file.
-def deleteModifiedAudio(id: str):
-    if os.path.exists(dict.getModifiedAudioPath(id)):
-        os.remove(dict.getModifiedAudioPath(id))
+# Delete audio file.
+def deleteAudioFile(path: str):
+    if os.path.exists(path):
+        os.remove(path)
 
 
 # Parses songs.json to a simplified JSON object.
