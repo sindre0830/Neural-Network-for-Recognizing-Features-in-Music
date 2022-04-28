@@ -60,7 +60,7 @@ def diagnosis():
         "Version": dict.VERSION,
         "Uptime": getUptime()
     }
-    return output
+    return output, http.HTTPStatus.OK
 
 
 # Analysis endpoint.
@@ -72,7 +72,7 @@ def analysis():
         error = {
             "Msg": "Requires a YouTube ID, example: '.../v1/analysis?id=dQw4w9WgXcQ'"
         }
-        return error
+        return error, http.HTTPStatus.BAD_REQUEST
     dict.printDivider()
     # preprocess audio file
     preprocessing.downloadAudio(id)
@@ -91,7 +91,7 @@ def analysis():
         "beats": beatRecognizer.beats.tolist(),
         "chords": chordRecognizer.chords.tolist()
     }
-    return output
+    return output, http.HTTPStatus.OK
 
 
 # Clean-up endpoint.
