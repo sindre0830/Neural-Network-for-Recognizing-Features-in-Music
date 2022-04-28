@@ -47,16 +47,16 @@ class ChordRecognizer:
     # Runs the neural network model.
     def runModel(self, beats: np.ndarray, model: keras.models.Sequential):
         chords = []
-        lastDuration = 0.
+        lastEnd = 0.
         for i in range(beats.shape[0]):
             # get audio sample between two beats and generate chromagram
             if i + 1 < len(beats):
                 end = beats[i + 1]
                 start = beats[i]
                 duration = (end - start)
-                lastDuration = duration
+                lastEnd = end
             else:
-                duration = lastDuration
+                duration = (lastEnd - start)
             y, sr = librosa.load(dict.getModifiedAudioPath(self.id), sr=None, offset=start, duration=duration)
             chroma = librosa.feature.chroma_stft(y=y, sr=sr)
             # resize matrix to uniform length
