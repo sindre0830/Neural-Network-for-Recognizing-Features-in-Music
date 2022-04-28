@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
 import './addSong.css';
 
-
 /**
  *  Check if the input is a URL.
  * 
  *  @param {text} link
+ *  @returns {Boolean} True if the link is valid.
  */
 const validateInput = (link) => {
-    var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/
-    return regexp.test(link);
+    if (link.startsWith('https://www.youtube.com/watch?v=') || link.startsWith('https://youtu.be/')) {
+        return true;
+    }
+    return false;
 }
 
 /**

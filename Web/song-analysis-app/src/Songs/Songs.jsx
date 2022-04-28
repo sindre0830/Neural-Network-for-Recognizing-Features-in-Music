@@ -18,13 +18,8 @@ const Songs = () => {
      *  Get results from the API.
      */
     const getSongs = async () => {
-        /*/ getting songs from file (for testing purposes)
-        const jsonData= require('../testData.json'); 
-        setSongs(jsonData);*/
-
         setLoading(true);
         setError(false);
-
         try {
             const res = await fetch('/v1/results');
             const json = await res.json();
@@ -32,7 +27,6 @@ const Songs = () => {
         } catch (err) {
             setError(true);
         }
-        
         setLoading(false);
     }
 

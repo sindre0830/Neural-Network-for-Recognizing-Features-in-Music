@@ -34,9 +34,22 @@
     height: 1px;
 }
 
+.song__line p {
+    margin-top: 20px;
+    text-align: center;
+}
+
 .song__result {
     margin-top: 20px;
     background-color: #E8E8E8;
+}
+
+.shown {
+    display: block;
+}
+
+.hidden {
+    display: none;
 }
 
 .song__result form {
