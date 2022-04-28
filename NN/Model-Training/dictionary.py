@@ -15,7 +15,7 @@ EPOCHS = 50
 DATASET_PATH = "Data/dataset.npy"
 SPLIT_PATH = "Data/split.npy"
 RANDOM_SEARCH_PATH = "Data/RandomSearch/"
-MODEL_PATH = "../Data/Model"
+MODEL_PATH = "../API/Model"
 
 
 # Print operation that allows status message on the same line.
