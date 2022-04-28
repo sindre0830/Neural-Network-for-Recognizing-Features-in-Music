@@ -1,7 +1,9 @@
-flask
-librosa
+Flask==2.0.2
+librosa==0.8.0
 pyaca==0.3.0
-matplotlib
-yt-dlp
-spleeter
-numpy==1.19.5
+yt-dlp==2022.2.4
+spleeter==2.3.0
+tensorflow==2.8.0
+keras==2.8.0
+numpy==1.22.3
+matplotlib==3.5.1

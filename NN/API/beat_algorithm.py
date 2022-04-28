@@ -22,7 +22,7 @@ class BeatRecognizer:
         self.id = id
 
     # Compute beat recognizer.
-    def run(self, plot: bool = False, verbose: bool = False):
+    def run(self, plot: bool = False, plot_start: float = None, plot_end: float = None, verbose: bool = False):
         # preprocess
         dict.printOperation("Preprocess data...", verbose=verbose)
         preprocessing.splitAudio(self.id, mode=dict.NO_STEMS)
@@ -35,8 +35,12 @@ class BeatRecognizer:
         # plot
         if plot:
             dict.printOperation("Plotting results...", verbose=verbose)
-            self.plot(start=None, end=None)
+            self.plot(start=plot_start, end=plot_end)
             dict.printMessage(dict.DONE, verbose=verbose)
+        # clean-up
+        dict.printOperation("Cleaning up...", verbose=verbose)
+        preprocessing.deleteModifiedAudio(self.id)
+        dict.printMessage(dict.DONE, verbose=verbose)
         dict.printDivider(verbose=verbose)
 
     # Get beats and BPM from Librosa's beat tracker.
@@ -53,6 +57,8 @@ class BeatRecognizer:
         onset_env = librosa.onset.onset_strength(y=y, sr=sr, aggregate=np.median)
         times = librosa.times_like(onset_env, sr=sr, hop_length=512)
         plt.plot(times, librosa.util.normalize(onset_env), alpha=0.6)
+        plt.xlabel("Time")
+        plt.ylabel("Onset strength")
         # plot beat timestamps
         n = 1
         # branch if database has been loaded
@@ -68,7 +74,9 @@ class BeatRecognizer:
         # set other parameters
         plt.ylim(0, 1)
         plt.legend(bbox_to_anchor=(0, 1.02, 1, 0.2), loc="lower left", mode="expand", ncol=n)
-        plt.title(self.id + "  -  " + str(sr) + " samplerate", pad=40.)
+        plt.title(self.id + "  -  " + str(sr) + " sample rate", pad=40.)
+        plt.xlabel("Time")
+        plt.ylabel("Onset strength")
         # trim figure between two timestamps
         if start is not None:
             plt.xlim(left=start)

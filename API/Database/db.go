@@ -39,23 +39,21 @@ func (db *Database) Setup() error {
 	return nil
 }
 
-// Get a document from a collection.
-func (db *Database) Get(collection string, id string) (map[string]interface{}, error) {
-	// find the document with the specific ID
-	dsnap, err := db.Client.Collection(collection).Doc(id).Get(db.Ctx)
-	if err != nil {
-		return nil, err
+// Get all documents from a collection.
+func (db *Database) GetAll(collection string, query string) ([]map[string]interface{}, error) {
+	var data []map[string]interface{}
+	var doc map[string]interface{}
+
+	var iter *firestore.DocumentIterator
+
+	// check if a query is sent with
+	if query != "" {
+		iter = db.Client.Collection(collection).Where(query, "==", true).Documents(db.Ctx)
+	} else {
+		iter = db.Client.Collection(collection).Documents(db.Ctx)
 	}
 
-	data := dsnap.Data()
-	return data, nil
-}
-
-// Get all documents from a collection.
-func (db *Database) GetAll(collection string) ([]map[string]interface{}, error) {
-	var data []map[string]interface{}
 	// iterate through collection
-	iter := db.Client.Collection(collection).Documents(db.Ctx)
 	for {
 		el, err := iter.Next()
 		if err == iterator.Done {
@@ -64,8 +62,11 @@ func (db *Database) GetAll(collection string) ([]map[string]interface{}, error) 
 		if err != nil {
 			return nil, err
 		}
-		// add current document to the data slice
-		data = append(data, el.Data())
+		// get the current document's id
+		doc = el.Data()
+		doc["id"] = el.Ref.ID
+		// add document to data slice
+		data = append(data, doc)
 	}
 
 	return data, nil
@@ -82,7 +83,7 @@ func (db *Database) Update(collection string, id string, data interface{}) error
 	// check if the ID is a valid document
 	_, err := db.Client.Collection(collection).Doc(id).Get(db.Ctx)
 	if err != nil {
-		// returning prevents the creation of a new document
+		// prevents the creation of a new document
 		return err
 	}
 

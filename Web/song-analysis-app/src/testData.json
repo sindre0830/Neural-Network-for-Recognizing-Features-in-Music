@@ -1,0 +1,26 @@
+[
+  {
+    "title": "MARINA AND THE DIAMONDS - HOW TO BE A HEARTBREAKER",
+    "link": "https://www.youtube.com/watch?v=vKNcuTWzTVw",
+    "bpm": 145,
+    "beats": [1.4234, 5.3423, 7.2341],
+    "chords": ["A", "B", "C"],
+    "approved": true
+  },
+  {
+    "title": "The Rolling Stones - Paint It, Black (Official Lyric Video)",
+    "link": "https://www.youtube.com/watch?v=O4irXQhgMqg",
+    "bpm": 145,
+    "beats": [1.4234, 5.3423, 7.2341],
+    "chords": ["A", "B", "C"],
+    "approved": false
+  },
+  {
+    "title": "Tame Impala - The Less I Know the Better (Official Audio)",
+    "link": "https://www.youtube.com/watch?v=2SUwOgmvzK4",
+    "bpm": 145,
+    "beats": [1.4234, 5.3423, 7.2341],
+    "chords": ["A", "B", "C"],
+    "approved": false
+  }
+]
