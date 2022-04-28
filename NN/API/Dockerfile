@@ -5,8 +5,10 @@ FROM python:3.9
 WORKDIR /app
 
 COPY requirements.txt requirements.txt
-RUN pip install -r requirements.txt
+RUN pip install --no-deps -r requirements.txt
+
+RUN apt-get update && apt-get -y install ffmpeg libsndfile1-dev
 
 COPY . .
 
-CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0"]
+CMD export FLASK_APP=main && flask run --host=0.0.0.0
