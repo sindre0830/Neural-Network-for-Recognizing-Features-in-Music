@@ -14,24 +14,30 @@ const Songs = () => {
     const [search, setSearch] = useState("")
     const [filter, setFilter] = useState("All")
 
-    /**
-     *  Get results from the API.
-     */
-    const getSongs = async () => {
-        setLoading(true);
-        setError(false);
-        try {
-            const res = await fetch('/v1/results');
-            const json = await res.json();
-            setSongs(json);
-        } catch (err) {
-            setError(true);
-        }
-        setLoading(false);
-    }
-
     useEffect(() => {
+        // flag used to check if component is mounted or not
+        let unmounted = false;
+        // get all results
+        const getSongs = async () => {
+            setLoading(true);
+            setError(false);
+            try {
+                const res = await fetch('/v1/results');
+                const json = await res.json();
+                if (!unmounted) {
+                    setSongs(json);
+                }
+            } catch (err) {
+                console.log(err);
+                setError(true);
+            }
+            setLoading(false);
+        }
         getSongs()
+        // cleanup
+        return () => {
+            unmounted = true;
+        }
     }, [])
 
     /**
