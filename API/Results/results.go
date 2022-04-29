@@ -65,39 +65,18 @@ func update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// add the values that are not null to the data map
-	data := make(map[string]interface{})
-	if update.Title != "" {
-		data["Title"] = update.Title
-	}
-	if update.Bpm != 0 {
-		data["Bpm"] = update.Bpm
-	}
-	if update.Beats != nil {
-		data["Beats"] = update.Beats
-	}
-	if update.Chords != nil {
-		// make sure the slice only contains valid chords
-		flag := true
-		for _, v := range update.Chords {
-			if !checkChord(v) {
-				flag = false
-				break
-			}
-		}
-		if flag {
-			data["Chords"] = update.Chords
-		} else {
-			errorMsg.Update(
-				http.StatusBadRequest,
-				"update() -> Validating user input",
-				"input validation: invalid values",
-				"Invalid Chords values",
-			)
-			errorMsg.Print()
-			http.Error(w, http.StatusText(errorMsg.StatusCode), errorMsg.StatusCode)
-			return
-		}
+	// add to map to be able to merge with the firebase document
+	data := addToMap(update)
+	if data == nil {
+		errorMsg.Update(
+			http.StatusBadRequest,
+			"update() -> Validating user input",
+			"input validation: invalid values",
+			"Invalid Chords values",
+		)
+		errorMsg.Print()
+		http.Error(w, http.StatusText(errorMsg.StatusCode), errorMsg.StatusCode)
+		return
 	}
 
 	// update data in database
@@ -115,6 +94,31 @@ func update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Error(w, "Document successfully updated", http.StatusOK)
+}
+
+// addToMap moves the data from a structure to a map.
+func addToMap(update Update) map[string]interface{} {
+	// add the values that are not null to the data map
+	data := make(map[string]interface{})
+	if update.Title != "" {
+		data["Title"] = update.Title
+	}
+	if update.Bpm != 0 {
+		data["Bpm"] = update.Bpm
+	}
+	if update.Beats != nil {
+		data["Beats"] = update.Beats
+	}
+	if update.Chords != nil {
+		// make sure the slice only contains valid chords
+		for _, v := range update.Chords {
+			if !checkChord(v) {
+				return nil
+			}
+		}
+		data["Chords"] = update.Chords
+	}
+	return data
 }
 
 // checkChord checks if the given value is a valid chord.
