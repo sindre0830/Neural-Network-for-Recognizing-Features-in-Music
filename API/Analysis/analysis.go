@@ -2,11 +2,13 @@ package analysis
 
 import (
 	"encoding/json"
+	"log"
 	datahandling "main/DataHandling"
 	database "main/Database"
 	debug "main/Debug"
 	dictionary "main/Dictionary"
 	"net/http"
+	"net/url"
 	"strings"
 )
 
@@ -29,21 +31,19 @@ func analyze(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// check if a link is sent
-	if song.Link == "" {
+	// get id of song, if the link is valid
+	id := getID(song.Link)
+	if id == song.Link {
 		errorMsg.Update(
 			http.StatusBadRequest,
 			"analysis.post() -> Parsing body",
-			"json: not a valid json format",
-			"JSON format not valid",
+			"",
+			"Body not valid",
 		)
 		errorMsg.Print()
 		http.Error(w, http.StatusText(errorMsg.StatusCode), errorMsg.StatusCode)
 		return
 	}
-
-	// get id of song
-	id := getID(song.Link)
 
 	// get title of video
 	title, status, err := getTitle(id)
@@ -129,38 +129,57 @@ func analyze(w http.ResponseWriter, r *http.Request) {
 
 // getID retrieves the ID of a YouTube video from the link.
 func getID(link string) string {
-	// retrieve the id from the link
-	linkArr := strings.Split(link, "=")
-	var id string
+	// remove whitespace from link
+	trimmedLink := strings.ReplaceAll(link, " ", "")
 
-	// there are two ways to send a youtube link, so we have to check which link format is sent to be able to retrieve the id
-	if len(linkArr) <= 1 {
-		id = strings.Split(link, "/")[3]
-	} else {
-		id = linkArr[1]
+	// parse the link to an url
+	u, err := url.Parse(trimmedLink)
+	if err != nil {
+		return link
 	}
 
-	return id
+	// youtube links have two different formats, so there needs to be two different ways of retrieving them
+	if strings.HasPrefix(trimmedLink, "https://youtu.be/") {
+		return u.Path[1:]
+	} else if strings.HasPrefix(trimmedLink, "https://www.youtube.com/") {
+		id, err := url.ParseQuery(u.RawQuery)
+		if err != nil {
+			log.Fatal(err)
+		}
+		return id["v"][0]
+	} else {
+		// if it is not a valid link, return the same value as inputted
+		return link
+	}
 }
 
 // getTitle gets the title of a YouTube video based on the id.
 func getTitle(id string) (string, int, error) {
-	// get title of youtube video
-	body, status, err := datahandling.Request(dictionary.GetYouTubeURL(id))
+	u, err := url.Parse("https://www.youtube.com/oembed")
+	if err != nil {
+		return "", http.StatusInternalServerError, err
+	}
+
+	// construct url
+	q := u.Query()
+	q.Set("format", "json")
+	q.Set("url", "https://www.youtube.com/watch?v="+id)
+	u.RawQuery = q.Encode()
+
+	// send request
+	body, status, err := datahandling.Request(u.String())
 	if err != nil {
 		return "", status, err
 	}
 
 	// unmarshal to map
-	var items map[string][]interface{}
-	err = json.Unmarshal(body, &items)
+	var data map[string]interface{}
+	err = json.Unmarshal(body, &data)
 	if err != nil {
 		return "", http.StatusInternalServerError, err
 	}
 
-	title := items["items"][0].(map[string]interface{})["snippet"].(map[string]interface{})["title"].(string)
-
-	return title, http.StatusOK, nil
+	return data["title"].(string), http.StatusOK, nil
 }
 
 // getAnalysis result.

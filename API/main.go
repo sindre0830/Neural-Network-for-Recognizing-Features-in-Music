@@ -11,16 +11,6 @@ import (
 	"os"
 )
 
-// initialize values.
-func init() {
-	// api key
-	var err error
-	dictionary.YOUTUBE_KEY, err = dictionary.GetYouTubeKey()
-	if err != nil {
-		log.Fatalln(err)
-	}
-}
-
 // main program.
 func main() {
 	// get port
