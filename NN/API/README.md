@@ -45,3 +45,45 @@ To stop the program press ```CTRL-C```
                 "Version": "v1"
             }
             ```
+
+2. Analysis endpoint - *Used to get analysis of song on youtube*
+    - Input:
+        ```
+        Method: GET
+        Path: .../analysis{?id=youtube_id}
+        ```
+        - Endpoint will return an error if the youtube_id parameter isn't added.
+    - Output:
+        ```json
+        {
+            "beats": [float],
+            "bpm": float,
+            "chords": [string]
+        }
+        ```
+    - Example:
+        - Input:
+            ```
+            Method: GET
+            Path: http://localhost:5000/v1/analysis?id=dQw4w9WgXcQ
+            ```
+        - Output:
+            ```json
+            {
+                "beats": [
+                    0.1536,
+                    0.6144,
+                    1.1264,
+                    ...
+                    209.0496
+                ],
+                "bpm": 117.1875,
+                "chords": [
+                    "A",
+                    "E",
+                    "F#m",
+                    ...
+                    "A#m"
+                ]
+            }
+            ```
