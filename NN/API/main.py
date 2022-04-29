@@ -56,7 +56,6 @@ def getUptime():
 # Diagnosis endpoint.
 @app.route(dict.DIAGNOSIS_ENDPOINT)
 def diagnosis():
-    dict.printDivider()
     output = {
         "Version": dict.VERSION,
         "Uptime": getUptime()
@@ -67,7 +66,6 @@ def diagnosis():
 # Analysis endpoint.
 @app.route(dict.ANALYSIS_ENDPOINT)
 def analysis():
-    dict.printDivider()
     # get youtube id
     id = flask.request.args.get('id', None)
     if id is None:
@@ -78,14 +76,10 @@ def analysis():
     # preprocess audio file
     preprocessing.downloadAudio(id)
     # analyze song
-    dict.printOperation("Run beat tracker...")
     beatRecognizer = beat_algorithm.BeatRecognizer(id)
     beatRecognizer.run()
-    dict.printMessage(dict.DONE)
-    dict.printOperation("Run chord tracker...")
     chordRecognizer = chord_algorithm.ChordRecognizer(id)
     chordRecognizer.run(beats=beatRecognizer.beats, model=modelChord)
-    dict.printMessage(dict.DONE)
     # return output
     output = {
         "bpm": beatRecognizer.bpm,
@@ -98,7 +92,6 @@ def analysis():
 # Clean-up endpoint.
 @app.route(dict.REMOVE_ENDPOINT)
 def remove():
-    dict.printDivider()
     # get youtube id
     id = flask.request.args.get('id', None)
     if id is None:
@@ -107,9 +100,7 @@ def remove():
         }
         return error, http.HTTPStatus.BAD_REQUEST
     # remove audio file
-    dict.printOperation("Removing " + id + " audio file...")
     preprocessing.deleteAudioFile(dict.getNativeAudioPath(id))
-    dict.printMessage(dict.DONE)
     # return output
     output = ''
     return output, http.HTTPStatus.OK
