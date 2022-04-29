@@ -27,7 +27,7 @@ def splitAudio(id: str, mode: str, output: str = None):
         os.makedirs(dict.MODIFIED_PATH)
     if mode is not dict.NO_STEMS:
         # split audio file according to the mode then move splitted file according to output
-        os.system("spleeter separate -p spleeter:" + mode + " -o " + dict.MODIFIED_PATH + " " + dict.getNativeAudioPath(id) + " &> /dev/null")
+        os.system("spleeter separate -p spleeter:" + mode + " -o " + dict.MODIFIED_PATH + " " + dict.getNativeAudioPath(id))
         y, sr = librosa.load(path=dict.MODIFIED_PATH + id + output, sr=None)
         sf.write(dict.getModifiedAudioPath(id), data=y, samplerate=sr)
         # remove temporary directory
