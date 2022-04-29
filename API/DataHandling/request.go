@@ -1,4 +1,4 @@
-package dataHandling
+package datahandling
 
 import (
 	"io/ioutil"

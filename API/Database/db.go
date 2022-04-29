@@ -10,7 +10,7 @@ import (
 	"google.golang.org/api/option"
 )
 
-// Global object for db connection
+// Firestore contains db connection
 var Firestore Database
 
 // Database structure contains db variables
@@ -39,7 +39,7 @@ func (db *Database) Setup() error {
 	return nil
 }
 
-// Get all documents from a collection.
+// GetAll documents from a collection.
 func (db *Database) GetAll(collection string, query string) ([]map[string]interface{}, error) {
 	var data []map[string]interface{}
 	var doc map[string]interface{}
@@ -50,7 +50,7 @@ func (db *Database) GetAll(collection string, query string) ([]map[string]interf
 	if query != "" {
 		iter = db.Client.Collection(collection).Where(query, "==", true).Documents(db.Ctx)
 	} else {
-		iter = db.Client.Collection(collection).Documents(db.Ctx)
+		iter = db.Client.Collection(collection).OrderBy("Approved", firestore.Asc).Documents(db.Ctx)
 	}
 
 	// iterate through collection

@@ -9,26 +9,30 @@ const Status = () => {
     const [status, setStatus] = useState([])
     const [isLoading, setLoading] = useState(false)
 
-    /**
-     *  Get application status.
-     */
-    const getStatus = async () => {
-        setLoading(true);
-
-        try {
-            const res = await fetch('/v1/diag');
-            const json = await res.json();
-            setStatus(json);
-        } catch (err) {
-            console.log(err);
-        }
-        
-        setLoading(false);
-    }
-
     useEffect(() => {
-        getStatus()
-    }, [])
+        // flag used to check if component is mounted or not
+        let unmounted = false;
+        // get the status of the rest of the program
+        const getStatus = async () => {
+            setLoading(true);
+            try {
+                const res = await fetch('/v1/diag');
+                const json = await res.json();
+                // only set the state if the component is mounted
+                if (!unmounted) {
+                    setStatus(json);
+                }
+            } catch (err) {
+                console.log(err);
+            }
+            setLoading(false);
+        }
+        getStatus();
+        // cleanup
+        return () => {
+            unmounted = true;
+        }
+    }, []);
 
     return (
         <div className='status'>

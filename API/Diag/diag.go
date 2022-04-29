@@ -2,7 +2,7 @@ package diag
 
 import (
 	"encoding/json"
-	dataHandling "main/DataHandling"
+	datahandling "main/DataHandling"
 	database "main/Database"
 	debug "main/Debug"
 	dictionary "main/Dictionary"
@@ -14,7 +14,7 @@ func (diag *Diag) get(w http.ResponseWriter, r *http.Request) {
 	var errorMsg debug.Debug
 
 	// get model status
-	err, status := getModelStatus()
+	status, err := getModelStatus()
 	if err != nil {
 		errorMsg.Update(
 			status,
@@ -56,13 +56,13 @@ func (diag *Diag) get(w http.ResponseWriter, r *http.Request) {
 }
 
 // getModelStatus gets the status of the model.
-func getModelStatus() (error, int) {
-	_, status, err := dataHandling.Request("http://localhost:8082/status")
+func getModelStatus() (int, error) {
+	_, status, err := datahandling.Request("http://localhost:8082/status")
 	if err != nil {
-		return err, status
+		return status, err
 	}
 
-	return nil, http.StatusOK
+	return http.StatusOK, nil
 }
 
 // getSongs get all songs based on a query from the database.

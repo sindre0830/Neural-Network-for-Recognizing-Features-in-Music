@@ -19,5 +19,6 @@ func MethodHandler(w http.ResponseWriter, r *http.Request) {
 			"Method not implemented",
 		)
 		errorMsg.Print()
+		http.Error(w, http.StatusText(errorMsg.StatusCode), errorMsg.StatusCode)
 	}
 }
