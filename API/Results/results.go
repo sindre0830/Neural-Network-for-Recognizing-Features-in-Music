@@ -51,8 +51,8 @@ func update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// decode body to a map
-	var data map[string]interface{}
-	err := json.NewDecoder(r.Body).Decode(&data)
+	var update Update
+	err := json.NewDecoder(r.Body).Decode(&update)
 	if err != nil {
 		errorMsg.Update(
 			http.StatusBadRequest,
@@ -63,6 +63,41 @@ func update(w http.ResponseWriter, r *http.Request) {
 		errorMsg.Print()
 		http.Error(w, http.StatusText(errorMsg.StatusCode), errorMsg.StatusCode)
 		return
+	}
+
+	// add the values that are not null to the data map
+	data := make(map[string]interface{})
+	if update.Title != "" {
+		data["Title"] = update.Title
+	}
+	if update.Bpm != 0 {
+		data["Bpm"] = update.Bpm
+	}
+	if update.Beats != nil {
+		data["Beats"] = update.Beats
+	}
+	if update.Chords != nil {
+		// make sure the slice only contains valid chords
+		flag := true
+		for _, v := range update.Chords {
+			if !checkChord(v) {
+				flag = false
+				break
+			}
+		}
+		if flag {
+			data["Chords"] = update.Chords
+		} else {
+			errorMsg.Update(
+				http.StatusBadRequest,
+				"update() -> Validating user input",
+				"input validation: invalid values",
+				"Invalid Chords values",
+			)
+			errorMsg.Print()
+			http.Error(w, http.StatusText(errorMsg.StatusCode), errorMsg.StatusCode)
+			return
+		}
 	}
 
 	// update data in database
@@ -80,4 +115,14 @@ func update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Error(w, "Document successfully updated", http.StatusOK)
+}
+
+// checkChord checks if the given value is a valid chord.
+func checkChord(value string) bool {
+	for _, el := range dictionary.CHORDS {
+		if el == value {
+			return true
+		}
+	}
+	return false
 }

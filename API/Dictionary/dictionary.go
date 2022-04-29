@@ -16,6 +16,9 @@ const RESULTS_COLLECTION = "results"
 /* urls */
 const YOUTUBE_URL = "https://www.googleapis.com/youtube/v3/videos?part=snippet&fields=items"
 
+/* other values */
+var CHORDS = []string{"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B", "Cm", "C#m", "Dm", "D#m", "Em", "Fm", "F#m", "Gm", "G#m", "Am", "A#m", "Bm"}
+
 /* api keys */
 var YOUTUBE_KEY string
 
