@@ -87,3 +87,19 @@ To stop the program press ```CTRL-C```
                 ]
             }
             ```
+
+3. Remove endpoint - *Used to clean-up cached audio files after running analysis endpoint*
+    - Input:
+        ```
+        Method: GET
+        Path: .../remove{?id=youtube_id}
+        ```
+        - Endpoint will return an error if the youtube_id parameter isn't added.
+    - Output:
+        ```If the request is successful, nothing will be returned```
+    - Example:
+        - Input:
+            ```
+            Method: GET
+            Path: http://localhost:5000/v1/remove?id=dQw4w9WgXcQ
+            ```
