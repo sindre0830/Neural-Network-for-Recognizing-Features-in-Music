@@ -24,10 +24,10 @@ Root path: http://localhost:5000/v1/
         Path: .../diag
         ```
     - Output:
-        ```json
+        ```
         {
-            "Uptime": string,
-            "Version": string
+            "uptime": string,
+            "version": string
         }
         ```
     - Example:
@@ -39,8 +39,8 @@ Root path: http://localhost:5000/v1/
         - Output:
             ```json
             {
-                "Uptime": "1791 seconds",
-                "Version": "v1"
+                "uptime": "1791 seconds",
+                "version": "v1"
             }
             ```
 2. Analysis endpoint - *Used to get analysis of song on youtube*
@@ -51,7 +51,7 @@ Root path: http://localhost:5000/v1/
         ```
         - Endpoint will return an error if the youtube_id parameter isn't added. *See error handling below*
     - Output:
-        ```json
+        ```
         {
             "beats": [float],
             "bpm": float,
@@ -102,8 +102,8 @@ Root path: http://localhost:5000/v1/
 
 ## Error Handling
 If the analysis or the remove endpoint doesn't have the ```id``` parameter, an error message will be returned with the appropriate HTTP status code. Both timed out and internal server errors will only have the appropriate status codes and not this body. It's important to expect some extra time with the analysis endpoint as it takes time to get the results.
-```json
+```
 {
-    "Msg": string
+    "msg": string
 }
 ```

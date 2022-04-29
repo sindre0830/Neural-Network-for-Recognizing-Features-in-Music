@@ -57,8 +57,8 @@ def getUptime():
 @app.route(dict.DIAGNOSIS_ENDPOINT)
 def diagnosis():
     output = {
-        "Version": dict.VERSION,
-        "Uptime": getUptime()
+        "version": dict.VERSION,
+        "uptime": getUptime()
     }
     return output, http.HTTPStatus.OK
 
@@ -70,7 +70,7 @@ def analysis():
     id = flask.request.args.get('id', None)
     if id is None:
         error = {
-            "Msg": "Requires a YouTube ID, example: '.../v1/analysis?id=dQw4w9WgXcQ'"
+            "msg": "Requires a YouTube ID, example: '.../v1/analysis?id=dQw4w9WgXcQ'"
         }
         return error, http.HTTPStatus.BAD_REQUEST
     # preprocess audio file
@@ -96,7 +96,7 @@ def remove():
     id = flask.request.args.get('id', None)
     if id is None:
         error = {
-            "Msg": "Requires a YouTube ID, example: '.../v1/remove?id=dQw4w9WgXcQ'"
+            "msg": "Requires a YouTube ID, example: '.../v1/remove?id=dQw4w9WgXcQ'"
         }
         return error, http.HTTPStatus.BAD_REQUEST
     # remove audio file
