@@ -103,3 +103,11 @@ To stop the program press ```CTRL-C```
             Method: GET
             Path: http://localhost:5000/v1/remove?id=dQw4w9WgXcQ
             ```
+
+## Error Handling
+If the analysis or the remove endpoint doesn't have the ```id``` parameter, an error message will be returned with the appropriate HTTP status code. Both timed out and internal server errors will only have the appropriate status codes and not this body. It's important to expect some extra time with the analysis endpoint as it takes time to both download the audio and perform the analysis.
+```json
+{
+    "Msg": string
+}
+```
