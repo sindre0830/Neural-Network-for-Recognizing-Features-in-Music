@@ -11,6 +11,7 @@ import warnings
 import os
 import tensorflow as tf
 import keras
+import http
 
 start_time = time.time()
 app = flask.Flask(__name__)
@@ -53,44 +54,56 @@ def getUptime():
 
 
 # Diagnosis endpoint.
-@app.route(dict.DIAGNOSIS_PATH)
+@app.route(dict.DIAGNOSIS_ENDPOINT)
 def diagnosis():
     output = {
-        "Version": dict.VERSION,
-        "Uptime": getUptime()
+        "version": dict.VERSION,
+        "uptime": getUptime()
     }
-    return output
+    return output, http.HTTPStatus.OK
 
 
 # Analysis endpoint.
-@app.route(dict.ANALYSIS_PATH)
+@app.route(dict.ANALYSIS_ENDPOINT)
 def analysis():
     # get youtube id
     id = flask.request.args.get('id', None)
     if id is None:
         error = {
-            "Msg": "Requires a YouTube ID, example: '.../v1/analysis?id=dQw4w9WgXcQ'"
+            "msg": "Requires a YouTube ID, example: '.../v1/analysis?id=dQw4w9WgXcQ'"
         }
-        return error
-    dict.printDivider()
+        return error, http.HTTPStatus.BAD_REQUEST
     # preprocess audio file
     preprocessing.downloadAudio(id)
     # analyze song
-    dict.printOperation("Run beat tracker...")
     beatRecognizer = beat_algorithm.BeatRecognizer(id)
     beatRecognizer.run()
-    dict.printMessage(dict.DONE)
-    dict.printOperation("Run chord tracker...")
     chordRecognizer = chord_algorithm.ChordRecognizer(id)
     chordRecognizer.run(beats=beatRecognizer.beats, model=modelChord)
-    dict.printMessage(dict.DONE)
     # return output
     output = {
         "bpm": beatRecognizer.bpm,
         "beats": beatRecognizer.beats.tolist(),
         "chords": chordRecognizer.chords.tolist()
     }
-    return output
+    return output, http.HTTPStatus.OK
+
+
+# Clean-up endpoint.
+@app.route(dict.REMOVE_ENDPOINT)
+def remove():
+    # get youtube id
+    id = flask.request.args.get('id', None)
+    if id is None:
+        error = {
+            "msg": "Requires a YouTube ID, example: '.../v1/remove?id=dQw4w9WgXcQ'"
+        }
+        return error, http.HTTPStatus.BAD_REQUEST
+    # remove audio file
+    preprocessing.deleteAudioFile(dict.getNativeAudioPath(id))
+    # return output
+    output = ''
+    return output, http.HTTPStatus.OK
 
 
 # branch if program is run through 'python main.py'
