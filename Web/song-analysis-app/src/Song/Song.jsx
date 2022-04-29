@@ -62,7 +62,7 @@ const Song = (props) => {
      */
     const handleSubmit = async (e) => {
         e.preventDefault();
-        let items = {Approved: false};
+        let items = {Approved: true};
         // only send the values that have been changed
         if (title !== "") {
             items.Title = title;
@@ -102,8 +102,8 @@ const Song = (props) => {
 
             const res = await fetch('/v1/results?id=' + props.value.id, options);
             if (res.status === 200) {
-                setMessage("Song approved");
-                //setApproved(prev => !prev)
+                setMessage("");
+                setApproved(prev => !prev)
             } else {
                 setMessage("Something went wrong...");
             }
@@ -144,19 +144,19 @@ const Song = (props) => {
                 <form className={toggleSong ? 'shown' : 'hidden'} id='update' onSubmit={handleSubmit}>
                     <div className='song__result-group'>
                         <label htmlFor='title'>Title</label>
-                        <input type='text' name='title' onChange={(e) => setTitle(e.target.value)} defaultValue={props.value.Title} disabled={approved} />
+                        <input id='title' type='text' name='title' onChange={(e) => setTitle(e.target.value)} defaultValue={props.value.Title} disabled={approved} />
                     </div>
                     <div className='song__result-group'>
                         <label htmlFor='bpm'>Bpm</label>
-                        <input type='text' name='bpm' onChange={(e) => setBpm(e.target.value)} defaultValue={props.value.Bpm} disabled={approved} />
+                        <input id='bpm' type='text' name='bpm' onChange={(e) => setBpm(e.target.value)} defaultValue={props.value.Bpm} disabled={approved} />
                     </div>
                     <div className='song__result-group'>
                         <label htmlFor='beats'>Beats</label>
-                        <input type='text' name='beats' onChange={(e) => setBeats(e.target.value)} defaultValue={props.value.Beats} disabled={approved} />
+                        <input id='beats' type='text' name='beats' onChange={(e) => setBeats(e.target.value)} defaultValue={props.value.Beats} disabled={approved} />
                     </div>
                     <div className='song__result-group'>
                         <label htmlFor='chords'>Chords</label>
-                        <input type='text' name='chords' onChange={(e) => setChords(e.target.value)} defaultValue={props.value.Chords} disabled={approved} />
+                        <input id='chords' type='text' name='chords' onChange={(e) => setChords(e.target.value)} defaultValue={props.value.Chords} disabled={approved} />
                     </div>
                 </form>
             </div>

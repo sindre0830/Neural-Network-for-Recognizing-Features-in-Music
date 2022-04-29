@@ -15,10 +15,11 @@ func TestAddToMap(t *testing.T) {
 				Chords: []string{"A", "C#", "A"},
 			},
 			expected: map[string]interface{}{
-				"Title":  "New title",
-				"Bpm":    213.42,
-				"Beats":  []float64{2.34, 5.34, 8.24},
-				"Chords": []string{"A", "C#", "A"},
+				"Title":    "New title",
+				"Bpm":      213.42,
+				"Beats":    []float64{2.34, 5.34, 8.24},
+				"Chords":   []string{"A", "C#", "A"},
+				"Approved": true,
 			},
 		},
 		{
@@ -27,8 +28,9 @@ func TestAddToMap(t *testing.T) {
 				Chords: []string{"C", "A"},
 			},
 			expected: map[string]interface{}{
-				"Bpm":    23,
-				"Chords": []string{"C", "A"},
+				"Bpm":      23,
+				"Chords":   []string{"C", "A"},
+				"Approved": true,
 			},
 		},
 		{

@@ -63,8 +63,8 @@ const AddSong = () => {
             {/* this is were error/status messages will show up */}
             <div className='add-song__message'>
                 {message
-                    ? <p>{message}</p>
-                    : <br></br>
+                    ? <p><strong>{message}</strong></p>
+                    : <br />
                 }
             </div>
             <div className='add-song__input'>
