@@ -47,13 +47,13 @@ const Songs = () => {
      */
     const filterSongs = () => {
         // filter based on search query
-        let filteredSongs = songs.filter(song => song.Title.toLowerCase().includes(search.toLowerCase()));
+        let filteredSongs = songs.filter(song => song.title.toLowerCase().includes(search.toLowerCase()));
 
         // filter based on status
         if (filter === 'Approved') {
-            return filteredSongs.filter(song => song.Approved);
+            return filteredSongs.filter(song => song.approved);
         } else if (filter === 'Pending') {
-            return filteredSongs.filter(song => !song.Approved);
+            return filteredSongs.filter(song => !song.approved);
         }
 
         return filteredSongs;

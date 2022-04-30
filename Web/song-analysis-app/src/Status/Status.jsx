@@ -38,13 +38,13 @@ const Status = () => {
         <div className='status'>
             {isLoading && <p id='error'>Loading...</p>}
             <div className='status__list'>
-                <StatusList  title='Processing Songs' value={status.ProcessingSongs ? status.ProcessingSongs : []} status='processing' />
+                <StatusList  title='Processing Songs' value={status.processing_songs ? status.processing_songs : []} status='processing' />
             </div>
             <div className='status__list'>
-                <StatusList title='Failed Songs' value={status.FailedSongs ? status.FailedSongs : []} status='failed' />
+                <StatusList title='Failed Songs' value={status.failed_songs ? status.failed_songs : []} status='failed' />
             </div>
             <div className='status__list'>
-                <StatusList title='API Status' value={status.ModelConnection ? ['API Connection: 200', `Model Connection: ${status.ModelConnection}`] : ['API Connection: 500']} />
+                <StatusList title='API Status' value={status.model_connection ? ['API Connection: 200', `Model Connection: ${status.model_connection}`] : ['API Connection: 500']} />
             </div>
         </div>
     )
