@@ -2,6 +2,8 @@ package results
 
 import (
 	"encoding/json"
+	"errors"
+	datahandling "main/DataHandling"
 	database "main/Database"
 	debug "main/Debug"
 	dictionary "main/Dictionary"
@@ -46,7 +48,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 			"Missing 'id' param",
 		)
 		errorMsg.Print()
-		http.Error(w, http.StatusText(errorMsg.StatusCode), errorMsg.StatusCode)
+		http.Error(w, errorMsg.PossibleReason, errorMsg.StatusCode)
 		return
 	}
 
@@ -58,10 +60,10 @@ func update(w http.ResponseWriter, r *http.Request) {
 			http.StatusBadRequest,
 			"update() -> Decoding body",
 			err.Error(),
-			"Unknown",
+			"Invalid body",
 		)
 		errorMsg.Print()
-		http.Error(w, http.StatusText(errorMsg.StatusCode), errorMsg.StatusCode)
+		http.Error(w, errorMsg.PossibleReason, errorMsg.StatusCode)
 		return
 	}
 
@@ -75,7 +77,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 			"Invalid Chords values",
 		)
 		errorMsg.Print()
-		http.Error(w, http.StatusText(errorMsg.StatusCode), errorMsg.StatusCode)
+		http.Error(w, errorMsg.PossibleReason, errorMsg.StatusCode)
 		return
 	}
 
@@ -93,6 +95,18 @@ func update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// clean up cached data on the NN side
+	status, err := cleanUp(id[0])
+	if err != nil {
+		errorMsg.Update(
+			status,
+			"update() -> cleanUp() -> Clean up audio files",
+			err.Error(),
+			"Unknown",
+		)
+		errorMsg.Print()
+	}
+
 	http.Error(w, "Document successfully updated", http.StatusOK)
 }
 
@@ -101,13 +115,13 @@ func addToMap(update Update) map[string]interface{} {
 	// add the values that are not null to the data map
 	data := make(map[string]interface{})
 	if update.Title != "" {
-		data["Title"] = update.Title
+		data["title"] = update.Title
 	}
 	if update.Bpm != 0 {
-		data["Bpm"] = update.Bpm
+		data["bpm"] = update.Bpm
 	}
 	if update.Beats != nil {
-		data["Beats"] = update.Beats
+		data["beats"] = update.Beats
 	}
 	if update.Chords != nil {
 		// make sure the slice only contains valid chords
@@ -116,10 +130,10 @@ func addToMap(update Update) map[string]interface{} {
 				return nil
 			}
 		}
-		data["Chords"] = update.Chords
+		data["chords"] = update.Chords
 	}
 	// add approved label
-	data["Approved"] = true
+	data["approved"] = true
 	return data
 }
 
@@ -131,4 +145,25 @@ func checkChord(value string) bool {
 		}
 	}
 	return false
+}
+
+// cleanUp removes requests that the NN API removes the song's audio files.
+func cleanUp(id string) (int, error) {
+	body, status, err := datahandling.Request(dictionary.NN_URL + dictionary.NN_REMOVE + "?id=" + id)
+	if err != nil {
+		return status, err
+	}
+
+	// only get error message if there is a body
+	// everything went fine if there is not
+	if len(body) > 0 {
+		var data map[string]string
+		err = json.Unmarshal(body, &data)
+		if err != nil {
+			return http.StatusInternalServerError, err
+		}
+		return http.StatusBadRequest, errors.New(data["msg"])
+	}
+
+	return status, nil
 }

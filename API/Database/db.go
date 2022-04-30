@@ -50,7 +50,7 @@ func (db *Database) GetAll(collection string, query string) ([]map[string]interf
 	if query != "" {
 		iter = db.Client.Collection(collection).Where(query, "==", true).Documents(db.Ctx)
 	} else {
-		iter = db.Client.Collection(collection).OrderBy("Approved", firestore.Asc).Documents(db.Ctx)
+		iter = db.Client.Collection(collection).OrderBy("approved", firestore.Asc).Documents(db.Ctx)
 	}
 
 	// iterate through collection
