@@ -20,7 +20,7 @@ class ChordRecognizer:
         self.id = id
 
     # Compute chord recognizer.
-    def run(self, beats: np.ndarray, model: keras.models.Sequential, solution: str = "CNN", plot: bool = False, verbose: bool = False):
+    def run(self, beats: np.ndarray, model: keras.models.Sequential = None, solution: str = "CNN", plot: bool = False, verbose: bool = False):
         # preprocess
         dict.printOperation("Preprocess data...", verbose=verbose)
         preprocessing.splitAudio(self.id, mode=dict.STEMS2, output=dict.ACCOMPANIMENT)

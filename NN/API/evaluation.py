@@ -106,7 +106,7 @@ class Evaluators:
         chordRecognizer = chord_algorithm.ChordRecognizer(id)
         song.beats = np.array(dataset[id]["beats"])
         song.beats = song.beats[song.beats <= librosa.get_duration(filename=dict.getNativeAudioPath(id))]   # trim timestamps
-        chordRecognizer.run(beats=song.beats, verbose=True)
+        chordRecognizer.run(beats=song.beats, solution="ALG", verbose=True)
         self.createJson(self.beat_chord_aggregate, id, chordRecognizer.chords.tolist(), song.beats.tolist(), "chords", "beats")
         result = self.compareChords(song.beats, dataset[id]["chords"], song.beats, chordRecognizer.chords)
         # Save
@@ -121,7 +121,6 @@ class Evaluators:
             outfile.write(json_object)
 
         os.remove(dict.getNativeAudioPath(id))
-        os.remove(dict.getModifiedAudioPath(id))
         return result
 
     # Updates a dictionary with new key+values
