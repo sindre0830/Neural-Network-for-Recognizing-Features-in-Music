@@ -28,7 +28,7 @@ func (diag *Diag) get(w http.ResponseWriter, r *http.Request) {
 	diag.ModelConnection = status
 
 	// get processing songs
-	diag.ProcessingSongs, err = getSongs("Processing")
+	diag.ProcessingSongs, err = getSongs("processing")
 	if err != nil {
 		errorMsg.Update(
 			http.StatusInternalServerError,
@@ -40,7 +40,7 @@ func (diag *Diag) get(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// get failed songs
-	diag.FailedSongs, err = getSongs("Failed")
+	diag.FailedSongs, err = getSongs("failed")
 	if err != nil {
 		errorMsg.Update(
 			http.StatusInternalServerError,
@@ -77,7 +77,7 @@ func getSongs(query string) ([]string, error) {
 	// retrieve the titles of all documents
 	var title []string
 	for _, el := range data {
-		title = append(title, el["Title"].(string))
+		title = append(title, el["title"].(string))
 	}
 
 	return title, nil

@@ -115,13 +115,13 @@ func addToMap(update Update) map[string]interface{} {
 	// add the values that are not null to the data map
 	data := make(map[string]interface{})
 	if update.Title != "" {
-		data["Title"] = update.Title
+		data["title"] = update.Title
 	}
 	if update.Bpm != 0 {
-		data["Bpm"] = update.Bpm
+		data["bpm"] = update.Bpm
 	}
 	if update.Beats != nil {
-		data["Beats"] = update.Beats
+		data["beats"] = update.Beats
 	}
 	if update.Chords != nil {
 		// make sure the slice only contains valid chords
@@ -130,10 +130,10 @@ func addToMap(update Update) map[string]interface{} {
 				return nil
 			}
 		}
-		data["Chords"] = update.Chords
+		data["chords"] = update.Chords
 	}
 	// add approved label
-	data["Approved"] = true
+	data["approved"] = true
 	return data
 }
 

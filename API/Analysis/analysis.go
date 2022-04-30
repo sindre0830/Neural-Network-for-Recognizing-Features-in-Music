@@ -61,8 +61,8 @@ func analyze(w http.ResponseWriter, r *http.Request) {
 
 	// add title to database, marked as processing
 	data := map[string]interface{}{
-		"Title":      title,
-		"Processing": true,
+		"title":      title,
+		"processing": true,
 	}
 	err = database.Firestore.Add(dictionary.RESULTS_COLLECTION, id, data)
 	if err != nil {
@@ -85,8 +85,8 @@ func analyze(w http.ResponseWriter, r *http.Request) {
 	status, err = analysis.getAnalysis(id)
 	if err != nil {
 		// mark song as failed
-		result["Failed"] = true
-		result["Processing"] = false
+		result["failed"] = true
+		result["processing"] = false
 
 		errorMsg.Update(
 			status,
@@ -97,12 +97,12 @@ func analyze(w http.ResponseWriter, r *http.Request) {
 		errorMsg.Print()
 	} else {
 		// initialize result map with result
-		result["Failed"] = false
-		result["Processing"] = false
-		result["Approved"] = false
-		result["Bpm"] = analysis.Bpm
-		result["Beats"] = analysis.Beats
-		result["Chords"] = analysis.Chords
+		result["failed"] = false
+		result["processing"] = false
+		result["approved"] = false
+		result["bpm"] = analysis.Bpm
+		result["beats"] = analysis.Beats
+		result["chords"] = analysis.Chords
 	}
 
 	// update database with the result
@@ -120,7 +120,7 @@ func analyze(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// return status based on if the song failed or not
-	if result["Failed"].(bool) {
+	if result["failed"].(bool) {
 		http.Error(w, "Song failed", status)
 	} else {
 		http.Error(w, "Song successfully analyzed", http.StatusOK)
