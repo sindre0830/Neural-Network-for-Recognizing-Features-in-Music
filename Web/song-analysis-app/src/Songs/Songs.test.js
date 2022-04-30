@@ -19,18 +19,18 @@ afterEach(() => {
 it("fetch songs", async () => {
     const results = [
         {
-            Title: 'National Anthem - Lana Del Rey',
-            Bpm: 130,
-            Beats: [1.23,4.56,7.89],
-            Chords: ['A','B','C'],
-            Approved: false
+            title: 'National Anthem - Lana Del Rey',
+            bpm: 130,
+            beats: [1.23,4.56,7.89],
+            chords: ['A','B','C'],
+            approved: false
         },
         {
-            Title: 'Kaleidoscope - blink-182',
-            Bpm: 120,
-            Beats: [1.11,2.22],
-            Chords: ['D','E'],
-            Approved: true
+            title: 'Kaleidoscope - blink-182',
+            bpm: 120,
+            beats: [1.11,2.22],
+            chords: ['D','E'],
+            approved: true
         }
     ];
 

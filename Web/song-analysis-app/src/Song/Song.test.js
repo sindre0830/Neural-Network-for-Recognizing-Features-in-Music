@@ -16,11 +16,11 @@ afterEach(() => {
 
 it("inputs are initally filled with song result", () => {
     const result = {
-        Title: "As it was - Harry Styles",
-        Bpm: 163,
-        Beats: [1,2,3],
-        Chords: ['A','B','C'],
-        Approved: false
+        title: "As it was - Harry Styles",
+        bpm: 163,
+        beats: [1,2,3],
+        chords: ['A','B','C'],
+        approved: false
     };
 
     render(<Song value={result} />, container);
@@ -35,19 +35,19 @@ it("inputs are initally filled with song result", () => {
     const beatsEl = screen.getByLabelText(/beats/i);
     const chordsEl = screen.getByLabelText(/chords/i);
 
-    expect(titleEl.value).toBe(result.Title);
-    expect(bpmEl.value).toBe(result.Bpm.toString());
-    expect(beatsEl.value).toBe(result.Beats.toString());
-    expect(chordsEl.value).toBe(result.Chords.toString());
+    expect(titleEl.value).toBe(result.title);
+    expect(bpmEl.value).toBe(result.bpm.toString());
+    expect(beatsEl.value).toBe(result.beats.toString());
+    expect(chordsEl.value).toBe(result.chords.toString());
 })
 
 it("approve button is present if the song is pending", () => {
     const result = {
-        Title: "As it was - Harry Styles",
-        Bpm: 163,
-        Beats: [1,2,3],
-        Chords: ['A','B','C'],
-        Approved: false
+        title: "As it was - Harry Styles",
+        bpm: 163,
+        beats: [1,2,3],
+        chords: ['A','B','C'],
+        approved: false
     };
 
     render(<Song value={result} />, container);
@@ -58,11 +58,11 @@ it("approve button is present if the song is pending", () => {
 
 it("approve button is not present if the song is approved", () => {
     const result = {
-        Title: "As it was - Harry Styles",
-        Bpm: 163,
-        Beats: [1,2,3],
-        Chords: ['A','B','C'],
-        Approved: true
+        title: "As it was - Harry Styles",
+        bpm: 163,
+        beats: [1,2,3],
+        chords: ['A','B','C'],
+        approved: true
     };
 
     render(<Song value={result} />, container);
