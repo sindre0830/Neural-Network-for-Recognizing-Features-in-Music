@@ -1,14 +1,18 @@
 # api info
 VERSION = 'v1'
 # endpoint paths
-DIAGNOSIS_PATH = '/' + VERSION + '/diag'
-ANALYSIS_PATH = '/' + VERSION + '/analysis'
+DIAGNOSIS_ENDPOINT = '/' + VERSION + '/diag'
+ANALYSIS_ENDPOINT = '/' + VERSION + '/analysis'
+REMOVE_ENDPOINT = '/' + VERSION + '/remove'
 # directory paths
 PLOTS_DIR = "Data/Plots/"
 NATIVE_DIR = "Data/Audio/Native/"
 MODIFIED_DIR = "Data/Audio/Modified/"
 TRIMMED_SONGS_PATH = "Data/Processed/"
 TRIMMED_JSON_PATH = "Data/trimmedSongs.json"
+PLOTS_PATH = "Data/Plots/"
+NATIVE_PATH = "Data/Audio/Native/"
+MODIFIED_PATH = "Data/Audio/Modified/"
 JSON_PATH = "Data/songs.json"
 RESULTS_PATH = "Data/Results/"
 RESULTS_SONG_PATH = RESULTS_PATH + "Songs/"
@@ -21,6 +25,8 @@ DETAILED_RESULTS_PATH = "Data/Results/detailed_results.json"
 BEAT_RESULTS_PATH = "Data/Results/beatresults.json"
 CHORDPLOT_PATH = "Data/Results/chordplot.png"
 BEATPLOT_PATH = "Data/Results/beatplot.png"
+TRAINING_DATASET_PATH = "../Model-Training/Data/"
+MODEL_PATH = "Model/"
 # extensions for conversion to wav
 EXTENSIONS = [".m4v", ".webm", ".mp3", ".mp4"]
 # formats
@@ -49,15 +55,15 @@ ACCOMPANIMENT = "/accompaniment" + WAV_FORMAT
 FLAG_DATABASE = False
 FLAG_RESULTS = False
 # blacklisted songs from EC-Play dataset
-BLACKLIST = ["6d5ST3tbPIU", "ASywAfBAVrQ", "DGIgXP9SvB8", "xz3F744K2v0"]
+BLACKLIST = ["6d5ST3tbPIU", "ASywAfBAVrQ", "DGIgXP9SvB8", "qf9Ipqubh9g", "gaR2k-EPADs", "V9RxDNY2vuk", "Lrl5C-cYC64", "nnDyWwZs-ek "]
 
 
 def getNativeAudioPath(id):
-    return NATIVE_DIR + id + WAV_FORMAT
+    return NATIVE_PATH + id + WAV_FORMAT
 
 
 def getModifiedAudioPath(id):
-    return MODIFIED_DIR + id + WAV_FORMAT
+    return MODIFIED_PATH + id + WAV_FORMAT
 
 
 def getSongResultAudioPath(id):
@@ -65,7 +71,7 @@ def getSongResultAudioPath(id):
 
 
 def getPlotPath(id):
-    return PLOTS_DIR + id + PNG_FORMAT
+    return PLOTS_PATH + id + PNG_FORMAT
 
 # chords
 chords = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B', 'Cm', 'C#m',

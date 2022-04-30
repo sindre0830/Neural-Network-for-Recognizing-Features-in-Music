@@ -1,0 +1,39 @@
+.status {
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    margin-top: 70px;
+    margin-bottom: 50px;
+    width: 75%;
+}
+
+.status #error {
+    text-align: center;
+    color: red;
+    font-family: var(--font-family);
+}
+
+.status__list {
+    margin-bottom: 30px;
+}
+
+/* small devices */
+@media (min-width: 768px) {
+    .status {
+        width: 60%;
+    }
+}
+
+/* medium devices */
+@media (min-width: 992px) {
+    .status {
+        width: 50%;
+    }
+}
+
+/* large devices */
+@media (min-width: 1200px) {
+    .status {
+        width: 40%;
+    }
+}

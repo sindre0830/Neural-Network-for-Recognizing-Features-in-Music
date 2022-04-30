@@ -1,0 +1,85 @@
+.song {
+    margin: auto;
+    padding-top: 25px;
+}
+
+.song__bar {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.song__bar-title {
+    margin-right: auto;
+    padding-right: 15px;
+}
+
+.song__bar button {
+    margin-right: 10px;
+    height: 30px;
+    padding: 5px;
+    border: none;
+    border-radius: 10px;
+    background-color: var(--color-approved);
+    color: white;
+    font-family: var(--font-family);
+    font-style: bold;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.song__line hr {
+    border: none;
+    background-color: black;
+    height: 1px;
+}
+
+.song__line p {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.song__result {
+    margin-top: 20px;
+    background-color: #E8E8E8;
+}
+
+.shown {
+    display: block;
+}
+
+.hidden {
+    display: none;
+}
+
+.song__result form {
+    padding: 10px;
+}
+
+.song__result-group {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0 20px 0;
+    font-family: var(--font-family);
+    font-size: 18px;
+}
+
+.song__result-group input {
+    height: 25px;
+    width: 85%;
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 18px;
+    background-color: white;
+}
+
+/* large devices */
+@media (min-width: 1200px) {
+    .song__result-group input {
+        height: 50px;
+        width: 75%;
+    }
+}

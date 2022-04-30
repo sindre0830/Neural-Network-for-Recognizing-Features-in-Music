@@ -1,0 +1,33 @@
+.song-title {
+    display: flex;
+    align-items: center;
+    font-size: 10px;
+}
+
+.song-title hr {
+    margin-right: 10px;
+    height: 20px;
+    min-width: 5px;
+    border: none;
+}
+
+.song-title p {
+    font-family: var(--font-family);
+    font-size: 18px;
+}
+
+.song-title__approved {
+    background-color: var(--color-approved);
+}
+
+.song-title__pending {
+    background-color: var(--color-pending);
+}
+
+.song-title__processing {
+    background-color: var(--color-pending);
+}
+
+.song-title__failed {
+    background-color: red;
+}

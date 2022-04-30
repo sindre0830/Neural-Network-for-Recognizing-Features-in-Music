@@ -9,30 +9,28 @@ import numpy as np
 import json
 
 # Downloads an audio file from given URL.
-def downloadAudio(id):
+def downloadAudio(id: str):
     # branch if audio directory doesn't exist
-    if not os.path.exists(dict.NATIVE_DIR):
-        os.makedirs(dict.NATIVE_DIR)
+    if not os.path.exists(dict.NATIVE_PATH):
+        os.makedirs(dict.NATIVE_PATH)
     # branch if audio file doesn't exist
     if not os.path.isfile(dict.getNativeAudioPath(id)):
-        # Try to download audio file with best quality then convert to wav
-        os.system("yt-dlp -q -f 'ba' -x --audio-format wav https://www.youtube.com/watch?v=" + id + " -o '" + dict.NATIVE_DIR + "%(id)s.%(ext)s'")
-        if not os.path.exists(dict.NATIVE_DIR + id + ".wav"):
-            raise dict.YoutubeError
+        # download audio file with best quality then convert to wav
+        os.system("yt-dlp -q -f 'ba' -x --audio-format wav https://www.youtube.com/watch?v=" + id + " -o '" + dict.NATIVE_PATH + "%(id)s.%(ext)s'")
 
 
 # Seperates instruments and vocals from audio file.
-def splitAudio(id, mode, output=None):
+def splitAudio(id: str, mode: str, output: str = None):
     # branch if audio directory doesn't exist
-    if not os.path.exists(dict.MODIFIED_DIR):
-        os.makedirs(dict.MODIFIED_DIR)
+    if not os.path.exists(dict.MODIFIED_PATH):
+        os.makedirs(dict.MODIFIED_PATH)
     if mode is not dict.NO_STEMS:
         # split audio file according to the mode then move splitted file according to output
-        os.system("spleeter separate -p spleeter:" + mode + " -o " + dict.MODIFIED_DIR + " " + dict.getNativeAudioPath(id) + " &> /dev/null")
-        y, sr = librosa.load(path=dict.MODIFIED_DIR + id + output, sr=None)
+        os.system("spleeter separate -p spleeter:" + mode + " -o " + dict.MODIFIED_PATH + " " + dict.getNativeAudioPath(id))
+        y, sr = librosa.load(path=dict.MODIFIED_PATH + id + output, sr=None)
         sf.write(dict.getModifiedAudioPath(id), data=y, samplerate=sr)
         # remove temporary directory
-        shutil.rmtree(dict.MODIFIED_DIR + id)
+        shutil.rmtree(dict.MODIFIED_PATH + id)
     else:
         # copy native audio file to modified
         y, sr = librosa.load(path=dict.getNativeAudioPath(id), sr=None)
@@ -40,10 +38,10 @@ def splitAudio(id, mode, output=None):
 
 
 # Resamples audio file and saves the modified version to disk.
-def resampleAudio(id, samplerate):
+def resampleAudio(id: str, samplerate: int):
     # branch if audio directory doesn't exist
-    if not os.path.exists(dict.MODIFIED_DIR):
-        os.makedirs(dict.MODIFIED_DIR)
+    if not os.path.exists(dict.MODIFIED_PATH):
+        os.makedirs(dict.MODIFIED_PATH)
     # check if modified audio exists and if it has correct samplerate
     flagResample = False
     if not os.path.isfile(dict.getModifiedAudioPath(id)):
@@ -64,15 +62,21 @@ def resampleAudio(id, samplerate):
 
 
 # Filter audio by threshold.
-def filterAudio(id):
+def filterAudio(id: str):
     y, sr = librosa.load(path=dict.getModifiedAudioPath(id), sr=None)
     applyFilter = np.vectorize(lambda t: 0. if t < 0.15 else t)
     y = applyFilter(y)
     sf.write(dict.getModifiedAudioPath(id), data=y, samplerate=sr)
 
 
+# Delete audio file.
+def deleteAudioFile(path: str):
+    if os.path.exists(path):
+        os.remove(path)
+
+
 # Parses songs.json to a simplified JSON object.
-def parseJson(path):
+def parseJson(path: str):
     dict.printOperation("Parse songs.json for comparison data...")
     if os.path.exists(dict.JSON_PATH):
         dict.FLAG_DATABASE = True
@@ -164,3 +168,95 @@ def chordToString(chordNum: int, minor: bool):
         char += " Maj"
 
     return char
+
+
+# generate training set for NN training through songs.json (provided by EC-Play).
+def getTrainingData():
+    data = []
+    label = []
+    maxLength = 0
+    a = 0
+    # load parsed JSON file
+    with open(dict.PROCESSED_JSON_PATH, 'r') as f:
+        ECPlayDataset = json.loads(f.read())
+    # iterate through each song
+    for key in ECPlayDataset:
+        a += 1
+        # preprocess audio file
+        downloadAudio(key)
+        splitAudio(key, mode=dict.STEMS2, output=dict.ACCOMPANIMENT)
+        resampleAudio(key, dict.SAMPLERATE_CHORDS)
+        beats = ECPlayDataset[key]["beats"]
+        chords = ECPlayDataset[key]["chords"]
+        # iterate through each beat in song
+        for i in range(len(beats)):
+            # branch if beat is not last and its not a pause
+            if i + 1 < len(beats) and chords[i] != '':
+                # try to convert audio sample to chromagram and add to list, otherwise skip to next song
+                chroma, maxLength = getChordChroma(key, maxLength, start=beats[i], end=beats[i + 1])
+                if chroma is not None:
+                    data.append(chroma)
+                    label.append(chords[i])
+                else:
+                    break
+        print(str(a) + "\t" + key + "\tlength: " + str(len(data)) + "\tmax_lenght: " + str(maxLength))
+    # extend each chromagram to the largest length found
+    for i in range(len(data)):
+        data[i] = extendMatrix(data[i], maxLength)
+        # print info if an error occurred
+        if maxLength != data[i].shape[1]:
+            print("index: " + str(i) + "\tlength: " + str(data[i].shape[1]) + "\tmax_length: " + str(maxLength))
+    # compact data and label to tuple and save to file
+    dataset = (data, label)
+    dataset = np.array(dataset)
+    # branch if audio directory doesn't exist
+    if not os.path.exists(dict.TRAINING_DATASET_PATH):
+        os.makedirs(dict.TRAINING_DATASET_PATH)
+    np.save(dict.TRAINING_DATASET_PATH + "dataset.npy", dataset)
+
+
+# Generate chromagram from audio sample.
+def getChordChroma(id: str, max_length: int, start: float, end: float):
+    # load audio sample and branch if it was able to load the audio sample
+    y, sr = librosa.load(dict.getModifiedAudioPath(id), sr=None, offset=start, duration=(end - start))
+    if np.any(y):
+        # generate chromagram and branch if there is enough data (threshold set to 10 data points)
+        chroma = librosa.feature.chroma_stft(y=y, sr=sr)
+        if np.any(chroma) and chroma.shape[1] > 10:
+            if chroma.shape[1] > max_length:
+                max_length = chroma.shape[1]
+            return chroma, max_length
+    return None, max_length
+
+
+# Extend matrix on the X axis by n length evenly.
+def extendMatrix(mat: np.ndarray, max_length: int):
+    INIT_LENGTH = mat.shape[1]
+    if INIT_LENGTH == max_length:
+        return mat
+    length = INIT_LENGTH
+    max_length -= INIT_LENGTH
+    double = max_length // INIT_LENGTH
+    rest = max_length - (double * INIT_LENGTH)
+    # double the size of the matrix
+    for i in range(double):
+        length += INIT_LENGTH
+        for j in range(length):
+            if j % (i + 2) != 0:
+                continue
+            mat = np.insert(mat, j + i + 1, mat[:, j + i], axis=1)
+    if rest == 0:
+        return mat
+    # apply the rest evenly
+    skip = length / rest
+    total = 0
+    i = 0
+    j = 0
+    while j < length:
+        if j > total:
+            mat = np.insert(mat, i + 1, mat[:, i], axis=1)
+            total += skip
+            i += 1
+        i += 1
+        j += 1
+    return mat

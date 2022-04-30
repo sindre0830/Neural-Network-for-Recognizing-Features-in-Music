@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
 import './addSong.css';
 
-
 /**
  *  Check if the input is a URL.
  * 
  *  @param {text} link
+ *  @returns {Boolean} True if the link is valid.
  */
 const validateInput = (link) => {
-    var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
-    return regexp.test(link);
+    if (link.startsWith('https://www.youtube.com/watch?v=') || link.startsWith('https://youtu.be/')) {
+        return true;
+    }
+    return false;
 }
 
 /**
@@ -34,20 +36,22 @@ const AddSong = () => {
             return;
         }
 
+        const item = { link: link }
+
         try {
             const options = {
                 method: 'POST',
-                body: JSON.stringify(link)
+                body: JSON.stringify(item)
             }
 
-            const res = await fetch('/post', options);
+            const res = await fetch('/v1/analysis', options);
 
             if (res.status === 200) {
                 setLink("");
-                setMessage("Link successfully parsed, result will be uploaded to the result page.");
+                setMessage("Song successfully analyzed, the result is uploaded to the results page");
             } else {
                 setLink("");
-                setMessage("Error when parsing link");
+                setMessage("Error when analyzing song");
             }
         } catch (err) {
             console.log(err);
@@ -59,8 +63,8 @@ const AddSong = () => {
             {/* this is were error/status messages will show up */}
             <div className='add-song__message'>
                 {message
-                    ? <p>{message}</p>
-                    : <br></br>
+                    ? <p><strong>{message}</strong></p>
+                    : <br />
                 }
             </div>
             <div className='add-song__input'>
