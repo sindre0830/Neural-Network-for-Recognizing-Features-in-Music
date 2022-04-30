@@ -155,7 +155,7 @@ func getID(link string) string {
 
 // getTitle gets the title of a YouTube video based on the id.
 func getTitle(id string) (string, int, error) {
-	u, err := url.Parse("https://www.youtube.com/oembed")
+	u, err := url.Parse(dictionary.YOUTUBE_URL)
 	if err != nil {
 		return "", http.StatusInternalServerError, err
 	}
@@ -185,7 +185,7 @@ func getTitle(id string) (string, int, error) {
 // getAnalysis result.
 func (analysis *Analysis) getAnalysis(id string) (int, error) {
 	// create request
-	body, status, err := datahandling.Request("http://localhost:8082/analysis?id=" + id)
+	body, status, err := datahandling.Request(dictionary.NN_URL + dictionary.NN_ANALYSIS + "?id=" + id)
 	if err != nil {
 		return status, err
 	}

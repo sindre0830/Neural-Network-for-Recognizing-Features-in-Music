@@ -57,7 +57,7 @@ func (diag *Diag) get(w http.ResponseWriter, r *http.Request) {
 
 // getModelStatus gets the status of the model.
 func getModelStatus() (int, error) {
-	_, status, err := datahandling.Request("http://localhost:8082/status")
+	_, status, err := datahandling.Request(dictionary.NN_URL + dictionary.NN_DIAG)
 	if err != nil {
 		return status, err
 	}
