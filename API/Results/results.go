@@ -2,6 +2,8 @@ package results
 
 import (
 	"encoding/json"
+	"errors"
+	datahandling "main/DataHandling"
 	database "main/Database"
 	debug "main/Debug"
 	dictionary "main/Dictionary"
@@ -93,6 +95,18 @@ func update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// clean up cached data on the NN side
+	status, err := cleanUp(id[0])
+	if err != nil {
+		errorMsg.Update(
+			status,
+			"update() -> cleanUp() -> Clean up audio files",
+			err.Error(),
+			"Unknown",
+		)
+		errorMsg.Print()
+	}
+
 	http.Error(w, "Document successfully updated", http.StatusOK)
 }
 
@@ -131,4 +145,25 @@ func checkChord(value string) bool {
 		}
 	}
 	return false
+}
+
+// cleanUp removes requests that the NN API removes the song's audio files.
+func cleanUp(id string) (int, error) {
+	body, status, err := datahandling.Request(dictionary.NN_URL + dictionary.NN_REMOVE + "?id=" + id)
+	if err != nil {
+		return status, err
+	}
+
+	// only get error message if there is a body
+	// everything went fine if there is not
+	if len(body) > 0 {
+		var data map[string]string
+		err = json.Unmarshal(body, &data)
+		if err != nil {
+			return http.StatusInternalServerError, err
+		}
+		return http.StatusBadRequest, errors.New(data["msg"])
+	}
+
+	return status, nil
 }
