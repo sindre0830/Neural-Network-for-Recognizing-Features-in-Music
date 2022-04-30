@@ -48,7 +48,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 			"Missing 'id' param",
 		)
 		errorMsg.Print()
-		http.Error(w, http.StatusText(errorMsg.StatusCode), errorMsg.StatusCode)
+		http.Error(w, errorMsg.PossibleReason, errorMsg.StatusCode)
 		return
 	}
 
@@ -60,10 +60,10 @@ func update(w http.ResponseWriter, r *http.Request) {
 			http.StatusBadRequest,
 			"update() -> Decoding body",
 			err.Error(),
-			"Unknown",
+			"Invalid body",
 		)
 		errorMsg.Print()
-		http.Error(w, http.StatusText(errorMsg.StatusCode), errorMsg.StatusCode)
+		http.Error(w, errorMsg.PossibleReason, errorMsg.StatusCode)
 		return
 	}
 
@@ -77,7 +77,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 			"Invalid Chords values",
 		)
 		errorMsg.Print()
-		http.Error(w, http.StatusText(errorMsg.StatusCode), errorMsg.StatusCode)
+		http.Error(w, errorMsg.PossibleReason, errorMsg.StatusCode)
 		return
 	}
 

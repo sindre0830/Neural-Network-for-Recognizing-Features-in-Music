@@ -27,7 +27,7 @@ func analyze(w http.ResponseWriter, r *http.Request) {
 			"JSON format not valid",
 		)
 		errorMsg.Print()
-		http.Error(w, http.StatusText(errorMsg.StatusCode), errorMsg.StatusCode)
+		http.Error(w, errorMsg.PossibleReason, errorMsg.StatusCode)
 		return
 	}
 
@@ -37,11 +37,11 @@ func analyze(w http.ResponseWriter, r *http.Request) {
 		errorMsg.Update(
 			http.StatusBadRequest,
 			"analysis.post() -> Parsing body",
-			"",
-			"Body not valid",
+			"parsing id: not a valid id",
+			"invalid id",
 		)
 		errorMsg.Print()
-		http.Error(w, http.StatusText(errorMsg.StatusCode), errorMsg.StatusCode)
+		http.Error(w, errorMsg.PossibleReason, errorMsg.StatusCode)
 		return
 	}
 
