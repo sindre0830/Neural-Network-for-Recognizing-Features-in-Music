@@ -55,7 +55,7 @@ ACCOMPANIMENT = "/accompaniment" + WAV_FORMAT
 FLAG_DATABASE = False
 FLAG_RESULTS = False
 # blacklisted songs from EC-Play dataset
-BLACKLIST = ["6d5ST3tbPIU", "ASywAfBAVrQ", "DGIgXP9SvB8", "qf9Ipqubh9g", "gaR2k-EPADs", "V9RxDNY2vuk", "Lrl5C-cYC64", "nnDyWwZs-ek "]
+BLACKLIST = ["6d5ST3tbPIU", "ASywAfBAVrQ", "DGIgXP9SvB8", "qf9Ipqubh9g", "gaR2k-EPADs", "V9RxDNY2vuk", "Lrl5C-cYC64", "nnDyWwZs-ek ", "poZOXqafw-4"]
 
 
 def getNativeAudioPath(id):

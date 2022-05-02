@@ -44,8 +44,8 @@ class Evaluators:
 
     # Handles batch process comparison of database
     def batchHandler(self, force:bool = False, plot:bool = False):
-        # Make sure we have the dataset parsed
-        if not os.path.exists(dict.PROCESSED_JSON_PATH) or os.path.getsize(dict.PROCESSED_JSON_PATH) < 100:
+        # Make sure we have the dataset parsed - CHANGE
+        if not os.path.exists(dict.PROCESSED_JSON_PATH) or os.path.getsize(dict.PROCESSED_JSON_PATH) < os.path.getsize(dict.JSON_PATH):
             preprocessing.parseJson(dict.JSON_PATH)
         with open(dict.PROCESSED_JSON_PATH, 'r') as f:
             dataset = json.loads(f.read())
@@ -59,8 +59,9 @@ class Evaluators:
         # Check if we have existing data for comparison and data does not need to be reprocessed
         if os.path.exists(dict.ALGORITHM_JSON_PATH):
             algSize = os.path.getsize(dict.ALGORITHM_JSON_PATH) 
-            if algSize != 0:  # Add after debugging: or algSize != dataSize
-                updateJson(dict.ALGORITHM_JSON_PATH, dict.RESULTS_SONG_PATH)
+            if algSize != 0:
+                if os.listdir(dict.RESULTS_SONG_PATH) != 0:
+                    updateJson(dict.ALGORITHM_JSON_PATH, dict.RESULTS_SONG_PATH)
                 with open(dict.ALGORITHM_JSON_PATH, 'r') as f:
                     results = json.loads(f.read())
         else:
@@ -68,19 +69,22 @@ class Evaluators:
 
         # # Go through dataset
         for id in dataset:
-            print(id)
-            song = self.Evaluator(id)
-            if id in results.keys():
-                print("Using saved result")
-                song.chords = self.compareChords(dataset[id]["beats"], dataset[id]["chords"], dataset[id]["beats"], results[id]["chords"])
-                song.beats = results[id]["beats"]
-            # Get the data we need if not existing
+            if id in dict.BLACKLIST:
+                pass
             else:
-                print("Generating from scratch...")
-                song.chords = self.processChords(id, song, dataset)
-                meanbeat, song.beats = self.processBeats(dataset[id]["beats"], id)
-            self.createResults(self.detailed_results, id, algorithm = song.chords)
-            print("The result manual is: " + str(song.chords * 100) + chr(37) + " accuracy")
+                print(id)
+                song = self.Evaluator(id)
+                if id in results.keys():
+                    print("Using saved result")
+                    song.chords = self.compareChords(dataset[id]["beats"], dataset[id]["chords"], results[id]["beats"], results[id]["chords"])
+                    song.beats = results[id]["beats"]
+                # Get the data we need if not existing
+                else:
+                    print("Generating from scratch...")
+                    song.chords = self.processChords(id, song, dataset)
+                    meanbeat, song.beats = self.processBeats(dataset[id]["beats"], id)
+                self.createResults(self.detailed_results, id, algorithm = song.chords)
+                print("The result manual is: " + str(song.chords * 100) + chr(37) + " accuracy")
         
         # Update processed data with trimmed beats
         if(len(self.processed_beats)) > len(dataset):
@@ -120,7 +124,6 @@ class Evaluators:
         with open(dict.RESULTS_SONG_PATH + id + '.json', "w+") as outfile:
             outfile.write(json_object)
 
-        os.remove(dict.getNativeAudioPath(id))
         return result
 
     # Updates a dictionary with new key+values
@@ -177,6 +180,7 @@ class Evaluators:
     def processBeats(self, dataset, id):
         beatRecognizer = beat_algorithm.BeatRecognizer(id)
         beatRecognizer.run()
+        os.remove(dict.getNativeAudioPath(id))  # Clear up audio data
         return self.evaluateBeats(dataset, beatRecognizer.beats)
 
 
