@@ -6,10 +6,10 @@
     - To stop the container run the command ```docker ps``` to get the container id, then copy that id and run ```docker stop CONTAINER_ID```
     - To start the container again, run the command ```docker ps -a``` to get the container id, then copy that id and run ```docker start CONTAINER_ID```
 
-### Manual
+#### Manual
 1. Run the command ```npm install```
 2. Run the command ```npm start```
-  - To stop the program press ```CTRL-C```
+    - To stop the program press ```CTRL-C```
 
 ## Tests
 1. Run the command ```npm test```
