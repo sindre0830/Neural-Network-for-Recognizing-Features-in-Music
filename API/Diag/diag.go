@@ -11,6 +11,7 @@ import (
 
 // get handles get requests to the diag endpoint
 func (diag *Diag) get(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Content-Type", "application/json")
 	var errorMsg debug.Debug
 
 	// get model status
