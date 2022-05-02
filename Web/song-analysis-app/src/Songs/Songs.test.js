@@ -154,3 +154,43 @@ describe('searching and filtering', () => {
         global.fetch.mockRestore();
     })
 })
+
+it('updating of one song', async () => {
+    jest.spyOn(global, 'fetch').mockImplementation(() =>
+        Promise.resolve({
+            json: () => Promise.resolve(testResults)
+        })
+    );
+
+    await act(async () => {
+        render(<Songs />, container);
+    });
+
+    // search for the wanted song
+    const searchEl = screen.getByPlaceholderText('Search for something...');
+    fireEvent.change(searchEl, { target: { value: 'Lana Del Rey' } });
+
+    // make sure only the chosen song is displayed
+    expect(screen.queryByText('National Anthem - Lana Del Rey')).toBeTruthy();
+    expect(screen.queryByText('Kaleidoscope - blink-182')).toBeNull();
+
+    // click the arrow to display the song result
+    const arrowEl = screen.getByTestId('arrow-down');
+    expect(arrowEl).toBeTruthy();
+    fireEvent.click(arrowEl);
+
+    // try to input new bpm value
+    const inputEl = screen.getByLabelText(/bpm/i);
+    expect(inputEl).toBeTruthy();
+    fireEvent.change(inputEl, { target: { value: '147.231'}});
+
+    // click approve button
+    const buttonEl = screen.getByRole('button');
+    expect(buttonEl).toBeTruthy();
+    fireEvent.click(buttonEl);
+
+    // check if the correct error message is displayed
+    expect(screen.findByText('Not a valid Bpm format')).toBeTruthy();
+
+    global.fetch.mockRestore();
+})
