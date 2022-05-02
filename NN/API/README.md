@@ -2,7 +2,7 @@
 #### Docker
 0. Download [Docker](https://docs.docker.com/get-docker/)
 1. Run the command ```docker build -t nn-internal .``` to build the image. Only needs to be done once
-2. Run the command ```docker run -p 5000:5000 nn-internal``` to start the container. Run this command anytime you would like to start the container again
+2. Run the command ```docker run --network="host" -p 5000:5000 nn-internal``` to start the container. Run this command anytime you would like to start the container again
 
 To stop the container run the command ```docker ps``` to get the container id, then copy that id and run ```docker stop CONTAINER_ID```.
 
