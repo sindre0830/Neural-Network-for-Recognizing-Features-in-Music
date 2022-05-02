@@ -1,0 +1,17 @@
+version: "3.7"
+services:
+  nn-internal-api:
+    restart: always
+    build: NN/API/
+    ports:
+      - 5000:5000
+  main-api:
+    restart: always
+    build: API/
+    ports: 
+      - 8080:8080
+  song-analysis:
+    restart: always
+    build: Web/song-analysis-app/
+    ports: 
+      - 3000:3000
