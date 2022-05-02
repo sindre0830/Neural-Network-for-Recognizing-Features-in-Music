@@ -16,7 +16,7 @@ const Status = () => {
         const getStatus = async () => {
             setLoading(true);
             try {
-                const res = await fetch('localhost:8080/v1/diag');
+                const res = await fetch('/v1/diag');
                 const json = await res.json();
                 // only set the state if the component is mounted
                 if (!unmounted) {
