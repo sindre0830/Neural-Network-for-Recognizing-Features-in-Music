@@ -1,4 +1,6 @@
 ## Instructions
+You need to create a serviceAccountKey.json file and add the service key provided by your firebase project to this file.
+
 #### Docker
 0. Download [Docker](https://docs.docker.com/get-docker/)
 1. Run the command ```docker build -t main-api .``` to build the image. Only needs to be done once
