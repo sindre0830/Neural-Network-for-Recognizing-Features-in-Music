@@ -44,7 +44,7 @@ const AddSong = () => {
                 body: JSON.stringify(item)
             }
 
-            const res = await fetch('/v1/analysis', options);
+            const res = await fetch('localhost:8080/v1/analysis', options);
 
             if (res.status === 200) {
                 setLink("");

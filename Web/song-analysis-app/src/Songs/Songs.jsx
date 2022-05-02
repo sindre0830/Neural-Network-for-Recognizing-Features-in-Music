@@ -22,7 +22,7 @@ const Songs = () => {
             setLoading(true);
             setError(false);
             try {
-                const res = await fetch('/v1/results');
+                const res = await fetch('localhost:8080/v1/results');
                 const json = await res.json();
                 if (!unmounted) {
                     setSongs(json);
