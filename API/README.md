@@ -1,7 +1,17 @@
 ## Instructions
+#### Docker
+0. Download [Docker](https://docs.docker.com/get-docker/)
+1. Run the command ```docker build -t main-api .``` to build the image. Only needs to be done once
+2. Run the command ```docker run --network="host" -p 8080:8080 main-api``` to start the container. Run this command anytime you would like to start the container again
+
+To stop the container run the command ```docker ps``` to get the container id, then copy that id and run ```docker stop CONTAINER_ID```.
+
+#### Manual (Linux)
 0. Uses Golang version 1.17
-1. Run the command ```go build .\main.go``` to build the application.
-2. Run the command ```.\main.exe``` to run the program.
+1. Run the command ```go build ./main.go``` to build the application.
+2. Run the command ```./main``` to run the program.
+
+To stop the program press ```CTRL-C```
 
 ## Usage
 Root path: http://localhost:8080/v1/
