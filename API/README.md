@@ -1,5 +1,5 @@
 ## Instructions
-You need to create a serviceAccountKey.json file and add the service key provided by your firebase project to this file.
+You need to create a serviceAccountKey.json file and add the service key provided by your [firebase project](https://firebase.google.com/docs/admin/setup#initialize-sdk) to this file.
 
 #### Docker
 0. Download [Docker](https://docs.docker.com/get-docker/)
