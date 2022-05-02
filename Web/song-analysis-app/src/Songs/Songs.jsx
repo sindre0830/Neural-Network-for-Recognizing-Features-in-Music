@@ -47,18 +47,18 @@ const Songs = () => {
      */
     const filterSongs = () => {
         // filter based on search query
-        let filteredSongs = songs.filter(song => song.Title.toLowerCase().includes(search.toLowerCase()));
+        let filteredSongs = songs.filter(song => song.title.toLowerCase().includes(search.toLowerCase()));
 
         // filter based on status
         if (filter === 'Approved') {
-            return filteredSongs.filter(song => song.Approved);
+            return filteredSongs.filter(song => song.approved);
         } else if (filter === 'Pending') {
-            return filteredSongs.filter(song => !song.Approved);
+            return filteredSongs.filter(song => !song.approved);
         }
 
         return filteredSongs;
     }
-
+    
     return (
         <div className='songs'>
             <div className='songs__sort'>
@@ -67,15 +67,15 @@ const Songs = () => {
                 </div>
                 <div className='songs__sort-filter'>
                     <div className='songs__sort-filter-option'>  
-                        <input type='radio' name='filter' value='all' onClick={() => setFilter("All")} />
+                        <input id='all' type='radio' name='filter' value='all' onClick={() => setFilter("All")} />
                         <label htmlFor='all'>All</label>
                     </div>
                     <div className='songs__sort-filter-option'>
-                        <input type='radio' name='filter' value='approved' onClick={() => setFilter("Approved")} />
+                        <input id='approved' type='radio' name='filter' value='approved' onClick={() => setFilter("Approved")} />
                         <label htmlFor='approved'>Approved</label>
                     </div>
                     <div className='songs__sort-filter-option'>
-                        <input type='radio' name='filter' value='pending' onClick={() => setFilter("Pending")} />
+                        <input id='pending' type='radio' name='filter' value='pending' onClick={() => setFilter("Pending")} />
                         <label htmlFor='pending'>Pending</label>
                     </div>
                 </div>
@@ -93,7 +93,7 @@ const Songs = () => {
                         ))}
                     </>
                     : <p id='error'>No songs have been added yet...</p>
-                }          
+                }   
             </div>
         </div>
     )

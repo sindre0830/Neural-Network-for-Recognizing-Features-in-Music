@@ -24,8 +24,8 @@ const StatusList = (props) => {
             {toggle &&
                 <>
                     {props.value.map((song, index) => (
-                        <div className='status-list__title'>
-                            <SongTitle title={song} status={props.status} key={index} />
+                        <div key={index} className='status-list__title'>
+                            <SongTitle title={song} status={props.status} />
                             {/* create a line between each title */}
                             {index+1 !== props.value.length &&
                                 <hr id='line'/>

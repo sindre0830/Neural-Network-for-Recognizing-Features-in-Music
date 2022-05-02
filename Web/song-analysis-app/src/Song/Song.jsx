@@ -53,7 +53,7 @@ const Song = (props) => {
     const [bpm, setBpm] = useState(0);
     const [beats, setBeats] = useState("");
     const [chords, setChords] = useState("");
-    const [approved, setApproved] = useState(props.value.Approved);
+    const [approved, setApproved] = useState(props.value.approved);
 
     /**
      *  Update result.
@@ -62,10 +62,10 @@ const Song = (props) => {
      */
     const handleSubmit = async (e) => {
         e.preventDefault();
-        let items = {Approved: true};
+        let items = {approved: true};
         // only send the values that have been changed
         if (title !== "") {
-            items.Title = title;
+            items.title = title;
         }
         if (bpm !== 0) {
             const num = parseFloat(bpm);
@@ -73,7 +73,7 @@ const Song = (props) => {
                 setMessage('Not a valid Bpm format');
                 return;
             }
-            items.Bpm = num;
+            items.bpm = num;
         }
         if (beats !== "") {
             const beatsSplit = beats.replace(/\s+/g, '').split(",");
@@ -82,12 +82,12 @@ const Song = (props) => {
                 setMessage('Not a valid Beats format');
                 return;
             }
-            items.Beats = obj.beats;
+            items.beats = obj.beats;
         }
         if (chords !== "") {
-            items.Chords = chords.replace(/\s+/g, '').split(",");
+            items.chords = chords.replace(/\s+/g, '').split(",");
             // make sure there are actual chords
-            if (!checkChords(items.Chords)) {
+            if (!checkChords(items.chords)) {
                 setMessage('Not a valid Chords format');
                 return;
             }
@@ -113,14 +113,14 @@ const Song = (props) => {
     }
 
     useEffect(() => {
-        setApproved(props.value.Approved)
-    }, [props.value.Approved]);
+        setApproved(props.value.approved)
+    }, [props.value.approved]);
 
     return (
         <div className='song'>
             <div className='song__bar'>
                 <div className='song__bar-title'>
-                    <SongTitle title={props.value.Title} status={approved ? 'approved' : 'pending'}/>
+                    <SongTitle title={props.value.title} status={approved ? 'approved' : 'pending'}/>
                 </div>
 
                 {/* show approve button if the song is pending */}
@@ -144,19 +144,19 @@ const Song = (props) => {
                 <form className={toggleSong ? 'shown' : 'hidden'} id='update' onSubmit={handleSubmit}>
                     <div className='song__result-group'>
                         <label htmlFor='title'>Title</label>
-                        <input id='title' type='text' name='title' onChange={(e) => setTitle(e.target.value)} defaultValue={props.value.Title} disabled={approved} />
+                        <input id='title' type='text' name='title' onChange={(e) => setTitle(e.target.value)} defaultValue={props.value.title} disabled={approved} />
                     </div>
                     <div className='song__result-group'>
                         <label htmlFor='bpm'>Bpm</label>
-                        <input id='bpm' type='text' name='bpm' onChange={(e) => setBpm(e.target.value)} defaultValue={props.value.Bpm} disabled={approved} />
+                        <input id='bpm' type='text' name='bpm' onChange={(e) => setBpm(e.target.value)} defaultValue={props.value.bpm} disabled={approved} />
                     </div>
                     <div className='song__result-group'>
                         <label htmlFor='beats'>Beats</label>
-                        <input id='beats' type='text' name='beats' onChange={(e) => setBeats(e.target.value)} defaultValue={props.value.Beats} disabled={approved} />
+                        <input id='beats' type='text' name='beats' onChange={(e) => setBeats(e.target.value)} defaultValue={props.value.beats} disabled={approved} />
                     </div>
                     <div className='song__result-group'>
                         <label htmlFor='chords'>Chords</label>
-                        <input id='chords' type='text' name='chords' onChange={(e) => setChords(e.target.value)} defaultValue={props.value.Chords} disabled={approved} />
+                        <input id='chords' type='text' name='chords' onChange={(e) => setChords(e.target.value)} defaultValue={props.value.chords} disabled={approved} />
                     </div>
                 </form>
             </div>
