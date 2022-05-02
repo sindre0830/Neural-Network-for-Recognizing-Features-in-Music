@@ -1,18 +1,17 @@
 ## Instructions
 #### Docker
 0. Download [Docker](https://docs.docker.com/get-docker/)
-1. Run the command ```docker build -t nn-internal .``` to build the image. Only needs to be done once
-2. Run the command ```docker run -p 5000:5000 nn-internal``` to start the container. Run this command anytime you would like to start the container again
-
-To stop the container run the command ```docker ps``` to get the container id, then copy that id and run ```docker stop CONTAINER_ID```.
+1. Run the command ```docker build -t main-api .``` to build the image. Only needs to be done once
+2. Run the command ```docker run --network="host" -p 8080:8080 main-api``` to build and run the container.
+    - To stop the container run the command ```docker ps``` to get the container id, then copy that id and run ```docker stop CONTAINER_ID```
+    - To start the container again, run the command ```docker ps -a``` to get the container id, then copy that id and run ```docker start CONTAINER_ID```
 
 #### Manual (Linux)
 0. Requires Python version 3.9
 1. Run the command ```apt-get update && apt-get -y install ffmpeg libsndfile1-dev``` to install dependencies for Spleeter
 2. Run the command ```pip install --no-deps -r requirements.txt``` to install required Python packages
 3. Run the command ```export FLASK_APP=main && flask run --host=0.0.0.0``` to start the program
-
-To stop the program press ```CTRL-C```
+    - To stop the program press ```CTRL-C```
 
 ## Usage
 Root path: http://localhost:5000/v1/
