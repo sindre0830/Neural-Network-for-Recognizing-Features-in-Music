@@ -155,18 +155,13 @@ def chordToString(chordNum: int, minor: bool):
     if chordNum <= 2 or chordNum == 4 or chordNum == 6:
         charNum -= 1
 
-    if minor:
-        char = chr(charNum + 97)
-    else:
-        char = chr(charNum + 65)
+    char = chr(charNum + 65)
 
     if chordNum == 1 or chordNum == 4 or chordNum == 6 or chordNum == 9 or chordNum == 11:
         char += "#"
 
     if minor:
-        char += " min"
-    else:
-        char += " Maj"
+        char += "m"
 
     return char
 

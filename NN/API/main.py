@@ -1,7 +1,6 @@
 # import local modules
 import dictionary as dict
 import preprocessing
-import evaluation
 import beat_algorithm
 import chord_algorithm
 # import foreign modules

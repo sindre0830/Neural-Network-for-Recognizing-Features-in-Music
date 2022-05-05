@@ -5,9 +5,6 @@ DIAGNOSIS_ENDPOINT = '/' + VERSION + '/diag'
 ANALYSIS_ENDPOINT = '/' + VERSION + '/analysis'
 REMOVE_ENDPOINT = '/' + VERSION + '/remove'
 # directory paths
-PLOTS_DIR = "Data/Plots/"
-NATIVE_DIR = "Data/Audio/Native/"
-MODIFIED_DIR = "Data/Audio/Modified/"
 TRIMMED_SONGS_PATH = "Data/Processed/"
 PLOTS_PATH = "Data/Plots/"
 NATIVE_PATH = "Data/Audio/Native/"
@@ -17,11 +14,11 @@ RESULTS_PATH = "Data/Results/"
 RESULTS_SONG_PATH = RESULTS_PATH + "Songs/"
 RESULTS_BEATS_PATH = RESULTS_PATH + "Beats/"
 PROCESSED_JSON_PATH = "Data/processedSongs.json"
-ALGORITHM_JSON_PATH = "Data/algoSongs.json"
-CHORDRESULTS_CSV_PATH = "Data/Results/chordresults.csv"
-BEATRESULTS_CSV_PATH = "Data/Results/beatresults.csv"
-DETAILED_RESULTS_PATH = "Data/Results/detailed_results.json"
-BEAT_RESULTS_PATH = "Data/Results/beatresults.json"
+CHORD_JSON_PATH = "Data/evaluatedChords.json"
+BEAT_JSON_PATH = "Data/evaluatedBeats.json"
+CHORDRESULTS_CSV_PATH = "Data/Results/chordResults.csv"
+BEATRESULTS_CSV_PATH = "Data/Results/beatResults.csv"
+DETAILED_RESULTS_PATH = "Data/Results/detailedResults.json"
 CHORDPLOT_PATH = "Data/Results/chordplot.png"
 BEATPLOT_PATH = "Data/Results/beatplot.png"
 TRAINING_DATASET_PATH = "../Model-Training/Data/"
@@ -76,15 +73,31 @@ def getPlotPath(id):
 # chords
 chords = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B', 'Cm', 'C#m',
           'Dm', 'D#m', 'Em', 'Fm', 'F#m', 'Gm', 'G#m', 'Am', 'A#m', 'Bm']
-nested_cof = ['G', 'Bm', 'D', 'F#m', 'A', 'C#m', 'E', 'G#m', 'B', 'D#m', 'F#', 'A#m',
-              'C#', "Fm", "G#", 'Cm', 'D#', 'Gm', 'A#', 'Dm', 'F', 'Am', 'C', 'Em']
 
-chords1 = ['C Maj', 'C# Maj', 'D Maj', 'D# Maj', 'E Maj', 'F Maj', 'F# Maj', 'G Maj',
-           'G# Maj', 'A Maj', 'A# Maj', 'B Maj', 'c min', 'c# min', 'd min', 'd# min',
-           'e min', 'f min', 'f# min', 'g min', 'g# min', 'a min', 'a# min', 'b min']
-nested_cof1 = ['G Maj', 'b min', 'D Maj', 'f# min', 'A Maj', 'c# min', 'E Maj', 'g# min',
-               'B Maj', 'd# min', 'F# Maj', 'a# min', 'C# Maj', 'f min', 'G# Maj', 'c min',
-               'D# Maj', 'g min', 'A# Maj', 'd min', 'F Maj', 'a min', 'C Maj', 'e min']
+algoFormat = {'C Maj':'C',
+              'C# Maj': 'C#', 
+              'D Maj': 'D',
+              'D# Maj':'D#',
+              'E Maj':'E',
+              'F Maj':'F',
+              'F# Maj':'F#',
+              'G Maj':'G',
+              'G# Maj':'G#',
+              'A Maj':'A',
+              'A# Maj':'A#',
+              'B Maj':'B',
+              'c min':'Cm',
+              'c# min':'C#m',
+              'd min':'Dm',
+              'd# min':'D#m',
+              'e min':'Em',
+              'f min':'Fm',
+              'f# min':'F#m',
+              'g min':'Gm',
+              'g# min':'G#m',
+              'a min':'Am',
+              'a# min':'A#m',
+              'b min':'Bm'}
 
 
 # Print operation that allows status message on the same line.
@@ -103,10 +116,3 @@ def printMessage(message, verbose=True):
 def printDivider(verbose=True):
     if verbose:
         print("\n")
-
-
-errorMessage = ""
-
-
-class YoutubeError(Exception):
-    errorMessage = "Audio file could not be extracted from Youtube link."

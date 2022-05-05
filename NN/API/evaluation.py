@@ -11,6 +11,7 @@ import numpy as np
 import json
 import pandas as pd
 import matplotlib.pyplot as plt
+import keras
 from pathlib import Path
 from itertools import tee, islice, chain
 from statistics import mean
@@ -20,9 +21,13 @@ from statistics import mean
 class Evaluators:
     # Temp algorithm data
     processed_beats: dict
+    dataset: dict
     # Analysis results
-    new_results: dict
-    old_results: dict
+    aggregate: dict
+    new_chord_results: dict
+    chord_results: dict
+    new_beat_results: dict
+    beat_results: dict
     detailed_results: dict
 
     class Evaluator:
@@ -35,95 +40,81 @@ class Evaluators:
 
     def __init__(self):
         self.processed_beats = {}
-        self.new_results = {}
-        self.results = {}
+        self.new_chord_results = {}
+        self.chord_results = {}
+        self.new_beat_results = {}
+        self.beat_results = {}
         self.detailed_results = {}
+        self.aggregate = {"chords":[],"beats":[]}
 
     # Handles batch process comparison of database
-    def batchHandler(self, force: bool = False, plot: bool = False):
-        # Make sure we have the dataset parsed
-        if not os.path.exists(dict.PROCESSED_JSON_PATH) \
-           or os.path.getsize(dict.PROCESSED_JSON_PATH) < os.path.getsize(dict.JSON_PATH) \
-           or force:
-            preprocessing.parseJson(dict.JSON_PATH)
-        with open(dict.PROCESSED_JSON_PATH, 'r') as f:
-            dataset = json.loads(f.read())
+    def batchHandler(self,
+                     force: bool = False,
+                     plot: bool = False,
+                     verbose: bool = False,
+                     model: keras.models.Sequential = None):
 
-        # prep for results
-        if not os.path.exists(dict.RESULTS_PATH):
-            os.makedirs(dict.RESULTS_PATH)
-        if not os.path.exists(dict.RESULTS_SONG_PATH):
-            os.makedirs(dict.RESULTS_SONG_PATH)
-
-        # Check if we have existing data for comparison and data does not need to be reprocessed
-        if os.path.exists(dict.ALGORITHM_JSON_PATH):
-            algSize = os.path.getsize(dict.ALGORITHM_JSON_PATH)
-            if algSize != 0:
-                if os.listdir(dict.RESULTS_SONG_PATH) != 0:
-                    self.updateJson(dict.ALGORITHM_JSON_PATH, dict.RESULTS_SONG_PATH)
-                with open(dict.ALGORITHM_JSON_PATH, 'r') as f:
-                    old_results = json.loads(f.read())
-        else:
-            old_results = {}
-
-        # # Go through dataset
-        for id in dataset:
+        # Validate existing data and prepare it
+        self.checkData(force)
+        
+        # Iterate through dataset
+        for id in self.dataset:
             if id in dict.BLACKLIST:
                 pass
             else:
-                print(id)
+                if(verbose):
+                    print(id)
                 song = self.Evaluator(id)
-                if id in old_results.keys():
-                    print("Using saved result")
-                    song.chords = self.compareChords(dataset[id]["beats"],
-                                                     dataset[id]["chords"],
-                                                     old_results[id]["beats"],
-                                                     old_results[id]["chords"])
-                    song.beats = old_results[id]["beats"]
+                if id in self.chord_results.keys():
+                    if(verbose):
+                        print("Using saved result")
+                    song.chords = self.compareChords(self.dataset[id]["beats"],
+                                                     self.dataset[id]["chords"],
+                                                     self.chord_results[id]["beats"],
+                                                     self.chord_results[id]["chords"])
+                    song.beats = self.beat_results[id]["beats"]
                 # Get the data we need if not existing
                 else:
-                    print("Generating from scratch...")
+                    if(verbose):
+                        print("Generating from scratch...")
                     song.chords = self.processChords(id,
                                                      song,
-                                                     dataset)
-                    meanbeat, song.beats = self.processBeats(dataset[id]["beats"], id)
+                                                     self.dataset,
+                                                     model)
+                    song.beats = self.processBeats(self.dataset[id]["beats"], id)
                 self.createJson(self.detailed_results,
                                 id,
-                                (song.chords, "algorithm"))
-                print("The result manual is: " + str(song.chords * 100) + chr(37) + " accuracy")
-
-        # Update processed data with trimmed beats
-        if(len(self.processed_beats)) > len(dataset):
-            json_object = json.dumps(self.processed_beats,
-                                     indent=3)
-            with open(dict.PROCESSED_JSON_PATH, "w+") as outfile:
-                outfile.write(json_object)
-        # Write our new algorithm data to file
-        if(len(self.new_results)) > len(old_results):
-            print("Writing algorithm results...")
-            json_object = json.dumps(self.new_results,
-                                     indent=3)
-            with open(dict.ALGORITHM_JSON_PATH, "w+") as outfile:
-                outfile.write(json_object)
-        if plot:
-            self.plotResults(False)
+                                (song.chords, "chords"),
+                                (song.beats, "beats"))
+                self.aggregate["beats"].append(song.beats)
+                self.aggregate["chords"].append(song.chords)
+                if(verbose):
+                    print("The result manual is: " + f'{song.chords:.2f}' + chr(37) + " chord accuracy" \
+                          ", " + f'{song.beats:.2f}' + chr(37) + " beat accuracy\n")
+        self.output(plot)
+        print("\n\tBatch evaluation complete!\n\n")
 
     # Handles beat recognition
     def processBeats(self,
-                     dataset,
                      id):
         beatRecognizer = beat_algorithm.BeatRecognizer(id)
         beatRecognizer.run()
-        os.remove(dict.getNativeAudioPath(id))  # Clear up audio data
-        return self.compareBeats(dataset, beatRecognizer.beats)
+        result = self.compareBeats(self.dataset, beatRecognizer.beats)
+        preprocessing.deleteAudioFile(dict.getNativeAudioPath(id))
+        self.createJson(self.new_beat_results,
+                        id,
+                        (result, "beats"))
+        json_object = json.dumps(self.new_beat_results[id], indent=3)
+        with open(dict.RESULTS_BEATS_PATH + id + '.json', "w+") as outfile:
+            outfile.write(json_object)
+        return result
 
     # Evaluate accuracy of beats
     def compareBeats(self,
-                     dataset: float,
                      algorithm: float,
                      verbose=False):
         beatAccuracy = []
-        for previous, item, nxt in self.previous_and_next(dataset):
+        for previous, item, nxt in self.previous_and_next(self.dataset):
             nearIdx = self.find_nearest(algorithm, item)
             distance = item - algorithm[nearIdx]
             if nxt is None:
@@ -142,38 +133,41 @@ class Evaluators:
         meanAccuracy = mean(beatAccuracy)
         if verbose:
             print("The average accuracy is: ", meanAccuracy)
-        return meanAccuracy, beatAccuracy
+        return meanAccuracy
 
     # Handles chord recognition
     def processChords(self,
                       id: str,
                       song: Evaluator,
-                      dataset):
-        try:
-            preprocessing.downloadAudio(id)
-        except dict.YoutubeError:
-            return
+                      model: keras.models.Sequential = None
+                      ):
+        preprocessing.downloadAudio(id)
         chordRecognizer = chord_algorithm.ChordRecognizer(id)
-        song.beats = np.array(dataset[id]["beats"])
+        song.beats = np.array(self.dataset[id]["beats"])
         # trim timestamps
         song.beats = song.beats[song.beats <= librosa.get_duration(filename=dict.getNativeAudioPath(id))]
-        chordRecognizer.run(beats=song.beats, solution="ALG", verbose=True)
+        if model == None:
+            chordRecognizer.run(beats=song.beats, solution="ALG", verbose=True)
+        else:
+            chordRecognizer.run(beats=song.beats, model=model,solution="CNN", verbose=True)
 
         result = self.compareChords(song.beats,
-                                    dataset[id]["chords"],
+                                    self.dataset[id]["chords"],
                                     song.beats,
                                     chordRecognizer.chords)
+        # Convert to %
+        result = result*100
         # Save
         self.createJson(self.processed_beats,
                         id,
-                        (dataset[id]["chords"], "chords"),
+                        (self.dataset[id]["chords"], "chords"),
                         (song.beats.tolist(), "beats"))    # Update processed dataset
 
-        self.createJson(self.new_results,
+        self.createJson(self.new_chord_results,
                         id,
                         (chordRecognizer.chords.tolist(), "chords"),
-                        (song.beats.tolist(), "beats"))
-        json_object = json.dumps(self.new_results[id], indent=3)
+                        (song.beats.tolist(), "fbeats"))
+        json_object = json.dumps(self.new_chord_results[id], indent=3)
         with open(dict.RESULTS_SONG_PATH + id + '.json', "w+") as outfile:
             outfile.write(json_object)
 
@@ -186,6 +180,9 @@ class Evaluators:
                       alg_timestamp,
                       alg_chord):
         results = 0
+        # We perform dictionary matching to ensure both chord lists
+        # have chords in the same format
+        alg_chord = [dict.algoFormat[k] for k in alg_chord]
         for idx, timestamp in enumerate(gt_timestamp):
             near = self.find_nearest(alg_timestamp,
                                      timestamp)
@@ -194,7 +191,7 @@ class Evaluators:
                 results += 1
         # Return number of correct guesses divided by total guesses - can improve
         temp = results / len(gt_chord)
-        return temp
+        return temp*100
 
     # Updates a dictionary with new key+values
     def createJson(self,
@@ -206,38 +203,64 @@ class Evaluators:
             s[variable[1]] = variable[0]
         dict[id] = s
 
-    # records the desired batch processing results into CSV
-    def output(self,
-               chorddata=None,
-               beatdata=None,
-               detailed=None):
-        if chorddata:
-            df = pd.DataFrame(list(chorddata.items()),
-                              columns=['id', 'result'])   # get it in dataframe form
-            aggregate = pd.cut(df['result'],
-                               bins=pd.interval_range(start=0, end=100, periods=10)).value_counts()
-            with open(dict.CHORDRESULTS_CSV_PATH, "w") as f:
-                aggregate.to_csv(f)
-        if detailed:
-            json_object = json.dumps(detailed, indent=3)
-            with open(dict.DETAILED_RESULTS_PATH, "w+") as outfile:
+    # records the results
+    def output(self, plot: bool = False):
+        
+        # Update processed data with trimmed beats
+        if(len(self.processed_beats)) > len(self.dataset):
+            json_object = json.dumps(self.processed_beats,
+                                     indent=3)
+            with open(dict.PROCESSED_JSON_PATH, "w+") as outfile:
                 outfile.write(json_object)
-        if beatdata:
-            df = pd.DataFrame(list(beatdata.items()), columns=['id', 'result'])
-            aggregate = pd.cut(df['result'].str['accuracy'],
-                               bins=pd.interval_range(start=0, end=100, periods=10)).value_counts()
-            with open(dict.BEATRESULTS_CSV_PATH, "w") as f:
-                aggregate.to_csv(f)
+
+        # Write our new algorithm data to file
+        if(len(self.new_chord_results)) > len(self.chord_results):
+            print("Writing chord algorithm results...")
+            json_object = json.dumps(self.new_chord_results,
+                                     indent=3)
+            with open(dict.CHORD_JSON_PATH, "w+") as outfile:
+                outfile.write(json_object)
+
+        if(len(self.new_beat_results)) > len(self.beat_results):
+            print("Writing beat algorithm results...")
+            json_object = json.dumps(self.new_beat_results,
+                                     indent=3)
+            with open(dict.BEAT_JSON_PATH, "w+") as outfile:
+                outfile.write(json_object)
+
+        json_object = json.dumps(self.detailed_results, indent=3)
+        with open(dict.DETAILED_RESULTS_PATH, "w+") as outfile:
+            outfile.write(json_object)
+
+        # Plot if desired
+        if plot:
+            self.plotResults(False)
+
+        # Generate CSV files with grouped accuracy
+        df = pd.DataFrame(self.aggregate["chords"],
+                            columns=['result'])   # get it in dataframe form
+        aggregate = pd.cut(df['result'],
+                            bins=pd.interval_range(start=0, end=100, periods=10)).value_counts()
+        with open(dict.CHORDRESULTS_CSV_PATH, "w") as f:
+            aggregate.to_csv(f)
+
+        df = pd.DataFrame(self.aggregate["beats"], columns=['result'])
+        aggregate = pd.cut(df['result'],
+                            bins=pd.interval_range(start=0, end=100, periods=10)).value_counts()
+        with open(dict.BEATRESULTS_CSV_PATH, "w") as f:
+            aggregate.to_csv(f)
 
     # finds closest value in array
-    def find_nearest(array,
+    def find_nearest(self,
+                     array,
                      value):
         array = np.asarray(array)
         idx = (np.abs(array - value)).argmin()
         return idx
 
     # Plot the beat or chord results into bins based on %accuracy
-    def plotResults(beat: bool = True):
+    def plotResults(self,
+                    beat: bool = True):
         if beat:
             path = dict.BEATPLOT_PATH
             with open(dict.BEATRESULTS_CSV_PATH) as f:
@@ -258,7 +281,8 @@ class Evaluators:
         plt.savefig(path)
 
     # updates json with new data from directory
-    def updateJson(file: str,
+    def updateJson(self,
+                   file: str,
                    dir: str):
         if os.path.getsize(file) == 0:
             resultsFile = {}
@@ -279,8 +303,43 @@ class Evaluators:
     # Takes an iterable and returns list of 3-element tuples that lets us
     # access the previous and next element for each item
     # Used to compare distances between chords for the beat dataset
-    def previous_and_next(some_iterable):
+    def previous_and_next(self,
+                          some_iterable):
         prevs, items, nexts = tee(some_iterable, 3)
         prevs = chain([None], prevs)
         nexts = chain(islice(nexts, 1, None), [None])
         return zip(prevs, items, nexts)
+
+    def checkData(self, force: bool = False):
+        # Make sure we have the dataset parsed
+        if not os.path.exists(dict.PROCESSED_JSON_PATH) \
+           or os.path.getsize(dict.PROCESSED_JSON_PATH) < os.path.getsize(dict.JSON_PATH) \
+           or force:
+            preprocessing.parseJson(dict.JSON_PATH)
+        with open(dict.PROCESSED_JSON_PATH, 'r') as f:
+            self.dataset = json.loads(f.read())
+
+        # prep for results
+        if not os.path.exists(dict.RESULTS_PATH):
+            os.makedirs(dict.RESULTS_PATH)
+        if not os.path.exists(dict.RESULTS_SONG_PATH):
+            os.makedirs(dict.RESULTS_SONG_PATH)
+        if not os.path.exists(dict.RESULTS_BEATS_PATH):
+            os.makedirs(dict.RESULTS_BEATS_PATH)
+
+        # Check if we have existing data for comparison and data does not need to be reprocessed
+        if os.path.exists(dict.CHORD_JSON_PATH):
+            algSize = os.path.getsize(dict.CHORD_JSON_PATH)
+            if algSize != 0:
+                if os.listdir(dict.RESULTS_SONG_PATH) != 0:
+                    self.updateJson(dict.CHORD_JSON_PATH, dict.RESULTS_SONG_PATH)
+                with open(dict.CHORD_JSON_PATH, 'r') as f:
+                    self.chord_results = json.loads(f.read())
+
+        if os.path.exists(dict.BEAT_JSON_PATH):
+            algSize = os.path.getsize(dict.BEAT_JSON_PATH)
+            if algSize != 0:
+                if os.listdir(dict.RESULTS_BEATS_PATH) != 0:
+                    self.updateJson(dict.BEAT_JSON_PATH, dict.RESULTS_BEATS_PATH)
+                with open(dict.BEAT_JSON_PATH, 'r') as f:
+                    self.beat_results = json.loads(f.read())
