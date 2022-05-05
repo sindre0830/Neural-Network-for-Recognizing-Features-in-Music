@@ -229,62 +229,58 @@ class Evaluators:
             with open(dict.BEATRESULTS_CSV_PATH, "w") as f:
                 aggregate.to_csv(f)
 
+    # finds closest value in array
+    def find_nearest(array,
+                    value):
+        array = np.asarray(array)
+        idx = (np.abs(array - value)).argmin()
+        return idx
 
-# finds closest value in array
-def find_nearest(array,
-                 value):
-    array = np.asarray(array)
-    idx = (np.abs(array - value)).argmin()
-    return idx
+    # Plot the beat or chord results into bins based on %accuracy
+    def plotResults(beat: bool = True):
+        if beat:
+            path = dict.BEATPLOT_PATH
+            with open(dict.BEATRESULTS_CSV_PATH) as f:
+                next(f)
+                df = pd.read_csv(f, names=['range', 'number'])
+                df = df.sort_values('range')
+        else:
+            path = dict.CHORDPLOT_PATH
+            with open(dict.CHORDRESULTS_CSV_PATH) as f:
+                next(f)
+                df = pd.read_csv(f, names=['range', 'number'])
+                df = df.sort_values('range')
+        plt.bar(df['range'], df['number'], color='b')
+        plt.title('Algorithm Accuracy')
+        plt.xlabel("Accuracy %")
+        plt.ylabel("# of songs")
+        plt.xticks(rotation=25)
+        plt.savefig(path)
 
+    # updates json with new data from directory
+    def updateJson(file: str,
+                dir: str):
+        if os.path.getsize(file) == 0:
+            resultsFile = {}
+        else:
+            with open(file, 'r') as f:
+                resultsFile = json.loads(f.read())
+        for f in os.listdir(dir):
+            with open(dir + f, "rb") as infile:
+                if Path(f).stem not in resultsFile:
+                    resultsFile[Path(f).stem] = json.load(infile)
+        output = json.dumps(resultsFile, indent=3)
+        with open(file, "w+") as outfile:
+            outfile.write(output)
+        shutil.rmtree(dir)
+        os.makedirs(dir)
 
-# Plot the beat or chord results into bins based on %accuracy
-def plotResults(beat: bool = True):
-    if beat:
-        path = dict.BEATPLOT_PATH
-        with open(dict.BEATRESULTS_CSV_PATH) as f:
-            next(f)
-            df = pd.read_csv(f, names=['range', 'number'])
-            df = df.sort_values('range')
-    else:
-        path = dict.CHORDPLOT_PATH
-        with open(dict.CHORDRESULTS_CSV_PATH) as f:
-            next(f)
-            df = pd.read_csv(f, names=['range', 'number'])
-            df = df.sort_values('range')
-    plt.bar(df['range'], df['number'], color='b')
-    plt.title('Algorithm Accuracy')
-    plt.xlabel("Accuracy %")
-    plt.ylabel("# of songs")
-    plt.xticks(rotation=25)
-    plt.savefig(path)
-
-
-# updates json with new data from directory
-def updateJson(file: str,
-               dir: str):
-    if os.path.getsize(file) == 0:
-        resultsFile = {}
-    else:
-        with open(file, 'r') as f:
-            resultsFile = json.loads(f.read())
-    for f in os.listdir(dir):
-        with open(dir + f, "rb") as infile:
-            if Path(f).stem not in resultsFile:
-                resultsFile[Path(f).stem] = json.load(infile)
-    output = json.dumps(resultsFile, indent=3)
-    with open(file, "w+") as outfile:
-        outfile.write(output)
-    shutil.rmtree(dir)
-    os.makedirs(dir)
-
-
-# Source: https://stackoverflow.com/a/1012089
-# Takes an iterable and returns list of 3-element tuples that lets us
-# access the previous and next element for each item
-# Used to compare distances between chords for the beat dataset
-def previous_and_next(some_iterable):
-    prevs, items, nexts = tee(some_iterable, 3)
-    prevs = chain([None], prevs)
-    nexts = chain(islice(nexts, 1, None), [None])
-    return zip(prevs, items, nexts)
+    # Source: https://stackoverflow.com/a/1012089
+    # Takes an iterable and returns list of 3-element tuples that lets us
+    # access the previous and next element for each item
+    # Used to compare distances between chords for the beat dataset
+    def previous_and_next(some_iterable):
+        prevs, items, nexts = tee(some_iterable, 3)
+        prevs = chain([None], prevs)
+        nexts = chain(islice(nexts, 1, None), [None])
+        return zip(prevs, items, nexts)
