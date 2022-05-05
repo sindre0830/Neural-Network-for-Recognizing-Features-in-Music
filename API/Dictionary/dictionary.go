@@ -13,7 +13,7 @@ const RESULTS_COLLECTION = "results"
 
 /* urls */
 const YOUTUBE_URL = "https://www.youtube.com/oembed"
-const NN_URL = "http://localhost:5000/v1/"
+const NN_URL = "http://nn-internal-api:5000/v1/"
 
 /* nn endpoints */
 const NN_ANALYSIS = "analysis"
