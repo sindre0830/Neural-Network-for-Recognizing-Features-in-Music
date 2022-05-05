@@ -1,5 +1,4 @@
 # import local modules
-from typing import Any
 import dictionary as dict
 import preprocessing
 import beat_algorithm
@@ -32,7 +31,7 @@ class Evaluators:
         beats: dict
 
         def __init__(self, id: str):
-            self.id = id    
+            self.id = id
 
     def __init__(self):
         self.processed_beats = {}
@@ -44,8 +43,8 @@ class Evaluators:
     def batchHandler(self, force: bool = False, plot: bool = False):
         # Make sure we have the dataset parsed
         if not os.path.exists(dict.PROCESSED_JSON_PATH) \
-            or os.path.getsize(dict.PROCESSED_JSON_PATH) < os.path.getsize(dict.JSON_PATH) \
-            or force:
+           or os.path.getsize(dict.PROCESSED_JSON_PATH) < os.path.getsize(dict.JSON_PATH) \
+           or force:
             preprocessing.parseJson(dict.JSON_PATH)
         with open(dict.PROCESSED_JSON_PATH, 'r') as f:
             dataset = json.loads(f.read())
@@ -58,14 +57,14 @@ class Evaluators:
 
         # Check if we have existing data for comparison and data does not need to be reprocessed
         if os.path.exists(dict.ALGORITHM_JSON_PATH):
-            algSize = os.path.getsize(dict.ALGORITHM_JSON_PATH) 
+            algSize = os.path.getsize(dict.ALGORITHM_JSON_PATH)
             if algSize != 0:
                 if os.listdir(dict.RESULTS_SONG_PATH) != 0:
                     updateJson(dict.ALGORITHM_JSON_PATH, dict.RESULTS_SONG_PATH)
                 with open(dict.ALGORITHM_JSON_PATH, 'r') as f:
                     old_results = json.loads(f.read())
         else:
-            old_results ={}
+            old_results = {}
 
         # # Go through dataset
         for id in dataset:
@@ -92,7 +91,7 @@ class Evaluators:
                                 id,
                                 (song.chords, "algorithm"))
                 print("The result manual is: " + str(song.chords * 100) + chr(37) + " accuracy")
-        
+
         # Update processed data with trimmed beats
         if(len(self.processed_beats)) > len(dataset):
             json_object = json.dumps(self.processed_beats,
@@ -108,8 +107,6 @@ class Evaluators:
                 outfile.write(json_object)
         if plot:
             plotResults(False)
-            
-
 
     # Handles beat recognition
     def processBeats(self,
@@ -120,19 +117,18 @@ class Evaluators:
         os.remove(dict.getNativeAudioPath(id))  # Clear up audio data
         return self.compareBeats(dataset, beatRecognizer.beats)
 
-
     # Evaluate accuracy of beats
     def compareBeats(self,
-                      dataset: float,
-                      algorithm: float,
-                      verbose = False):
+                     dataset: float,
+                     algorithm: float,
+                     verbose=False):
         beatAccuracy = []
         for previous, item, nxt in previous_and_next(dataset):
             nearIdx = find_nearest(algorithm, item)
             distance = item - algorithm[nearIdx]
-            if nxt == None:
+            if nxt is None:
                 nxt = previous
-            if previous == None:
+            if previous is None:
                 previous = nxt
             if distance >= 0:
                 control = abs(item - previous)
@@ -147,7 +143,6 @@ class Evaluators:
         if verbose:
             print("The average accuracy is: ", meanAccuracy)
         return meanAccuracy, beatAccuracy
-
 
     # Handles chord recognition
     def processChords(self,
@@ -184,7 +179,6 @@ class Evaluators:
 
         return result
 
-
     # Evaluate accuracy of chords - based on matching indexes with their timestamp arrays
     def compareChords(self,
                       gt_timestamp,
@@ -202,7 +196,6 @@ class Evaluators:
         temp = results / len(gt_chord)
         return temp
 
-
     # Updates a dictionary with new key+values
     def createJson(self,
                    dict,
@@ -213,17 +206,16 @@ class Evaluators:
             s[variable[1]] = variable[0]
         dict[id] = s
 
-
     # records the desired batch processing results into CSV
     def output(self,
-               chorddata = None,
-               beatdata = None,
-               detailed = None):
+               chorddata=None,
+               beatdata=None,
+               detailed=None):
         if chorddata:
             df = pd.DataFrame(list(chorddata.items()),
-                              columns = ['id', 'result'])   # get it in dataframe form
+                              columns=['id', 'result'])   # get it in dataframe form
             aggregate = pd.cut(df['result'],
-                               bins = pd.interval_range(start=0, end=100, periods=10)).value_counts()
+                               bins=pd.interval_range(start=0, end=100, periods=10)).value_counts()
             with open(dict.CHORDRESULTS_CSV_PATH, "w") as f:
                 aggregate.to_csv(f)
         if detailed:
@@ -231,9 +223,9 @@ class Evaluators:
             with open(dict.DETAILED_RESULTS_PATH, "w+") as outfile:
                 outfile.write(json_object)
         if beatdata:
-            df = pd.DataFrame(list(beatdata.items()), columns = ['id', 'result'])
+            df = pd.DataFrame(list(beatdata.items()), columns=['id', 'result'])
             aggregate = pd.cut(df['result'].str['accuracy'],
-                               bins = pd.interval_range(start=0, end=100, periods=10)).value_counts()
+                               bins=pd.interval_range(start=0, end=100, periods=10)).value_counts()
             with open(dict.BEATRESULTS_CSV_PATH, "w") as f:
                 aggregate.to_csv(f)
 
@@ -260,7 +252,7 @@ def plotResults(beat: bool = True):
             next(f)
             df = pd.read_csv(f, names=['range', 'number'])
             df = df.sort_values('range')
-    plt.bar(df['range'], df['number'], color = 'b')
+    plt.bar(df['range'], df['number'], color='b')
     plt.title('Algorithm Accuracy')
     plt.xlabel("Accuracy %")
     plt.ylabel("# of songs")
