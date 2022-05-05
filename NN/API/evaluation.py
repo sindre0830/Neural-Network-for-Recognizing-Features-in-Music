@@ -231,7 +231,7 @@ class Evaluators:
 
     # finds closest value in array
     def find_nearest(array,
-                    value):
+                     value):
         array = np.asarray(array)
         idx = (np.abs(array - value)).argmin()
         return idx
@@ -259,7 +259,7 @@ class Evaluators:
 
     # updates json with new data from directory
     def updateJson(file: str,
-                dir: str):
+                   dir: str):
         if os.path.getsize(file) == 0:
             resultsFile = {}
         else:
