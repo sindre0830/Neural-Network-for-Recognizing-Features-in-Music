@@ -8,6 +8,9 @@ Bachelor Thesis - Spring 2022
     - Maren Skårestuen Grindal (marensg@stud.ntnu.no)
 - Final report: [link here]()
 - Website address: [localhost:3000/](localhost:3000/)
+- Endpoints:
+    - [Main API](https://github.com/sindre0830/Neural-Network-for-Recognizing-Features-in-Music/tree/main/API)
+    - [Model API](https://github.com/sindre0830/Neural-Network-for-Recognizing-Features-in-Music/tree/main/NN/API)
 
 ## Instructions
 0. Download [Docker](https://docs.docker.com/get-docker/)
