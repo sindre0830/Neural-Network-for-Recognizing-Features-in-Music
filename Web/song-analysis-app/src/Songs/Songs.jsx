@@ -41,7 +41,7 @@ const Songs = () => {
         // create a new array of all the songs
         let updatedSongs = songs.map(song => {
             // only update the one that has a matching id
-            if (song.id == id) {
+            if (song.id === id) {
                 return { ...song, approved: !song.approved};
             }
                 return song;
