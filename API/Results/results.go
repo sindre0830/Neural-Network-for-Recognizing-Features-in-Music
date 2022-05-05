@@ -133,7 +133,7 @@ func addToMap(update Update) map[string]interface{} {
 		data["chords"] = update.Chords
 	}
 	// add approved label
-	data["approved"] = true
+	data["approved"] = update.Approved
 	return data
 }
 
