@@ -62,8 +62,41 @@ const Song = (props) => {
      */
     const handleSubmit = async (e) => {
         e.preventDefault();
-        let items = {approved: true};
-        // only send the values that have been changed
+        let items = {approved: !approved};
+        // if the song is pending, add date from the other fields
+        // if not, only the approved label is changed
+        if (!approved) {
+            items = {...validateData(), items}
+        }
+
+        try {
+            const options = {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(items)
+            }
+
+            const res = await fetch('/v1/results?id=' + props.value.id, options);
+            if (res.status === 200) {
+                setMessage("");
+                setApproved(prev => !prev)
+                // update the song in the parent component
+                props.update(props.value.id);
+            } else {
+                setMessage("Something went wrong...");
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    /**
+     *  Create an object with validated data.
+     * 
+     *  @returns {Object}   The data to be updated
+     */
+    const validateData = () => {
+        let items;
         if (title !== "") {
             items.title = title;
         }
@@ -92,26 +125,7 @@ const Song = (props) => {
                 return;
             }
         }
-
-        try {
-            const options = {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(items)
-            }
-
-            const res = await fetch('/v1/results?id=' + props.value.id, options);
-            if (res.status === 200) {
-                setMessage("");
-                setApproved(prev => !prev)
-                // update the song in the parent component
-                props.update(props.value.id);
-            } else {
-                setMessage("Something went wrong...");
-            }
-        } catch (err) {
-            console.log(err);
-        }
+        return items;
     }
 
     useEffect(() => {
@@ -126,8 +140,12 @@ const Song = (props) => {
                 </div>
 
                 {/* show approve button if the song is pending */}
-                {!approved &&
+                {/*!approved &&
                     <button type='submit' form={`update-${props.value.id}`} >Approve</button>
+                */}
+                {approved
+                    ? <button onClick={handleSubmit}>Edit</button>
+                    : <button type='submit' form={`update-${props.value.id}`} >Approve</button>
                 }
 
                 <div className='song__bar-button'>
@@ -149,15 +167,15 @@ const Song = (props) => {
                         <input id={`title-${props.value.id}`} type='text' name='title' onChange={(e) => setTitle(e.target.value)} defaultValue={props.value.title} disabled={approved} />
                     </div>
                     <div className='song__result-group'>
-                        <label htmlFor={`bpm-${props.value.id}`}>Bpm</label>
+                        <label htmlFor={`bpm-${props.value.id}`}>Bpm (use . for decimal values)</label>
                         <input id={`bpm-${props.value.id}`} type='text' name='bpm' onChange={(e) => setBpm(e.target.value)} defaultValue={props.value.bpm} disabled={approved} />
                     </div>
                     <div className='song__result-group'>
-                        <label htmlFor={`beats-${props.value.id}`}>Beats</label>
+                        <label htmlFor={`beats-${props.value.id}`}>Beats (value1,value2,...valueN)</label>
                         <input id={`beats-${props.value.id}`} type='text' name='beats' onChange={(e) => setBeats(e.target.value)} defaultValue={props.value.beats} disabled={approved} />
                     </div>
                     <div className='song__result-group'>
-                        <label htmlFor={`chords-${props.value.id}`}>Chords</label>
+                        <label htmlFor={`chords-${props.value.id}`}>Chords (value1,value2,...valueN)</label>
                         <input id={`chords-${props.value.id}`} type='text' name='chords' onChange={(e) => setChords(e.target.value)} defaultValue={props.value.chords} disabled={approved} />
                     </div>
                 </form>
