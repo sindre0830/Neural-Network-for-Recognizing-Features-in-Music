@@ -60,7 +60,7 @@ class Evaluators:
             algSize = os.path.getsize(dict.ALGORITHM_JSON_PATH)
             if algSize != 0:
                 if os.listdir(dict.RESULTS_SONG_PATH) != 0:
-                    updateJson(dict.ALGORITHM_JSON_PATH, dict.RESULTS_SONG_PATH)
+                    self.updateJson(dict.ALGORITHM_JSON_PATH, dict.RESULTS_SONG_PATH)
                 with open(dict.ALGORITHM_JSON_PATH, 'r') as f:
                     old_results = json.loads(f.read())
         else:
@@ -106,7 +106,7 @@ class Evaluators:
             with open(dict.ALGORITHM_JSON_PATH, "w+") as outfile:
                 outfile.write(json_object)
         if plot:
-            plotResults(False)
+            self.plotResults(False)
 
     # Handles beat recognition
     def processBeats(self,
@@ -123,8 +123,8 @@ class Evaluators:
                      algorithm: float,
                      verbose=False):
         beatAccuracy = []
-        for previous, item, nxt in previous_and_next(dataset):
-            nearIdx = find_nearest(algorithm, item)
+        for previous, item, nxt in self.previous_and_next(dataset):
+            nearIdx = self.find_nearest(algorithm, item)
             distance = item - algorithm[nearIdx]
             if nxt is None:
                 nxt = previous
@@ -187,8 +187,8 @@ class Evaluators:
                       alg_chord):
         results = 0
         for idx, timestamp in enumerate(gt_timestamp):
-            near = find_nearest(alg_timestamp,
-                                timestamp)
+            near = self.find_nearest(alg_timestamp,
+                                     timestamp)
             algoChord = alg_chord[near]
             if algoChord == gt_chord[idx]:
                 results += 1
