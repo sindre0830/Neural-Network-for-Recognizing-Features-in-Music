@@ -20,29 +20,28 @@ from statistics import mean
 # Object to perform chord tracking.
 class Evaluators:
     # Temp algorithm data
-    processed_beats:dict
-    # Analysis results  
-    new_results:dict
-    old_results:dict
-    detailed_results:dict
-    
+    processed_beats: dict
+    # Analysis results
+    new_results: dict
+    old_results: dict
+    detailed_results: dict
+
     class Evaluator:
         id: str
         chords: dict
         beats: dict
-        
+
         def __init__(self, id: str):
-            self.id = id
-    
+            self.id = id    
+
     def __init__(self):
         self.processed_beats = {}
-        self.new_results = {} # Don't need?
+        self.new_results = {}
         self.results = {}
         self.detailed_results = {}
 
-
     # Handles batch process comparison of database
-    def batchHandler(self, force:bool = False, plot:bool = False):
+    def batchHandler(self, force: bool = False, plot: bool = False):
         # Make sure we have the dataset parsed
         if not os.path.exists(dict.PROCESSED_JSON_PATH) \
             or os.path.getsize(dict.PROCESSED_JSON_PATH) < os.path.getsize(dict.JSON_PATH) \
@@ -124,8 +123,8 @@ class Evaluators:
 
     # Evaluate accuracy of beats
     def compareBeats(self,
-                      dataset:float,
-                      algorithm:float,
+                      dataset: float,
+                      algorithm: float,
                       verbose = False):
         beatAccuracy = []
         for previous, item, nxt in previous_and_next(dataset):
@@ -153,7 +152,7 @@ class Evaluators:
     # Handles chord recognition
     def processChords(self,
                       id: str,
-                      song:Evaluator,
+                      song: Evaluator,
                       dataset):
         try:
             preprocessing.downloadAudio(id)
@@ -197,8 +196,6 @@ class Evaluators:
             near = find_nearest(alg_timestamp,
                                 timestamp)
             algoChord = alg_chord[near]
-            # print(timestamp)              # Debug
-            # print(algoChord + " " + gt_chord[idx])
             if algoChord == gt_chord[idx]:
                 results += 1
         # Return number of correct guesses divided by total guesses - can improve
@@ -250,7 +247,7 @@ def find_nearest(array,
 
 
 # Plot the beat or chord results into bins based on %accuracy
-def plotResults(beat:bool = True):
+def plotResults(beat: bool = True):
     if beat:
         path = dict.BEATPLOT_PATH
         with open(dict.BEATRESULTS_CSV_PATH) as f:
@@ -272,8 +269,8 @@ def plotResults(beat:bool = True):
 
 
 # updates json with new data from directory
-def updateJson(file:str, 
-               dir:str):
+def updateJson(file: str,
+               dir: str):
     if os.path.getsize(file) == 0:
         resultsFile = {}
     else:

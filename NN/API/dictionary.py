@@ -72,6 +72,7 @@ def getSongResultAudioPath(id):
 def getPlotPath(id):
     return PLOTS_PATH + id + PNG_FORMAT
 
+
 # chords
 chords = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B', 'Cm', 'C#m',
           'Dm', 'D#m', 'Em', 'Fm', 'F#m', 'Gm', 'G#m', 'Am', 'A#m', 'Bm']
@@ -79,11 +80,12 @@ nested_cof = ['G', 'Bm', 'D', 'F#m', 'A', 'C#m', 'E', 'G#m', 'B', 'D#m', 'F#', '
               'C#', "Fm", "G#", 'Cm', 'D#', 'Gm', 'A#', 'Dm', 'F', 'Am', 'C', 'Em']
 
 chords1 = ['C Maj', 'C# Maj', 'D Maj', 'D# Maj', 'E Maj', 'F Maj', 'F# Maj', 'G Maj',
-          'G# Maj', 'A Maj', 'A# Maj', 'B Maj', 'c min', 'c# min', 'd min', 'd# min',
-          'e min', 'f min', 'f# min', 'g min', 'g# min', 'a min', 'a# min', 'b min']
+           'G# Maj', 'A Maj', 'A# Maj', 'B Maj', 'c min', 'c# min', 'd min', 'd# min',
+           'e min', 'f min', 'f# min', 'g min', 'g# min', 'a min', 'a# min', 'b min']
 nested_cof1 = ['G Maj', 'b min', 'D Maj', 'f# min', 'A Maj', 'c# min', 'E Maj', 'g# min',
-              'B Maj', 'd# min', 'F# Maj', 'a# min', 'C# Maj', 'f min', 'G# Maj', 'c min',
-              'D# Maj', 'g min', 'A# Maj', 'd min', 'F Maj', 'a min', 'C Maj', 'e min']
+               'B Maj', 'd# min', 'F# Maj', 'a# min', 'C# Maj', 'f min', 'G# Maj', 'c min',
+               'D# Maj', 'g min', 'A# Maj', 'd min', 'F Maj', 'a min', 'C Maj', 'e min']
+
 
 # Print operation that allows status message on the same line.
 def printOperation(message, verbose=True):
@@ -102,7 +104,9 @@ def printDivider(verbose=True):
     if verbose:
         print("\n")
 
-    
+
 errorMessage = ""
+
+
 class YoutubeError(Exception):
     errorMessage = "Audio file could not be extracted from Youtube link."

@@ -24,7 +24,7 @@ class ChordRecognizer:
         # preprocess
         dict.printOperation("Preprocess data...", verbose=verbose)
         preprocessing.splitAudio(self.id, mode=dict.STEMS2, output=dict.ACCOMPANIMENT)
-        #preprocessing.resampleAudio(self.id, dict.SAMPLERATE_CHORDS)
+        # preprocessing.resampleAudio(self.id, dict.SAMPLERATE_CHORDS)
         dict.printMessage(dict.DONE, verbose=verbose)
         # get results
         dict.printOperation("Running chord tracker...", verbose=verbose)
@@ -85,7 +85,7 @@ class ChordRecognizer:
         if end is not None:
             duration = (end - start)
         y, sr = librosa.load(dict.getModifiedAudioPath(self.id), sr=None, offset=start, duration=duration)
-        (label, _, _, _) = pyACA.computeChords(y, sr) #dict.getModifiedAudioPath(self.id)
+        (label, _, _, _) = pyACA.computeChords(y, sr)  # dict.getModifiedAudioPath(self.id)
         chord = self.pickChord(label[0])
         return np.array(chord)
 
@@ -106,11 +106,11 @@ class ChordRecognizer:
         chords = {}
         counter = len(labels)       # Weighting
         for chord in labels:
-            if not chord in chords:
+            if chord not in chords:
                 chords[chord] = 1
             else:
                 chords[chord] += 1
-            chords[chord] += (counter / len(labels)) # Add weighting, prioritizing early #s
+            chords[chord] += (counter / len(labels))  # Add weighting, prioritizing early #s
             counter -= 1
         mode = [i for i in set(labels) if labels.count(i) == max(map(labels.count, labels))]
         # If one most common chord, return it
