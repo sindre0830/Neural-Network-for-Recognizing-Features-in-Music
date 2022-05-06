@@ -75,7 +75,7 @@ chords = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B', 'Cm',
           'Dm', 'D#m', 'Em', 'Fm', 'F#m', 'Gm', 'G#m', 'Am', 'A#m', 'Bm']
 
 algoFormat = {'C Maj': 'C',
-              'C# Maj': 'C#', 
+              'C# Maj': 'C#',
               'D Maj': 'D',
               'D# Maj': 'D#',
               'E Maj': 'E',
