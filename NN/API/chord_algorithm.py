@@ -24,7 +24,7 @@ class ChordRecognizer:
         # preprocess
         dict.printOperation("Preprocess data...", verbose=verbose)
         preprocessing.splitAudio(self.id, mode=dict.STEMS2, output=dict.ACCOMPANIMENT)
-        # preprocessing.resampleAudio(self.id, dict.SAMPLERATE_CHORDS)
+        preprocessing.resampleAudio(self.id, dict.SAMPLERATE_CHORDS)
         dict.printMessage(dict.DONE, verbose=verbose)
         # get results
         dict.printOperation("Running chord tracker...", verbose=verbose)

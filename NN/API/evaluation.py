@@ -91,6 +91,7 @@ class Evaluators:
                 if(verbose):
                     print("The result manual is: " + f'{song.chords:.2f}' + chr(37) + " chord accuracy, " +
                           f'{song.beats:.2f}' + chr(37) + " beat accuracy\n")
+        # Write results
         self.output(plot)
         print("\n\tBatch evaluation complete!\n\n")
 
