@@ -45,7 +45,7 @@ class Evaluators:
         self.new_beat_results = {}
         self.beat_results = {}
         self.detailed_results = {}
-        self.aggregate = {"chords":[],"beats":[]}
+        self.aggregate = {"chords": [], "beats": []}
 
     # Handles batch process comparison of database
     def batchHandler(self,
@@ -56,7 +56,7 @@ class Evaluators:
 
         # Validate existing data and prepare it
         self.checkData(force)
-        
+
         # Iterate through dataset
         for id in self.dataset:
             if id in dict.BLACKLIST:
@@ -89,8 +89,8 @@ class Evaluators:
                 self.aggregate["beats"].append(song.beats)
                 self.aggregate["chords"].append(song.chords)
                 if(verbose):
-                    print("The result manual is: " + f'{song.chords:.2f}' + chr(37) + " chord accuracy" \
-                          ", " + f'{song.beats:.2f}' + chr(37) + " beat accuracy\n")
+                    print("The result manual is: " + f'{song.chords:.2f}' + chr(37) + " chord accuracy, " +
+                          f'{song.beats:.2f}' + chr(37) + " beat accuracy\n")
         self.output(plot)
         print("\n\tBatch evaluation complete!\n\n")
 
@@ -146,10 +146,10 @@ class Evaluators:
         song.beats = np.array(self.dataset[id]["beats"])
         # trim timestamps
         song.beats = song.beats[song.beats <= librosa.get_duration(filename=dict.getNativeAudioPath(id))]
-        if model == None:
+        if model is None:
             chordRecognizer.run(beats=song.beats, solution="ALG", verbose=True)
         else:
-            chordRecognizer.run(beats=song.beats, model=model,solution="CNN", verbose=True)
+            chordRecognizer.run(beats=song.beats, model=model, solution="CNN", verbose=True)
 
         result = self.compareChords(song.beats,
                                     self.dataset[id]["chords"],
@@ -205,7 +205,7 @@ class Evaluators:
 
     # records the results
     def output(self, plot: bool = False):
-        
+
         # Update processed data with trimmed beats
         if(len(self.processed_beats)) > len(self.dataset):
             json_object = json.dumps(self.processed_beats,
@@ -238,15 +238,15 @@ class Evaluators:
 
         # Generate CSV files with grouped accuracy
         df = pd.DataFrame(self.aggregate["chords"],
-                            columns=['result'])   # get it in dataframe form
+                          columns=['result'])   # get it in dataframe form
         aggregate = pd.cut(df['result'],
-                            bins=pd.interval_range(start=0, end=100, periods=10)).value_counts()
+                           bins=pd.interval_range(start=0, end=100, periods=10)).value_counts()
         with open(dict.CHORDRESULTS_CSV_PATH, "w") as f:
             aggregate.to_csv(f)
 
         df = pd.DataFrame(self.aggregate["beats"], columns=['result'])
         aggregate = pd.cut(df['result'],
-                            bins=pd.interval_range(start=0, end=100, periods=10)).value_counts()
+                           bins=pd.interval_range(start=0, end=100, periods=10)).value_counts()
         with open(dict.BEATRESULTS_CSV_PATH, "w") as f:
             aggregate.to_csv(f)
 
