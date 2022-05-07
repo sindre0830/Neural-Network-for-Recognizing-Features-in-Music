@@ -62,18 +62,21 @@ const Song = (props) => {
      */
     const handleSubmit = async (e) => {
         e.preventDefault();
-        let items = {approved: !approved};
+        setMessage('Updating song...');
+        let data = {};
         // if the song is pending, add date from the other fields
         // if not, only the approved label is changed
         if (!approved) {
-            items = {...validateData(), items}
+            data = validateData();
+        } else {
+            data = {approved: !approved};
         }
 
         try {
             const options = {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(items)
+                body: JSON.stringify(data)
             }
 
             const res = await fetch('/v1/results?id=' + props.value.id, options);
@@ -83,7 +86,7 @@ const Song = (props) => {
                 // update the song in the parent component
                 props.update(props.value.id);
             } else {
-                setMessage("Something went wrong...");
+                setMessage('Something went wrong...');
             }
         } catch (err) {
             console.log(err);
@@ -96,7 +99,7 @@ const Song = (props) => {
      *  @returns {Object}   The data to be updated
      */
     const validateData = () => {
-        let items;
+        let items = {approved: !approved};
         if (title !== "") {
             items.title = title;
         }
@@ -140,15 +143,12 @@ const Song = (props) => {
                 </div>
 
                 {/* show approve button if the song is pending */}
-                {/*!approved &&
-                    <button type='submit' form={`update-${props.value.id}`} >Approve</button>
-                */}
                 {approved
-                    ? <button onClick={handleSubmit}>Edit</button>
-                    : <button type='submit' form={`update-${props.value.id}`} >Approve</button>
+                    ? <button className='song__bar-edit' onClick={handleSubmit}>Edit</button>
+                    : <button className='song__bar-approve' type='submit' form={`update-${props.value.id}`} >Approve</button>
                 }
 
-                <div className='song__bar-button'>
+                <div className='song__bar-arrow'>
                     {/* check if song is opened or not */}
                     {toggleSong
                         ? <FiChevronUp data-testid='arrow-up' size={28} onClick={() => setToggle(prev => !prev)} style={{cursor: 'pointer'}}/>

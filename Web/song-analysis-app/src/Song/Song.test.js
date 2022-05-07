@@ -50,7 +50,7 @@ describe('button displaying', () => {
     it('approve button is present if the song is pending', () => {
         render(<Song value={resultPending} />, container);
 
-        const buttonEl = screen.getByRole("button");
+        const buttonEl = screen.queryByText(/approve/i);
         expect(buttonEl).toBeTruthy();
     })
 
@@ -58,6 +58,20 @@ describe('button displaying', () => {
         render(<Song value={resultApproved} />, container);
 
         const buttonEl = screen.queryByText(/approve/i);
+        expect(buttonEl).toBeNull();
+    })
+
+    it('edit button is present if the song is pending', () => {
+        render(<Song value={resultApproved} />, container);
+
+        const buttonEl = screen.queryByText(/edit/i);
+        expect(buttonEl).toBeTruthy();
+    })
+
+    it('edit button is not present if the song is approved', () => {
+        render(<Song value={resultPending} />, container);
+
+        const buttonEl = screen.queryByText(/edit/i);
         expect(buttonEl).toBeNull();
     })
 })
