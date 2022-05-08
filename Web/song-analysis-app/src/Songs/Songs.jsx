@@ -69,11 +69,9 @@ const Songs = () => {
             setError(false);
             try {
                 const res = await fetch('/v1/results');
-                if (res.status === 200 && !unmounted) {
-                    const json = await res.json();
+                const json = await res.json();
+                if (!unmounted) {
                     setSongs(json);
-                } else {
-                    setError(true);
                 }
             } catch (err) {
                 console.log(err);
