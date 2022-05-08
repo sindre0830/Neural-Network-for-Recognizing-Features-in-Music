@@ -128,7 +128,21 @@ Root path: http://localhost:8080/v1/
                 ]
             }
             ```
-    3.2 Updating result
+    3.2 Deleting result
+    - Input:
+        ```
+        Method: DELETE
+        Path: .../results{?id=youtube_id}
+        ```
+    - Output:
+        ```If the request is successful, nothing will be returned```
+    - Example:
+        - Input:
+            ```
+            Method: DELETE
+            Path: http://localhost:8080/results?id=mdJDPepGOAM
+            ```
+    3.3 Updating result
     - Input:
         ```
         Method: PUT
