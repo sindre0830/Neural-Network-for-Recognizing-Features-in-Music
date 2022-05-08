@@ -15,7 +15,7 @@
 }
 
 .song__bar button {
-    margin-right: 10px;
+    margin: 0 10px 0 10px;
     height: 30px;
     padding: 5px;
     width: 70px;

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FiChevronDown, FiChevronUp } from 'react-icons/fi';
+import { FiChevronDown, FiChevronUp, FiTrash2 } from 'react-icons/fi';
 import './song.css';
 import SongTitle from '../SongTitle/SongTitle';
 
@@ -56,6 +56,34 @@ const Song = (props) => {
     const [beats, setBeats] = useState("");
     const [chords, setChords] = useState("");
     const [approved, setApproved] = useState(props.value.approved);
+
+    /**
+     *  Delete result.
+     * 
+     *  @param {event} e 
+     */
+    const handleDelete = async (e) => {
+        e.preventDefault();
+        setMessage('Deleting song...');
+
+        try {
+            const options = {
+                method: 'DELETE'
+            }
+
+            const res = await fetch('/v1/results?id=' + props.value.id, options);
+            if (res.status === 200) {
+                setMessage("");
+                setApproved(prev => !prev)
+                // update the song in the parent component
+                props.delete(props.value.id);
+            } else {
+                setMessage('Something went wrong...');
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    }
 
     /**
      *  Update result.
@@ -148,6 +176,7 @@ const Song = (props) => {
                     <SongTitle title={props.value.title} status={approved ? 'approved' : 'pending'}/>
                 </div>
 
+                <FiTrash2 size={28} onClick={handleDelete} style={{ cursor: 'pointer' }}/>
                 {/* show approve button if the song is pending */}
                 {approved
                     ? <button className='song__bar-edit' onClick={handleSubmit}>Edit</button>

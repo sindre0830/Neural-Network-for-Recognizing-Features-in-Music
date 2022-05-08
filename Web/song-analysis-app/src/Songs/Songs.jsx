@@ -33,6 +33,17 @@ const Songs = () => {
     }
 
     /**
+     *  Delete the song with the matching ID.
+     * 
+     *  @param {String} id of song to be deleted.
+     */
+    const handleDelete = (id) => {
+        // create a new array of all the songs
+        let updatedSongs = songs.filter((item) => item.id !== id);
+        setSongs(updatedSongs);
+    }
+
+    /**
      *  Set the song with the matching ID as approved.
      * 
      *  @param {String} id of song to be approved.
@@ -105,7 +116,7 @@ const Songs = () => {
                     ? 
                     <>
                         {filterSongs().map((song) => (
-                            <Song value={song} key={song.id} update={handleUpdate} />
+                            <Song value={song} key={song.id} update={handleUpdate} delete={handleDelete} />
                         ))}
                     </>
                     : <p id='error'>No songs have been added yet...</p>
