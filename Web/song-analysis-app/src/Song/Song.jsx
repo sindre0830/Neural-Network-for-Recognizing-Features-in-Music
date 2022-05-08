@@ -9,7 +9,7 @@ const CHORDS = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B',
  *  Check if the array only contains numbers.
  * 
  *  @param {array} list
- *  @returns {{bool, array}} True if the array only contains numbers.
+ *  @returns {{bool, array}} True if the array only contains numbers, and an array with the values parsed to floats.
  */
 const checkNumbers = (list) => {
     let obj = {
@@ -17,8 +17,10 @@ const checkNumbers = (list) => {
         beats: []
     };
 
+    // convert all values to floats
     list.forEach(element => {
         let num = parseFloat(element);
+        // make sure the value is a valid float
         if (isNaN(num)) {
             obj.flag = false;
         }
@@ -68,6 +70,10 @@ const Song = (props) => {
         // if not, only the approved label is changed
         if (!approved) {
             data = validateData();
+            // if an error message has been written, do not submit the updated result
+            if (message !== "") {
+                return;
+            }
         } else {
             data = {approved: !approved};
         }
@@ -96,7 +102,7 @@ const Song = (props) => {
     /**
      *  Create an object with validated data.
      * 
-     *  @returns {Object}   The data to be updated
+     *  @returns {{bool, object}} True if the data is valid, and an object with the validated data.
      */
     const validateData = () => {
         let items = {approved: !approved};
