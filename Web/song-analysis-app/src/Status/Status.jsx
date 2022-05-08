@@ -7,19 +7,18 @@ import StatusList from '../StatusList/StatusList';
  */
 const Status = () => {
     const [status, setStatus] = useState([])
-    const [isLoading, setLoading] = useState(false)
+    const [isLoading, setLoading] = useState(true)
 
-    useEffect(() => {
+    const getStatus = async () => {
         // flag used to check if component is mounted or not
         let unmounted = false;
         // get the status of the rest of the program
         const getStatus = async () => {
-            setLoading(true);
             try {
                 const res = await fetch('/v1/diag');
-                const json = await res.json();
                 // only set the state if the component is mounted
-                if (!unmounted) {
+                if (res.status === 200 && !unmounted) {
+                    const json = await res.json();
                     setStatus(json);
                 }
             } catch (err) {
@@ -32,6 +31,11 @@ const Status = () => {
         return () => {
             unmounted = true;
         }
+    }
+
+    useEffect(() => {
+        const timer = setInterval(getStatus, 2000);
+        return () => clearInterval(timer);
     }, []);
 
     return (

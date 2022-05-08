@@ -36,6 +36,8 @@ const AddSong = () => {
             return;
         }
 
+        setMessage("Link successfully parsed");
+
         const item = { link: link }
 
         try {
