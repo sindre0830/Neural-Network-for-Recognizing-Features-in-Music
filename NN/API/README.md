@@ -106,3 +106,24 @@ If the analysis or the remove endpoint doesn't have the ```id``` parameter, an e
     "msg": string
 }
 ```
+
+## Evaluating results
+In order to perform evaluation of the generated chords compared to manually plotted chords, first an updated songs.json must be placed in the ```/Data/``` folder. Then, add the following lines to main.py:
+```
+import evaluation
+
+evaluator = evaluation.Evaluators()
+evaluator.batchHandler()
+```
+The batchHandler method takes four parameters. The first allows for forced reevaluation of previously evaluated and stored chords. The second gives the option to take the aggregated results and generate, save to CSV files and plot these aggregates. The third controls whether the handler should print IDs and results to screen. These options all default to 'False'. The fourth and final allows you to pass in a neural network model - the default is 'None', in which case it then uses the algorithm solution instead of a neural network solution.
+    - Parameters:
+        ```
+        {
+            "force": bool,
+            "plot": bool,
+            "verbose": bool,
+            "model": keras.models.Sequential
+        }
+        ```
+
+The output from this evaluation will be added to ```/Data/evaluatedSongs.json```. At first it is stored as individual files in ```/Data/Results/Songs/``` because the process will likely take many hours and this allows processed results to be saved in case of interruption. When run, batchHandler automatically checks this path for new songs, appends them to ```/Data/evaluatedSongs.json``` , and then deletes the directory and its files. Additionally, CSV-files with more grouping data will be generated in ```/Data/Results/``` folder if the "plot" option is selected. This folder also holds ```detailedResults.json```
