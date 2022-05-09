@@ -10,6 +10,8 @@ func MethodHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
 		get(w, r)
+	case http.MethodDelete:
+		delete(w, r)
 	case http.MethodPut:
 		update(w, r)
 	default:

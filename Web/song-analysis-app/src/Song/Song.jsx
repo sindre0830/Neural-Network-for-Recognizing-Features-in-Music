@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FiChevronDown, FiChevronUp } from 'react-icons/fi';
+import { FiChevronDown, FiChevronUp, FiTrash2 } from 'react-icons/fi';
 import './song.css';
 import SongTitle from '../SongTitle/SongTitle';
 
@@ -9,7 +9,7 @@ const CHORDS = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B',
  *  Check if the array only contains numbers.
  * 
  *  @param {array} list
- *  @returns {{bool, array}} True if the array only contains numbers.
+ *  @returns {{bool, array}} True if the array only contains numbers, and an array with the values parsed to floats.
  */
 const checkNumbers = (list) => {
     let obj = {
@@ -17,8 +17,10 @@ const checkNumbers = (list) => {
         beats: []
     };
 
+    // convert all values to floats
     list.forEach(element => {
         let num = parseFloat(element);
+        // make sure the value is a valid float
         if (isNaN(num)) {
             obj.flag = false;
         }
@@ -56,14 +58,82 @@ const Song = (props) => {
     const [approved, setApproved] = useState(props.value.approved);
 
     /**
+     *  Delete result.
+     * 
+     *  @param {event} e 
+     */
+    const handleDelete = async (e) => {
+        e.preventDefault();
+        setMessage('Deleting song...');
+
+        try {
+            const options = {
+                method: 'DELETE'
+            }
+
+            const res = await fetch('/v1/results?id=' + props.value.id, options);
+            if (res.status === 200) {
+                setMessage("");
+                setApproved(prev => !prev)
+                // update the song in the parent component
+                props.delete(props.value.id);
+            } else {
+                setMessage('Something went wrong...');
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    /**
      *  Update result.
      * 
      *  @param {event} e 
      */
     const handleSubmit = async (e) => {
         e.preventDefault();
-        let items = {approved: true};
-        // only send the values that have been changed
+        setMessage('Updating song...');
+        let data = {};
+        // if the song is pending, add date from the other fields
+        // if not, only the approved label is changed
+        if (!approved) {
+            data = validateData();
+            // if an error message has been written, do not submit the updated result
+            if (message !== "") {
+                return;
+            }
+        } else {
+            data = {approved: !approved};
+        }
+
+        try {
+            const options = {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            }
+
+            const res = await fetch('/v1/results?id=' + props.value.id, options);
+            if (res.status === 200) {
+                setMessage("");
+                setApproved(prev => !prev)
+                // update the song in the parent component
+                props.update(props.value.id);
+            } else {
+                setMessage('Something went wrong...');
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    /**
+     *  Create an object with validated data.
+     * 
+     *  @returns {{bool, object}} True if the data is valid, and an object with the validated data.
+     */
+    const validateData = () => {
+        let items = {approved: !approved};
         if (title !== "") {
             items.title = title;
         }
@@ -92,26 +162,7 @@ const Song = (props) => {
                 return;
             }
         }
-
-        try {
-            const options = {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(items)
-            }
-
-            const res = await fetch('/v1/results?id=' + props.value.id, options);
-            if (res.status === 200) {
-                setMessage("");
-                setApproved(prev => !prev)
-                // update the song in the parent component
-                props.update(props.value.id);
-            } else {
-                setMessage("Something went wrong...");
-            }
-        } catch (err) {
-            console.log(err);
-        }
+        return items;
     }
 
     useEffect(() => {
@@ -125,12 +176,14 @@ const Song = (props) => {
                     <SongTitle title={props.value.title} status={approved ? 'approved' : 'pending'}/>
                 </div>
 
+                <FiTrash2 size={28} onClick={handleDelete} style={{ cursor: 'pointer' }}/>
                 {/* show approve button if the song is pending */}
-                {!approved &&
-                    <button type='submit' form={`update-${props.value.id}`} >Approve</button>
+                {approved
+                    ? <button className='song__bar-edit' onClick={handleSubmit}>Edit</button>
+                    : <button className='song__bar-approve' type='submit' form={`update-${props.value.id}`} >Approve</button>
                 }
 
-                <div className='song__bar-button'>
+                <div className='song__bar-arrow'>
                     {/* check if song is opened or not */}
                     {toggleSong
                         ? <FiChevronUp data-testid='arrow-up' size={28} onClick={() => setToggle(prev => !prev)} style={{cursor: 'pointer'}}/>
@@ -149,15 +202,15 @@ const Song = (props) => {
                         <input id={`title-${props.value.id}`} type='text' name='title' onChange={(e) => setTitle(e.target.value)} defaultValue={props.value.title} disabled={approved} />
                     </div>
                     <div className='song__result-group'>
-                        <label htmlFor={`bpm-${props.value.id}`}>Bpm</label>
+                        <label htmlFor={`bpm-${props.value.id}`}>Bpm (use . for decimal values)</label>
                         <input id={`bpm-${props.value.id}`} type='text' name='bpm' onChange={(e) => setBpm(e.target.value)} defaultValue={props.value.bpm} disabled={approved} />
                     </div>
                     <div className='song__result-group'>
-                        <label htmlFor={`beats-${props.value.id}`}>Beats</label>
+                        <label htmlFor={`beats-${props.value.id}`}>Beats (value1,value2,...valueN)</label>
                         <input id={`beats-${props.value.id}`} type='text' name='beats' onChange={(e) => setBeats(e.target.value)} defaultValue={props.value.beats} disabled={approved} />
                     </div>
                     <div className='song__result-group'>
-                        <label htmlFor={`chords-${props.value.id}`}>Chords</label>
+                        <label htmlFor={`chords-${props.value.id}`}>Chords (value1,value2,...valueN)</label>
                         <input id={`chords-${props.value.id}`} type='text' name='chords' onChange={(e) => setChords(e.target.value)} defaultValue={props.value.chords} disabled={approved} />
                     </div>
                 </form>

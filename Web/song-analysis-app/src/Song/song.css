@@ -15,17 +15,25 @@
 }
 
 .song__bar button {
-    margin-right: 10px;
+    margin: 0 10px 0 10px;
     height: 30px;
     padding: 5px;
+    width: 70px;
     border: none;
     border-radius: 10px;
-    background-color: var(--color-approved);
     color: white;
     font-family: var(--font-family);
     font-style: bold;
     font-size: 14px;
     cursor: pointer;
+}
+
+.song__bar-edit {
+    background-color: var(--color-edit);
+}
+
+.song__bar-approve {
+    background-color: var(--color-approved);
 }
 
 .song__line hr {

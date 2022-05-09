@@ -34,10 +34,9 @@ func get(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(data)
 }
 
-// update a song in the database.
-func update(w http.ResponseWriter, r *http.Request) {
+// delete a song in the database.
+func delete(w http.ResponseWriter, r *http.Request) {
 	var errorMsg debug.Debug
-
 	// validate URL by extracting the id
 	id, ok := r.URL.Query()["id"]
 	if !ok || len(id[0]) < 1 {
@@ -45,7 +44,41 @@ func update(w http.ResponseWriter, r *http.Request) {
 			http.StatusBadRequest,
 			"update() -> Validating URL",
 			"url validation: incorrect format",
-			"Missing 'id' param",
+			"Missing 'id' query",
+		)
+		errorMsg.Print()
+		http.Error(w, errorMsg.PossibleReason, errorMsg.StatusCode)
+		return
+	}
+
+	// update data in database
+	err := database.Firestore.Delete(dictionary.RESULTS_COLLECTION, id[0])
+	if err != nil {
+		errorMsg.Update(
+			http.StatusInternalServerError,
+			"update() -> database.Delete() -> Deleting data in database",
+			err.Error(),
+			"Unknown",
+		)
+		errorMsg.Print()
+		http.Error(w, http.StatusText(errorMsg.StatusCode), errorMsg.StatusCode)
+		return
+	}
+
+	http.Error(w, "Document successfully deleted", http.StatusOK)
+}
+
+// update a song in the database.
+func update(w http.ResponseWriter, r *http.Request) {
+	var errorMsg debug.Debug
+	// validate URL by extracting the id
+	id, ok := r.URL.Query()["id"]
+	if !ok || len(id[0]) < 1 {
+		errorMsg.Update(
+			http.StatusBadRequest,
+			"update() -> Validating URL",
+			"url validation: incorrect format",
+			"Missing 'id' query",
 		)
 		errorMsg.Print()
 		http.Error(w, errorMsg.PossibleReason, errorMsg.StatusCode)
@@ -133,7 +166,7 @@ func addToMap(update Update) map[string]interface{} {
 		data["chords"] = update.Chords
 	}
 	// add approved label
-	data["approved"] = true
+	data["approved"] = update.Approved
 	return data
 }
 
