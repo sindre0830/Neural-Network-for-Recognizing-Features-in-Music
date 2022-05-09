@@ -12,5 +12,8 @@ RUN npm install
 # copy all files in the application to the image
 COPY . .
 
+# ports to use
+EXPOSE 3000
+
 # start up application
 CMD ["npm", "start"]

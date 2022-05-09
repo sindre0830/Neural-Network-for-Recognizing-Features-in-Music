@@ -14,6 +14,41 @@ const Songs = () => {
     const [search, setSearch] = useState("")
     const [filter, setFilter] = useState("All")
 
+    /**
+     *  Filter songs based on search query and filters.
+     * 
+     *  @returns {Array} Filtered songs.
+     */
+    const filterSongs = () => {
+        // filter based on search query
+        let filteredSongs = songs.filter(song => song.title.toLowerCase().includes(search.toLowerCase()));
+
+        // filter based on status
+        if (filter === 'Approved') {
+            return filteredSongs.filter(song => song.approved);
+        } else if (filter === 'Pending') {
+            return filteredSongs.filter(song => !song.approved);
+        }
+        return filteredSongs;
+    }
+
+    /**
+     *  Set the song with the matching ID as approved.
+     * 
+     *  @param {String} id of song to be approved.
+     */
+    const handleUpdate = (id) => {
+        // create a new array of all the songs
+        let updatedSongs = songs.map(song => {
+            // only update the one that has a matching id
+            if (song.id === id) {
+                return { ...song, approved: !song.approved};
+            }
+                return song;
+        });
+        setSongs(updatedSongs);
+    }
+
     useEffect(() => {
         // flag used to check if component is mounted or not
         let unmounted = false;
@@ -40,25 +75,6 @@ const Songs = () => {
         }
     }, [])
 
-    /**
-     *  Filter songs based on search query and filters.
-     * 
-     *  @returns {Array} Filtered songs.
-     */
-    const filterSongs = () => {
-        // filter based on search query
-        let filteredSongs = songs.filter(song => song.title.toLowerCase().includes(search.toLowerCase()));
-
-        // filter based on status
-        if (filter === 'Approved') {
-            return filteredSongs.filter(song => song.approved);
-        } else if (filter === 'Pending') {
-            return filteredSongs.filter(song => !song.approved);
-        }
-
-        return filteredSongs;
-    }
-    
     return (
         <div className='songs'>
             <div className='songs__sort'>
@@ -88,8 +104,8 @@ const Songs = () => {
                 {songs
                     ? 
                     <>
-                        {filterSongs().map((song, index) => (
-                            <Song value={song} key={index} />
+                        {filterSongs().map((song) => (
+                            <Song value={song} key={song.id} update={handleUpdate} />
                         ))}
                     </>
                     : <p id='error'>No songs have been added yet...</p>
