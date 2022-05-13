@@ -14,11 +14,12 @@ Bachelor Thesis - Spring 2022
 
 ## Instructions
 0. Download [Docker](https://docs.docker.com/get-docker/)
-1. Run the command ```docker compose up``` to build the images and run the containers.
+1. You need to create a serviceAccountKey.json file in the [API folder](https://github.com/sindre0830/Neural-Network-for-Recognizing-Features-in-Music/tree/main/API) and add the service key provided by your [firebase project](https://firebase.google.com/docs/admin/setup#initialize-sdk) to this file.
+2. Run the command ```docker compose up``` to build the images and run the containers.
     - To stop the containers run the command ```docker compose stop```
     - To start the containers run the command ```docker compose start```
 
-Note: The application is programmed to start when the server starts. To stop this, edit the ```docker-compose.yml``` file by removing the ```restart: always``` lines. You will have to build the containers again by running ```docker compose down``` and then start at instructions again.
+Note: The application is programmed to start when the server starts. To stop this, edit the ```docker-compose.yml``` file by removing the ```restart: always``` lines. You will have to build the containers again by running ```docker compose down``` and then ```docker compose up```.
 
 ## Usage
 Open the website at [localhost:3000/](localhost:3000/) and utilize the functionality through the UI.
