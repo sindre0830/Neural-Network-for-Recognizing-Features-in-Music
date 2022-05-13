@@ -71,6 +71,7 @@ Root path: http://localhost:8080/v1/
             }
             ```
 3. Results endpoint - *Used to retrieve and update results*
+    
     3.1 Retrieving results
     - Input:
         ```
