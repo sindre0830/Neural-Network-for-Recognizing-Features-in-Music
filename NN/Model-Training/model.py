@@ -262,15 +262,15 @@ def trainModel(model: keras.models.Sequential, xTrain, xTest, xVal, yTrain, yTes
 
 
 # Function for running model.predict.
-def predictModel(model: keras.models.Sequential, xTest, yTest):
+def predictModel(model: keras.models.Sequential, xVal, yVal):
     # predict dataset on model
-    yPred = model.predict(xTest)
+    yPred = model.predict(xVal)
     # flatten each array to get index of highest value
     yPred = np.argmax(yPred, axis=1)
-    yTest = np.argmax(yTest, axis=1)
+    yVal = np.argmax(yVal, axis=1)
     # print classification report and confusion matrix
-    print(sklearn.metrics.classification_report(yTest, yPred, target_names=dict.LABEL_NAMES, zero_division=1))
-    print(pd.DataFrame(sklearn.metrics.confusion_matrix(yTest, yPred), index=dict.LABEL_NAMES, columns=dict.LABEL_NAMES))
+    print(sklearn.metrics.classification_report(yVal, yPred, target_names=dict.LABEL_NAMES, zero_division=1))
+    print(pd.DataFrame(sklearn.metrics.confusion_matrix(yVal, yPred), index=dict.LABEL_NAMES, columns=dict.LABEL_NAMES))
 
 
 # Plots a graph with the results from model training.
