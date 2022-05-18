@@ -3,7 +3,7 @@ import { FiChevronDown, FiChevronUp, FiTrash2 } from 'react-icons/fi';
 import './song.css';
 import SongTitle from '../SongTitle/SongTitle';
 
-const CHORDS = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B', 'Cm', 'C#m', 'Dm', 'D#m', 'Em', 'Fm', 'F#m', 'Gm', 'G#m', 'Am', 'A#m', 'Bm'];
+const CHORDS = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B', 'Cm', 'C#m', 'Dm', 'D#m', 'Em', 'Fm', 'F#m', 'Gm', 'G#m', 'Am', 'A#m', 'Bm', ''];
 
 /**
  *  Check if the array only contains numbers.
