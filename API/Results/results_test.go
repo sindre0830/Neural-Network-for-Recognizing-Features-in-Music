@@ -52,8 +52,8 @@ func TestAddToMap(t *testing.T) {
 func TestCheckChord(t *testing.T) {
 	testData := map[string]bool{
 		"A":   true,
+		"":    true,
 		"E#":  false,
-		"":    false,
 		"hei": false,
 	}
 
