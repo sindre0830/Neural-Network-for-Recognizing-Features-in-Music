@@ -6,7 +6,7 @@ Bachelor Thesis - Spring 2022
     - Sindre Eiklid (sindreik@stud.ntnu.no)
     - Rickard Loland (rickarl@stud.ntnu.no)
     - Maren Skårestuen Grindal (marensg@stud.ntnu.no)
-- Final report: [link here]()
+- Final report: [NTNU Open](https://ntnuopen.ntnu.no/ntnu-xmlui/handle/11250/3005205)
 - Website address: [localhost:3000/](localhost:3000/)
 - Endpoints:
     - [Main API](https://github.com/sindre0830/Neural-Network-for-Recognizing-Features-in-Music/tree/main/API)
